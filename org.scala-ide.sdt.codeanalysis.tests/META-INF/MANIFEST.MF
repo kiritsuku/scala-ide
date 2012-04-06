@@ -1,14 +1,12 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: Scala Plugin (Test)
-Bundle-SymbolicName: org.scala-ide.sdt.core.tests
+Bundle-Name: Scala Plugin Codeanalysis (Test)
+Bundle-SymbolicName: org.scala-ide.sdt.codeanalysis.tests
 Bundle-Version: 2.1.0.qualifier
 Bundle-Vendor: scala-ide.org
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
-Bundle-ClassPath: .,
- lib/mockito-all-1.8.5.jar
-Require-Bundle: org.scala-ide.scala.library,
- org.eclipse.equinox.weaving.aspectj,
+Bundle-ClassPath: .
+Require-Bundle: 
  org.eclipse.core.expressions,
  org.eclipse.core.filesystem,
  org.eclipse.core.resources,
@@ -46,7 +44,9 @@ Require-Bundle: org.scala-ide.scala.library,
  scalariform,
  org.junit4;bundle-version="4.5.0",
  org.eclipse.ui.browser;bundle-version="3.3.0",
- org.scala-ide.sdt.core
+ org.scala-ide.sdt.core,
+ org.scala-ide.sdt.codeanalysis,
+ org.scala-ide.sdt.core.tests
 Import-Package: 
  com.ibm.icu.text;apply-aspects:=false;org.eclipse.swt.graphics;apply-aspects:=false,
  scala.tools.eclipse.contribution.weaving.jdt;apply-aspects:=false,
@@ -66,4 +66,3 @@ Import-Package:
  scala.tools.eclipse.contribution.weaving.jdt.ui.actions;apply-aspects:=false,
  scala.tools.eclipse.contribution.weaving.jdt.ui.javaeditor;apply-aspects:=false,
  scala.tools.eclipse.contribution.weaving.jdt.ui.javaeditor.formatter;apply-aspects:=false
-Export-Package: scala.tools.eclipse.testsetup

@@ -66,6 +66,8 @@ Import-Package:
  scala.tools.eclipse.contribution.weaving.jdt.ui.javaeditor;apply-aspects:=false,
  scala.tools.eclipse.contribution.weaving.jdt.ui.javaeditor.formatter;apply-aspects:=false
 Export-Package: 
+ net.miginfocom.layout,
+ net.miginfocom.swt,
  scala.tools.eclipse,
  scala.tools.eclipse.actions,
  scala.tools.eclipse.buildmanager,
@@ -79,14 +81,23 @@ Export-Package:
  scala.tools.eclipse.jcompiler,
  scala.tools.eclipse.launching,
  scala.tools.eclipse.lexical,
+ scala.tools.eclipse.logging,
  scala.tools.eclipse.markoccurrences,
  scala.tools.eclipse.properties,
+ scala.tools.eclipse.properties.syntaxcolouring,
  scala.tools.eclipse.quickfix,
+ scala.tools.eclipse.reconciliation,
  scala.tools.eclipse.refactoring,
+ scala.tools.eclipse.refactoring.move,
  scala.tools.eclipse.refactoring.rename,
  scala.tools.eclipse.refactoring.ui,
+ scala.tools.eclipse.semantichighlighting,
+ scala.tools.eclipse.semantichighlighting.classifier,
+ scala.tools.eclipse.semantichighlighting.implicits,
+ scala.tools.eclipse.semicolon,
  scala.tools.eclipse.templates,
  scala.tools.eclipse.ui,
+ scala.tools.eclipse.ui.actions,
  scala.tools.eclipse.util,
  scala.tools.eclipse.wizards
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
