@@ -11,6 +11,10 @@ import org.mockito.Mockito._
 
 import AutoEditStrategyTests.TestCommand
 
+trait DisabledScaladocAnnotationAutoEditStrategy extends ScaladocAnnotationAutoEditStrategy {
+
+}
+
 class CommentAutoEditStrategyTest {
 
   val prefStore = mock(classOf[IPreferenceStore])
@@ -57,7 +61,7 @@ class CommentAutoEditStrategyTest {
 
     val doc = createDocument(input)
     val cmd = createTestCommand(input)
-    val strategy = new CommentAutoIndentStrategy(prefStore, IJavaPartitions.JAVA_PARTITIONING)
+    val strategy = new CommentAutoIndentStrategy(prefStore, IJavaPartitions.JAVA_PARTITIONING) with DisabledScaladocAnnotationAutoEditStrategy
 
     strategy.customizeDocumentCommand(doc, cmd)
 
