@@ -8,6 +8,10 @@ import org.junit.{ComparisonFailure, Test}
 
 import AutoEditStrategyTests.TestCommand
 
+trait DisabledScaladocAnnotationAutoEditStrategy extends ScaladocAnnotationAutoEditStrategy {
+
+}
+
 class CommentAutoEditStrategyTest {
 
   /**
@@ -41,7 +45,7 @@ class CommentAutoEditStrategyTest {
 
     val doc = createDocument(input)
     val cmd = createTestCommand(input)
-    val strategy = new CommentAutoIndentStrategy(IJavaPartitions.JAVA_PARTITIONING)
+    val strategy = new CommentAutoIndentStrategy(IJavaPartitions.JAVA_PARTITIONING) with DisabledScaladocAnnotationAutoEditStrategy
 
     strategy.customizeDocumentCommand(doc, cmd)
     doc.replace(cmd.offset, 0, cmd.text)

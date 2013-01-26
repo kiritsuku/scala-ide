@@ -15,6 +15,8 @@ import org.eclipse.jface.text.{DefaultIndentLineAutoEditStrategy, DocumentComman
  */
 class CommentAutoIndentStrategy(partitioning: String) extends DefaultIndentLineAutoEditStrategy with HasLogger {
 
+  scaladocStrategy: ScaladocAnnotationAutoEditStrategy =>
+
   override def customizeDocumentCommand(doc: IDocument, cmd: DocumentCommand) {
     if (cmd.offset == -1 || doc.getLength() == 0) return // don't spend time on invalid docs
 
@@ -50,8 +52,20 @@ class CommentAutoIndentStrategy(partitioning: String) extends DefaultIndentLineA
           buf.append(" " * textIndent)
 
           if (shouldClose) {
-            // we want the caret before the closing comment
             cmd.caretOffset = cmd.offset + buf.length
+
+            if (isScaladoc) {
+              doc.replace(cmd.offset, 0, "*/")
+              val tags = scaladocStrategy.findTags(cmd.offset, isCommentClosed = true)
+              logger.debug(">>>>>>>>>>>>>>>>>>>>>>>>"+tags)
+              doc.replace(cmd.offset, 2, "")
+
+              for (ts <- tags; t <- ts)
+                buf.append("\n").append(indent).append(" * ").append(t)
+            }
+
+            // we want the caret before the closing comment
+//            cmd.caretOffset = cmd.offset + buf.length
             buf append ("\n"+indent)
             buf append (if (isDocStart) " */" else "*/")
             cmd.shiftsCaret = false
