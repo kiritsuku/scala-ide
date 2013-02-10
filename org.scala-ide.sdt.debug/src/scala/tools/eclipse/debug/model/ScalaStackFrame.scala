@@ -13,7 +13,7 @@ import com.sun.jdi.Method
 import com.sun.jdi.StackFrame
 
 object ScalaStackFrame {
-  
+
   def apply(thread: ScalaThread, stackFrame: StackFrame): ScalaStackFrame = {
     val scalaStackFrame= new ScalaStackFrame(thread, stackFrame)
     scalaStackFrame.fireCreationEvent()
@@ -24,7 +24,7 @@ object ScalaStackFrame {
   private val typeSignature = """L([^;]*);""".r
   private val arraySignature = """\[(.*)""".r
   private val argumentsInMethodSignature = """\(([^\)]*)\).*""".r
-  
+
   def getSimpleName(signature: String): String = {
     signature match {
       case typeSignature(typeName) =>
@@ -49,11 +49,11 @@ object ScalaStackFrame {
         "Boolean"
     }
   }
-  
+
   // TODO: need unit tests
   def getArgumentSimpleNames(methodSignature: String): List[String] = {
     val argumentsInMethodSignature(argString)= methodSignature
-    
+
     def parseArguments(args: String) : List[String] = {
       if (args.isEmpty) {
         Nil
@@ -70,7 +70,7 @@ object ScalaStackFrame {
         }
       }
     }
-    
+
     parseArguments(argString)
   }
 
@@ -140,7 +140,7 @@ class ScalaStackFrame private (val thread: ScalaThread, @volatile var stackFrame
 
   //FIXME: Should handle checked exception `AbsentInformationException`
   def getSourceName(): String = stackFrame.location.sourceName
-  
+
   /**
    * Return the source path based on source name and the package.
    * Segments are separated by '/'.
@@ -157,9 +157,9 @@ class ScalaStackFrame private (val thread: ScalaThread, @volatile var stackFrame
 
   def getMethodFullName(): String = getFullName(stackFrame.location.method)
 
-  /** Set the current stack frame to `newStackFrame`. The `ScalaStackFrame.variables` don't need 
-    *  to be recomputed because a variable (i.e., a `ScalaLocalVariable`) always uses the latest 
-    *  stack frame to compute its value, as it can be checked by looking at the implementation of 
+  /** Set the current stack frame to `newStackFrame`. The `ScalaStackFrame.variables` don't need
+    *  to be recomputed because a variable (i.e., a `ScalaLocalVariable`) always uses the latest
+    *  stack frame to compute its value, as it can be checked by looking at the implementation of
     *  `ScalaLocalVariable.getValue`
     */
   def rebind(newStackFrame: StackFrame) {

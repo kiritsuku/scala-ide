@@ -12,21 +12,21 @@ import org.junit.After
 class AbstractSymbolClassifierTest {
 
   protected val simulator = new EclipseUserSimulator
-  
+
   private var project: ScalaProject = _
-  
+
   @Before
   def createProject() {
     project = simulator.createProjectInWorkspace("symbols-classification", true)
   }
-  
+
   @After
   def deleteProject() {
-    EclipseUtils.workspaceRunnableIn(ScalaPlugin.plugin.workspaceRoot.getWorkspace) { _ => 
+    EclipseUtils.workspaceRunnableIn(ScalaPlugin.plugin.workspaceRoot.getWorkspace) { _ =>
       project.underlying.delete(true, null)
     }
   }
-  
+
   protected def checkSymbolClassification(source: String, locationTemplate: String, regionTagToSymbolType: Map[String, SymbolType]) {
     val expectedRegionToSymbolNameMap: Map[Region, String] = RegionParser.getRegions(locationTemplate)
     val expectedRegionsAndSymbols: List[(Region, SymbolType)] =
@@ -58,7 +58,7 @@ class AbstractSymbolClassifierTest {
       val dummy = new compiler.Response[Unit]
       compiler.askReload(List(sourceFile), dummy)
       dummy.get
-    
+
       // then run classification
       val symbolInfos: List[SymbolInfo] = SymbolClassifier.classifySymbols(sourceFile, compiler, useSyntacticHints = true)
       for {

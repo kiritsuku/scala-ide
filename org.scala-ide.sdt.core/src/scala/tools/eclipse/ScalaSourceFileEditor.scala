@@ -71,7 +71,7 @@ class ScalaSourceFileEditor extends CompilationUnitEditor with ScalaEditor { sel
   import ScalaSourceFileEditor._
 
   private var occurrenceAnnotations: Set[Annotation] = Set()
-  private var occurrencesFinder: ScalaOccurrencesFinder = _  
+  private var occurrencesFinder: ScalaOccurrencesFinder = _
   private val preferenceListener: IPropertyChangeListener = handlePreferenceStoreChanged _
   private lazy val selectionListener = new ISelectionListener() {
     def selectionChanged(part: IWorkbenchPart, selection: ISelection) {
@@ -82,7 +82,7 @@ class ScalaSourceFileEditor extends CompilationUnitEditor with ScalaEditor { sel
     }
   }
   private lazy val tpePresenter = {
-    val infoPresenter = new InformationPresenter(controlCreator) 
+    val infoPresenter = new InformationPresenter(controlCreator)
     infoPresenter.install(getSourceViewer)
     infoPresenter.setInformationProvider(actions.TypeOfExpressionProvider, IDocument.DEFAULT_CONTENT_TYPE)
     infoPresenter
@@ -90,7 +90,7 @@ class ScalaSourceFileEditor extends CompilationUnitEditor with ScalaEditor { sel
 
   setPartName("Scala Editor")
   scalaPrefStore.addPropertyChangeListener(preferenceListener)
-  
+
   def scalaPrefStore = ScalaPlugin.prefStore
   def javaPrefStore = getPreferenceStore
 
@@ -128,7 +128,7 @@ class ScalaSourceFileEditor extends CompilationUnitEditor with ScalaEditor { sel
     setAction(ShowInferredSemicolonsAction.ACTION_ID, showInferredSemicolons)
 
     val openAction = new Action {
-      private def scalaCompilationUnit: Option[ScalaCompilationUnit] = 
+      private def scalaCompilationUnit: Option[ScalaCompilationUnit] =
         Option(getInteractiveCompilationUnit) map (_.asInstanceOf[ScalaCompilationUnit])
 
       override def run {
@@ -160,7 +160,7 @@ class ScalaSourceFileEditor extends CompilationUnitEditor with ScalaEditor { sel
   override def updateOccurrenceAnnotations(selection: ITextSelection, astRoot: CompilationUnit): Unit = {
     askForOccurrencesUpdate(selection)
   }
-  
+
   private def performOccurrencesUpdate(selection: ITextSelection, documentLastModified: Long) {
     def getAnnotationModelOpt: Option[IAnnotationModel] = {
       for {
@@ -189,12 +189,12 @@ class ScalaSourceFileEditor extends CompilationUnitEditor with ScalaEditor { sel
 
   private def askForOccurrencesUpdate(selection: ITextSelection) {
 
-    if (selection.getLength < 0 || selection.getOffset < 0) 
+    if (selection.getLength < 0 || selection.getOffset < 0)
       return
-    
+
     if (getDocumentProvider == null || !isActiveEditor)
       return
-    
+
     val lastModified = getSourceViewer.getDocument match {
       case document: IDocumentExtension4 =>
         document.getModificationStamp
@@ -242,7 +242,7 @@ class ScalaSourceFileEditor extends CompilationUnitEditor with ScalaEditor { sel
     super.editorContextMenuAboutToShow(menu)
 
     def groupMenuItemsByGroupId(items: Seq[IContributionItem]) = {
-      // the different groups (as indicated by separators) and 
+      // the different groups (as indicated by separators) and
       // contributions in a menu are originally just a flat list
       items.foldLeft(Nil: List[(String, List[IContributionItem])]) {
 
@@ -274,10 +274,10 @@ class ScalaSourceFileEditor extends CompilationUnitEditor with ScalaEditor { sel
 
       // and provide our own organize imports instead
       mm.appendToGroup("importGroup", new refactoring.OrganizeImportsAction { setText("Organize Imports") })
-      
+
       // add GenerateHashcodeAndEquals and IntroductProductN source generators
-      mm.appendToGroup("generateGroup", new refactoring.source.GenerateHashcodeAndEqualsAction { 
-        setText("Generate hashCode() and equals()...") 
+      mm.appendToGroup("generateGroup", new refactoring.source.GenerateHashcodeAndEqualsAction {
+        setText("Generate hashCode() and equals()...")
       })
       mm.appendToGroup("generateGroup", new refactoring.source.IntroduceProductNTraitAction {
         setText("Introduce ProductN trait...")
@@ -339,12 +339,12 @@ object ScalaSourceFileEditor {
   private val SCALA_EDITOR_SCOPE = "scala.tools.eclipse.scalaEditorScope"
 
   private val OCCURRENCE_ANNOTATION = "org.eclipse.jdt.ui.occurrences"
-    
+
   private object controlCreator extends AbstractReusableInformationControlCreator {
-    override def doCreateInformationControl(shell: Shell) = 
+    override def doCreateInformationControl(shell: Shell) =
       new DefaultInformationControl(shell, true)
   }
-  
+
  private class ScalaSourceViewerDecorationSupport(viewer: ISourceViewer, overviewRuler: IOverviewRuler, annotationAccess: IAnnotationAccess, sharedTextColors: ISharedTextColors)
     extends SourceViewerDecorationSupport(viewer, overviewRuler, annotationAccess, sharedTextColors) {
 

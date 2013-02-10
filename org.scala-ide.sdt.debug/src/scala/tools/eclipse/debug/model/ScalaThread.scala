@@ -86,7 +86,7 @@ abstract class ScalaThread private (target: ScalaDebugTarget, private[model] val
   private var suspended = false
   @volatile
   private var running = true
-  
+
   /**
    * The current list of stack frames.
    * THE VALUE IS MODIFIED ONLY BY THE COMPANION ACTOR, USING METHODS DEFINED LOWER.
@@ -97,7 +97,7 @@ abstract class ScalaThread private (target: ScalaDebugTarget, private[model] val
   // keep the last known name around, for when the vm is not available anymore
   @volatile
   private var name: String = null
-  
+
   protected[debug] val companionActor: BaseDebuggerActor
 
   val isSystemThread: Boolean = {
@@ -152,7 +152,7 @@ abstract class ScalaThread private (target: ScalaDebugTarget, private[model] val
     stackFrames= Nil
     companionActor ! TerminatedFromScala
   }
-  
+
   /*
    * Methods used by the companion actor to update this object internal states
    * FOR THE COMPANION ACTOR ONLY.
@@ -189,7 +189,7 @@ abstract class ScalaThread private (target: ScalaDebugTarget, private[model] val
     // FIXME: Should check that `threadRef.frames == stackFrames` before zipping
     threadRef.frames.asScala.zip(stackFrames).foreach {
       case (jdiStackFrame, scalaStackFrame) => scalaStackFrame.rebind(jdiStackFrame)
-    }    
+    }
   }
 
 }
@@ -200,7 +200,7 @@ private[model] object ScalaThreadActor {
   case class InvokeMethod(objectReference: ObjectReference, method: Method, args: List[Value])
   case class InvokeStaticMethod(classType: ClassType, method: Method, args: List[Value])
   case object TerminatedFromScala
-  
+
   def apply(thread: ScalaThread): BaseDebuggerActor = {
     val actor = new ScalaThreadActor(thread)
     actor.start()
@@ -219,7 +219,7 @@ private[model] class ScalaThreadActor private(thread: ScalaThread) extends BaseD
   private var currentStep: Option[ScalaStep] = None
 
   override protected def postStart(): Unit = link(thread.getDebugTarget.companionActor)
-  
+
   override protected def behavior = {
     case SuspendedFromScala(eventDetail) =>
       currentStep.foreach(_.stop())
@@ -271,9 +271,9 @@ private[model] class ScalaThreadActor private(thread: ScalaThread) extends BaseD
       thread.fireTerminateEvent()
       poison()
   }
-  
+
   override protected def preExit(): Unit = {
-    // before shutting down the actor we need to unlink it from the `debugTarget` actor to prevent that normal termination of 
+    // before shutting down the actor we need to unlink it from the `debugTarget` actor to prevent that normal termination of
     // a `ScalaThread` leads to shutting down the whole debug session.
     unlink(thread.getDebugTarget.companionActor)
   }

@@ -42,11 +42,11 @@ class SemanticHighlightingReconciliation extends HasLogger {
         editorInput <- Option(scalaEditor.getEditorInput)
         compilationUnit <- getCompilationUnitOf(editorInput)
         if scu == compilationUnit
-      } 
+      }
         semanticDecorationManagers.remove(scu)
     }
   }
-  
+
   /* Following Iulian's suggestion (https://github.com/scala-ide/scala-ide/pull/154#discussion_r1179403).
    * Hopefully, we will be able to eliminate all this fuzzy code once we fix #1001156 */
   private def getCompilationUnitOf(editorInput: IEditorInput): Option[ICompilationUnit] = {
@@ -73,7 +73,7 @@ class SemanticHighlightingReconciliation extends HasLogger {
       } yield {
         page.addPartListener(new UnregisteringPartListener(scu))
         val semanticActions = List(
-            new ImplicitHighlightingPresenter(scalaEditor.sourceViewer), 
+            new ImplicitHighlightingPresenter(scalaEditor.sourceViewer),
             new SemanticHighlightingAnnotationsManager(scalaEditor.sourceViewer)
         )
         SemanticDecorationManagers(semanticActions)
@@ -87,12 +87,12 @@ class SemanticHighlightingReconciliation extends HasLogger {
     if (firstTimeReconciliation) {
       for (semanticDecorationManager <- createSemanticDecorationManagers(scu))
         semanticDecorationManagers.put(scu, semanticDecorationManager)
-    }   
+    }
   }
-  
+
   def afterReconciliation(scu: ScalaCompilationUnit, monitor: IProgressMonitor, workingCopyOwner: WorkingCopyOwner) {
     // sometimes we reconcile compilation units that are not open in an editor,
-    // so we need to guard against the case where there's no semantic highlighter 
+    // so we need to guard against the case where there's no semantic highlighter
     for {
       semanticDecorationManager <- Option(semanticDecorationManagers.get(scu))
       action <- semanticDecorationManager.actions

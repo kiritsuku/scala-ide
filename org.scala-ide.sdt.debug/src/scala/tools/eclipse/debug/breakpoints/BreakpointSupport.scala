@@ -46,7 +46,7 @@ private[debug] object BreakpointSupportActor {
 
   def apply(breakpoint: IBreakpoint, debugTarget: ScalaDebugTarget): Actor = {
     val typeName= breakpoint.typeName
-    
+
     val breakpointRequests   = createBreakpointsRequests(breakpoint, typeName, debugTarget)
 
     val actor = new BreakpointSupportActor(breakpoint, debugTarget, typeName, ListBuffer(breakpointRequests: _*))
@@ -124,7 +124,7 @@ private class BreakpointSupportActor private (
     val eventRequestManager = debugTarget.virtualMachine.eventRequestManager
 
     debugTarget.cache.removeClassPrepareEventListener(this, typeName)
-    
+
     breakpointRequests.foreach { request =>
       eventRequestManager.deleteEventRequest(request)
       eventDispatcher.unsetActorFor(request)

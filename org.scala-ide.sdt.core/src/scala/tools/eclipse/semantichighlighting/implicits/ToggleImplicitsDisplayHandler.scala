@@ -14,13 +14,13 @@ import scala.tools.eclipse.ScalaPlugin
 
 /**
  * Handler to toggle the Implicits Display (shortcut to avoid open Preferences,...)
- * 
+ *
  * @see org.eclipse.core.commands.IHandler
  * @see org.eclipse.core.commands.AbstractHandler
  */
 
 class ToggleImplicitsDisplayHandler extends AbstractHandler with IElementUpdater {
-  
+
   private val _commandId = "org.scala-ide.sdt.core.commands.ToggleImplicitsDisplay"
 
   /**
@@ -39,18 +39,18 @@ class ToggleImplicitsDisplayHandler extends AbstractHandler with IElementUpdater
    * refresh widget linked to this handlers (button, menu items,...)
    */
   def updateElement(element : UIElement, parameters : java.util.Map[_,_]) {
-    element.setChecked(isChecked)    
+    element.setChecked(isChecked)
   }
 
   private def isChecked  : Boolean = {
     pluginStore.getBoolean(ImplicitsPreferencePage.P_ACTIVE)
-  }  
-  
+  }
+
   private def toggle() : Boolean = {
     val newValue = !pluginStore.getBoolean(ImplicitsPreferencePage.P_ACTIVE)
     pluginStore.setValue(ImplicitsPreferencePage.P_ACTIVE, newValue.toString)
     newValue
-  }  
+  }
 
   private def refresh() {
     val service = PlatformUI.getWorkbench().getService(classOf[ICommandService]).asInstanceOf[ICommandService]
@@ -66,7 +66,7 @@ class ToggleImplicitsDisplayHandler extends AbstractHandler with IElementUpdater
       }
     }
   }
-  
+
   protected def pluginStore : IPreferenceStore = ScalaPlugin.plugin.getPreferenceStore
 
   PropertyChangeListenerProxy(_listener, pluginStore).autoRegister()

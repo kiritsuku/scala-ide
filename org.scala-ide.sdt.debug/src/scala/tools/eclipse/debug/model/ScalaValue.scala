@@ -13,7 +13,7 @@ import com.sun.jdi.Method
 object ScalaValue {
 
   /**
-   * Returns the given JDI value wrapped 
+   * Returns the given JDI value wrapped
    */
   def apply(value: Value, target: ScalaDebugTarget): ScalaValue = {
     value match {
@@ -86,13 +86,13 @@ class ScalaArrayReference(override val underlying: ArrayReference, target: Scala
   override def getValueString(): String = "%s(%d) (id=%d)".format(ScalaStackFrame.getSimpleName(underlying.referenceType.signature), underlying.length, underlying.uniqueID)
   override def getVariables(): Array[IVariable] = getVariables(0, underlying.length)
   override def hasVariables(): Boolean = underlying.length > 0
-  
+
   // Members declared in org.eclipse.debug.core.model.IIndexedValue
-  
+
   override def getVariable(offset: Int) : IVariable = new ScalaArrayElementVariable(offset, this)
-  
+
   override def getVariables(offset: Int, length: Int) : Array[IVariable] = (offset until offset + length).map(new ScalaArrayElementVariable(_, this)).toArray
-  
+
   override def getSize(): Int = underlying.length	
 
   override def getInitialOffset(): Int = 0
@@ -142,15 +142,15 @@ class ScalaObjectReference(override val underlying: ObjectReference, target: Sca
   override def hasVariables(): Boolean = !underlying.referenceType.allFields.isEmpty
 
   // Members declared in scala.tools.eclipse.debug.model.HasFieldValue
-  
+
   protected[model] override def referenceType = underlying.referenceType()
-  
+
   protected[model] override def jdiFieldValue(field: Field) = underlying.getValue(field)
-  
+
   // Members declared in scala.tools.eclipse.debug.model.HasMethodInvocation
-  
+
   protected[model] override def classType = underlying.referenceType.asInstanceOf[ClassType]
-  
+
   protected[model] def jdiInvokeMethod(method: Method, thread: ScalaThread, args: Value*) = thread.invokeMethod(underlying, method, args:_*)
 
   // -----
@@ -161,7 +161,7 @@ class ScalaObjectReference(override val underlying: ObjectReference, target: Sca
   private def getBoxedPrimitiveValue(): String = {
     ScalaDebugModelPresentation.computeDetail(fieldValue("value"))
   }
-  
+
 }
 
 class ScalaNullValue(target: ScalaDebugTarget) extends ScalaValue(null, target) {

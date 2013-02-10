@@ -12,29 +12,29 @@ object CompilerSettingsTest extends TestProjectSetup("compiler-settings")
 
 class CompilerSettingsTest {
   import CompilerSettingsTest._
-  
+
   @Test
   def failingToBuildSourceThatRequiresContinuationPlugin() {
     val unit = scalaCompilationUnit("cps/CPS.scala")
-    
+
     cleanProject()
     fullProjectBuild()
-    
+
     val errors = allBuildErrorsOf(unit)
-    
+
     assertTrue(errors.nonEmpty)
   }
-  
+
   @Test
   def successfullyBuildingSourceRequiringContinuationPluginEnabled() {
     withContinuationPluginEnabled {
       val unit = scalaCompilationUnit("cps/CPS.scala")
-    
+
       cleanProject()
       fullProjectBuild()
-    
+
       val errors = allBuildErrorsOf(unit)
-    
+
       assertTrue(errors.isEmpty)
     }
   }

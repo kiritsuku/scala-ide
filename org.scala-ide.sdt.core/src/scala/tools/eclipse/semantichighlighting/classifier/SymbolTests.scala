@@ -8,10 +8,10 @@ trait SymbolTests { self: SymbolClassification =>
   import global._
 
   def posToSym(pos: Position): Option[Symbol] = {
-    val t = locateTree(pos) 
+    val t = locateTree(pos)
     if (t.hasSymbol) safeSymbol(t).headOption.map(_._1) else None
   }
-  
+
   private lazy val forValSymbols: Set[Symbol] = for {
     region <- syntacticInfo.forVals
     pos = rangePosition(region)
@@ -24,10 +24,10 @@ trait SymbolTests { self: SymbolClassification =>
   }
 
   private def classifyTerm(sym: Symbol): SymbolType = {
-    
-    lazy val isCaseModule = 
+
+    lazy val isCaseModule =
       global.askOption( () => sym.companionClass.isCaseClass).getOrElse(false)
-    
+
     import sym._
     if (isPackage)
       Package
@@ -35,7 +35,7 @@ trait SymbolTests { self: SymbolClassification =>
       if (isLocal) LazyLocalVal else LazyTemplateVal
     else if (isSetter)
       TemplateVar
-    else if (isGetter) 
+    else if (isGetter)
       if(hasSetter(sym)) TemplateVar else TemplateVal
     else if (isSourceMethod)
       Method

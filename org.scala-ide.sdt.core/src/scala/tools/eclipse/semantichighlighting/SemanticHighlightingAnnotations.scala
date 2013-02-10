@@ -84,5 +84,5 @@ object SemanticHighlightingAnnotations {
       case TypeParameter => TYPE_PARAMETER
     }
   }
-  
+
 }

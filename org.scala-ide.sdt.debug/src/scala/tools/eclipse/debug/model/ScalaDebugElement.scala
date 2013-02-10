@@ -29,7 +29,7 @@ abstract class ScalaDebugElement(debugTarget: ScalaDebugTarget) extends DebugEle
         super.getAdapter(adapter)
     }
   }
-  
+
   override def getDebugTarget: ScalaDebugTarget = debugTarget
 
   // Members declared in org.eclipse.debug.core.model.IDebugElement

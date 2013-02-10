@@ -15,11 +15,11 @@ class ColorManager private () {
   def dispose() {
     for (c <- colorTable.values) c.dispose()
   }
-  
+
 }
 
 object ColorManager {
-  
+
   lazy val colorManager: ColorManager = new ColorManager
 
 }

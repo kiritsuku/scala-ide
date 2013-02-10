@@ -19,7 +19,7 @@ class ColourPreferenceInitializer extends AbstractPreferenceInitializer {
       doInitializeDefaultPreferences()
     }
   }
-  
+
   private def doInitializeDefaultPreferences() {
     val scalaPrefStore = ScalaPlugin.prefStore
 
@@ -47,7 +47,7 @@ class ColourPreferenceInitializer extends AbstractPreferenceInitializer {
    *  for execution, so the solution was to hide the call behind a closure.
    *
    *  TODO: Remove once we have a UI bundle, and a clear separation between UI and core.
-   *  
+   *
    */
   lazy val initializePreferencesIndirectly = (scalaPrefStore: IPreferenceStore) => {
     val javaPrefStore = JavaPlugin.getDefault.getPreferenceStore

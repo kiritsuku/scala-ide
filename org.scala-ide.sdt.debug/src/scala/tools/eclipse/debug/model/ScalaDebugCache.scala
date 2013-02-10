@@ -30,7 +30,7 @@ object ScalaDebugCache {
   }
 
   private lazy val prefStore = ScalaDebugPlugin.plugin.getPreferenceStore()
-		  
+		
   def apply(debugTarget: ScalaDebugTarget, scalaDebugTargetActor: BaseDebuggerActor): ScalaDebugCache = {
     val debugCache = new ScalaDebugCache(debugTarget) {
       val actor = new ScalaDebugCacheActor(this, debugTarget, scalaDebugTargetActor)
@@ -96,7 +96,7 @@ abstract class ScalaDebugCache(val debugTarget: ScalaDebugTarget) extends HasLog
   def getAnonFunctionsInRange(refType: ReferenceType, range: Range): Option[Method] = {
     getCachedAnonFunction(refType).filter(method => range.contains(method.location.lineNumber))
   }
- 
+
   /** Return the method containing the actual code of the anon function.
    */
   def getAnonFunction(refType: ReferenceType): Option[Method] = {

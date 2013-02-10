@@ -6,14 +6,14 @@ import scalariform.lexer.{ScalaLexer, Token}
 import scalariform.parser._
 import scalariform.utils.Range
 
-// Symbol information derived by purely syntactic means, via Scalariform's parser, because it (appears) 
+// Symbol information derived by purely syntactic means, via Scalariform's parser, because it (appears)
 // difficult to get this out scalac trees
 case class SyntacticInfo(
   namedArgs: Set[Region],
   forVals: Set[Region],
   maybeSelfRefs: Set[Region],
   maybeClassOfs: Set[Region],
-  annotations: Set[Region], 
+  annotations: Set[Region],
   packages: Set[Region]
 )
 
@@ -28,7 +28,7 @@ object SyntacticInfo {
   private implicit def range2Region(range: Range): Region = Region(range.offset, range.length)
 
   def noSyntacticInfo = SyntacticInfo(Set(), Set(), Set(), Set(), Set(), Set())
-  
+
   def getSyntacticInfo(source: String): SyntacticInfo = {
     var namedArgs: Set[Region] = Set()
     var forVals: Set[Region] = Set()

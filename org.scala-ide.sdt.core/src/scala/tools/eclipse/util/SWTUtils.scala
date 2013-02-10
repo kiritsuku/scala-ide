@@ -9,7 +9,7 @@ import org.eclipse.jface.util.PropertyChangeEvent
 import org.eclipse.swt.events._
 
 object SWTUtils {
-  
+
   /** Asynchronously run `f` on the UI thread.  */
   def asyncExec(f: => Unit) {
     Display.getDefault asyncExec new Runnable {
@@ -23,7 +23,7 @@ object SWTUtils {
       override def run() { f }
     }
   }
-  
+
   implicit def fnToModifyListener(f: ModifyEvent => Unit): ModifyListener = new ModifyListener {
     def modifyText(e: ModifyEvent) = f(e)
   }
@@ -41,7 +41,7 @@ object SWTUtils {
     new SelectionAdapter() {
       override def widgetSelected(e: SelectionEvent) { p() }
     }
-  
+
   implicit def noArgFnToMouseUpListener(f: () => Any): MouseAdapter = new MouseAdapter {
     override def mouseUp(me: MouseEvent) = f()
   }

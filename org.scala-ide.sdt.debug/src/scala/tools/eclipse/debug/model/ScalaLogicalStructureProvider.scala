@@ -11,7 +11,7 @@ import org.eclipse.debug.core.model.IValue
 import com.sun.jdi.ClassType
 
 object ScalaLogicalStructureProvider {
-  
+
   def isScalaCollection(objectReference: ScalaObjectReference): Boolean = {
     objectReference.underlying.referenceType match {
       case classType: ClassType =>
@@ -20,7 +20,7 @@ object ScalaLogicalStructureProvider {
         false
     }
   }
-  
+
   /**
    * Checks 'implements' with Java meaning
    */
@@ -28,7 +28,7 @@ object ScalaLogicalStructureProvider {
     import scala.collection.JavaConverters._
     classType.allInterfaces.asScala.exists(_.name == interfaceName)
   }
-  
+
 }
 
 class ScalaLogicalStructureProvider extends ILogicalStructureProvider {
@@ -46,17 +46,17 @@ class ScalaLogicalStructureProvider extends ILogicalStructureProvider {
         Array() // TODO: return fixed empty Array
     }
   }
-  
+
 }
 
 object ScalaCollectionLogicalStructureType extends ILogicalStructureType with HasLogger {
 
   // Members declared in org.eclipse.debug.core.ILogicalStructureType
-  
+
   override def getDescription(): String = "Flat the Scala collections"
-  
+
   override val getId: String = ScalaDebugPlugin.id + ".logicalstructure.collection"
-  
+
   // Members declared in org.eclipse.debug.core.model.ILogicalStructureTypeDelegate
 
   override def getLogicalStructure(value: IValue): IValue = {
@@ -89,10 +89,10 @@ object ScalaCollectionLogicalStructureType extends ILogicalStructureType with Ha
         scalaValue
     }
   }
-  
+
   override def providesLogicalStructure(value: IValue): Boolean = true // TODO: check that as it is created by the provider, it is never used with other values
-  
+
   // Members declared in org.eclipse.debug.core.model.ILogicalStructureTypeDelegate2
-  
+
   override def getDescription(value: IValue): String = getDescription
 }

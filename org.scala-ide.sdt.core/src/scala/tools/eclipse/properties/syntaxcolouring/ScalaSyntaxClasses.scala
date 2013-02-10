@@ -88,7 +88,7 @@ object ScalaSyntaxClasses {
   } yield syntaxClass.baseName + suffix).toSet
 
   val ENABLE_SEMANTIC_HIGHLIGHTING = "syntaxColouring.semantic.enabled"
-    
+
   val USE_SYNTACTIC_HINTS = "syntaxColouring.semantic.useSyntacticHints"
 
   val STRIKETHROUGH_DEPRECATED = "syntaxColouring.semantic.strikeDeprecated"

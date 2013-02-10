@@ -36,7 +36,7 @@ class SymbolClassification(protected val sourceFile: SourceFile, val global: Sca
 
   import SymbolClassification._
   import global.{ Symbol, Position, NoSymbol }
-  
+
   def compilationUnitOfFile(f: AbstractFile) = global.unitOfFile.get(f)
 
   protected lazy val syntacticInfo =
@@ -46,12 +46,12 @@ class SymbolClassification(protected val sourceFile: SourceFile, val global: Sca
 
   private def canSymbolBeReferencedInSource(sym: Symbol): Boolean = {
     def isSyntheticMethodParam(sym: Symbol): Boolean = sym.isSynthetic && sym.isValueParameter
-    
-    !sym.isAnonymousFunction && 
+
+    !sym.isAnonymousFunction &&
     !sym.isAnonymousClass &&
     !isSyntheticMethodParam(sym)
   }
-  
+
   def classifySymbols: List[SymbolInfo] = {
     val allSymbols: List[(Symbol, Position)] = debugTimed("allSymbols") {
       for {
@@ -69,21 +69,21 @@ class SymbolClassification(protected val sourceFile: SourceFile, val global: Sca
       for {
         (sym, pos) <- allSymbols
         if sym != NoSymbol
-      } symAndPos(sym) = pos :: symAndPos.getOrElse(sym, Nil) 
-      
-      
+      } symAndPos(sym) = pos :: symAndPos.getOrElse(sym, Nil)
+
+
       (for {
         (sym, poss) <- symAndPos
       } yield getSymbolInfo(sym, poss)).toList
     }
-    
+
     val prunedSymbolInfos = debugTimed("pruned")(prune(rawSymbolInfos))
     val all: Set[Region] = rawSymbolInfos flatMap (_.regions) toSet
     val localVars: Set[Region] = rawSymbolInfos.collect { case SymbolInfo(LocalVar, regions, _) => regions }.flatten.toSet
     val symbolInfosFromSyntax = debugTimed("symbolInfosFromSyntax")(getSymbolInfosFromSyntax(syntacticInfo, localVars, all))
 
     val res = debugTimed("res")((symbolInfosFromSyntax ++ prunedSymbolInfos) filter { _.regions.nonEmpty } distinct)
-    
+
     logger.debug("raw symbols: %d, pruned symbols: %d".format(rawSymbolInfos.size, prunedSymbolInfos.size))
     res
   }
@@ -128,7 +128,7 @@ class SymbolClassification(protected val sourceFile: SourceFile, val global: Sca
   }
 
   private def prune(rawSymbolInfos: Seq[SymbolInfo]): Seq[SymbolInfo] = {
-    def findRegionsWithSymbolType(symbolType: SymbolType): Set[Region] = 
+    def findRegionsWithSymbolType(symbolType: SymbolType): Set[Region] =
       rawSymbolInfos.collect { case SymbolInfo(`symbolType`, regions, _) => regions }.flatten.toSet
 
     val symbolTypeToRegion: Map[SymbolType, Set[Region]] = debugTimed("symbolTypeToRegion") {
@@ -142,7 +142,7 @@ class SymbolClassification(protected val sourceFile: SourceFile, val global: Sca
       }
     }
 
-    def pruneMisidentifiedSymbols(symbolInfo: SymbolInfo): SymbolInfo = 
+    def pruneMisidentifiedSymbols(symbolInfo: SymbolInfo): SymbolInfo =
       symbolTypeToRegion.get(symbolInfo.symbolType) match {
         case Some(regionsToRemove) => symbolInfo.copy(regions = symbolInfo.regions filterNot regionsToRemove)
         case None => symbolInfo

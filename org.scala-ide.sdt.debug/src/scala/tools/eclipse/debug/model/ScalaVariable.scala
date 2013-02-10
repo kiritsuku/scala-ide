@@ -21,7 +21,7 @@ abstract class ScalaVariable(target: ScalaDebugTarget) extends ScalaDebugElement
 }
 
 class ScalaThisVariable(underlying: ObjectReference, stackFrame: ScalaStackFrame) extends ScalaVariable(stackFrame.getDebugTarget) {
-  
+
   // Members declared in org.eclipse.debug.core.model.IVariable
 
   override def getName: String = "this"
@@ -35,7 +35,7 @@ class ScalaLocalVariable(underlying: LocalVariable, stackFrame: ScalaStackFrame)
 
   override def getName(): String = underlying.name
   override def getReferenceTypeName(): String = underlying.typeName
-  
+
   // fetching the value for local variables cannot be delayed because the underlying stackframe element may become invalid at any time
   override val getValue: IValue = ScalaValue(stackFrame.stackFrame.getValue(underlying), getDebugTarget)
 }
