@@ -93,7 +93,7 @@ class ScalaArrayReference(override val underlying: ArrayReference, target: Scala
 
   override def getVariables(offset: Int, length: Int) : Array[IVariable] = (offset until offset + length).map(new ScalaArrayElementVariable(_, this)).toArray
 
-  override def getSize(): Int = underlying.length	
+  override def getSize(): Int = underlying.length
 
   override def getInitialOffset(): Int = 0
 

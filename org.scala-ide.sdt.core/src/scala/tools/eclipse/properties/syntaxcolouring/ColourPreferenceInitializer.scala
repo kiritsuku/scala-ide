@@ -38,7 +38,7 @@ class ColourPreferenceInitializer extends AbstractPreferenceInitializer {
    *  preparing this class (even when this code is not executed). The reference exists
    *  in bytecode:
    *
-   *    invokevirtual	#78; //Method org/eclipse/ui/plugin/AbstractUIPlugin.getPreferenceStore:
+   *    invokevirtual  #78; //Method org/eclipse/ui/plugin/AbstractUIPlugin.getPreferenceStore:
    *
    *  Contrary to what we believe, this is enough to trigger initialization of
    *  `AbstractUIPlugin`, regardless whether this is ever executed.
