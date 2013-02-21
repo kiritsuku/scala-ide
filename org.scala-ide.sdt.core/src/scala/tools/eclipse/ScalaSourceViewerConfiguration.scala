@@ -44,6 +44,9 @@ import org.eclipse.jface.text.hyperlink.URLHyperlinkDetector
 import scala.tools.eclipse.ui.LiteralAutoEditStrategy
 import scala.tools.eclipse.ui.StringAutoEditStrategy
 import scala.tools.eclipse.ui.MultiLineStringAutoEditStrategy
+import org.eclipse.jdt.internal.ui.text.HTMLAnnotationHover
+import org.eclipse.jface.text.source.Annotation
+import org.eclipse.jface.internal.text.html.HTMLPrinter
 
 class ScalaSourceViewerConfiguration(store: IPreferenceStore, scalaPreferenceStore: IPreferenceStore, editor: ITextEditor)
    extends JavaSourceViewerConfiguration(JavaPlugin.getDefault.getJavaTextTools.getColorManager, store, editor, IJavaPartitions.JAVA_PARTITIONING) {
@@ -78,6 +81,23 @@ class ScalaSourceViewerConfiguration(store: IPreferenceStore, scalaPreferenceSto
       ScalaPartitions.XML_PCDATA -> xmlPCDATAScanner,
       ScalaPartitions.XML_PI -> xmlPIScanner
     )
+  }
+
+  override def getAnnotationHover(sourceViewer: ISourceViewer) = {
+    new HTMLAnnotationHover(false) {
+      override def isIncluded(annotation: Annotation) = {
+        isShowInVerticalRuler(annotation)
+      }
+
+      override def formatSingleMessage(message: String) = {
+        import HTMLPrinter._
+        val buffer = new StringBuffer(message.length())
+        addPageProlog(buffer)
+        addParagraph(buffer, "<pre><code>"+message+"</code></pre>")
+        addPageEpilog(buffer)
+        buffer.toString()
+      }
+    }
   }
 
   override def getPresentationReconciler(sourceViewer: ISourceViewer): ScalaPresentationReconciler = {
