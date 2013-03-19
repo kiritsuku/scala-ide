@@ -23,10 +23,10 @@ import org.eclipse.jface.util.PropertyChangeEvent
 import org.eclipse.swt.custom.StyleRange
 
 /** This class is responsible of:
- *  
+ *
   * - Triggering the semantic highlighting job as soon as the [[org.eclipse.jdt.internal.ui.text.JavaReconciler]]
   * has finished reconciling the opened compilation unit.
-  * 
+  *
   * - Updating the editor's text presentation with the up-to-date semantic highlighting styles.
   *
   * @note All accesses to this class are confined to the UI Thread.
@@ -39,11 +39,11 @@ private class TextPresentationEditorHighlighter(editor: ScalaSourceFileEditor, p
 
   override def initialize(semanticHighlightingJob: Job, positionsTracker: PositionsTracker): Unit = {
     highlightingOnReconciliationListener = new PerformSemanticHighlightingOnReconcilation(semanticHighlightingJob)
-    textPresentationChangeListener = new ApplyHighlightingTextPresentationChanges(semanticHighlightingJob, positionsTracker, preferences)
+    textPresentationChangeListener = new ApplyHighlightingTextPresentationChanges(editor, semanticHighlightingJob, positionsTracker, preferences)
 
     Option(preferences.store) foreach (_.addPropertyChangeListener(textPresentationChangeListener))
     Option(editor) foreach (_.addReconcilingListener(highlightingOnReconciliationListener))
-    // it's important to prepend the listener or semantic highlighting coloring will hide the style applied for hyperlinking when the 
+    // it's important to prepend the listener or semantic highlighting coloring will hide the style applied for hyperlinking when the
     // user hovers on a semantically highlighted binding.
     Option(sourceViewer) foreach (_.prependTextPresentationListener(textPresentationChangeListener))
   }
@@ -80,13 +80,13 @@ object TextPresentationEditorHighlighter {
     override def aboutToBeReconciled(): Unit = ()
     override def reconciled(ast: CompilationUnit, forced: Boolean, progressMonitor: IProgressMonitor): Unit = {
       /* There is no need to call `semanticHighlightingJob.cancel()` here because the document has a listener that
-       * already cancels the ongoing semantic highlighting job whenever the document is about to be changed. And `this` 
-       * reconciling listener always gets executed '''after''' the aforementioned listener (check 
+       * already cancels the ongoing semantic highlighting job whenever the document is about to be changed. And `this`
+       * reconciling listener always gets executed '''after''' the aforementioned listener (check
        * [[scala.tools.eclipse.semantichighlighting.Presenter$DocumentContentListener]] for more details).
-       * 
-       * Furthermore, a new semantic highlighting job run is only scheduled if the ongoing reconciliation has not been 
+       *
+       * Furthermore, a new semantic highlighting job run is only scheduled if the ongoing reconciliation has not been
        * cancelled. If it was cancelled, this usually means that the editor was closed, or the document was change.
-       * In the editor was closed, there is clearly no need for reconciling. While, if the document changed, then the 
+       * In the editor was closed, there is clearly no need for reconciling. While, if the document changed, then the
        * compilation unit will be soon reconciled again.
        */
       if (!progressMonitor.isCanceled()) semanticHighlightingJob.schedule()
@@ -102,13 +102,25 @@ object TextPresentationEditorHighlighter {
     * @param positionsTracker Holds the semantic positions that needs to be colored in the editor.
     * @param preferences      The user's preferences.
     */
-  private class ApplyHighlightingTextPresentationChanges(reconciler: Job, positionsTracker: PositionsTracker, preferences: Preferences) extends IPropertyChangeListener with ITextPresentationListener with HasLogger {
+  private class ApplyHighlightingTextPresentationChanges(editor: ScalaSourceFileEditor, reconciler: Job, positionsTracker: PositionsTracker, preferences: Preferences) extends IPropertyChangeListener with ITextPresentationListener with HasLogger {
 
     private var semanticCategory2style: immutable.Map[SymbolTypes.SymbolType, HighlightingStyle] = {
       (for (symType <- SymbolTypes.values) yield (symType -> HighlightingStyle(preferences, symType)))(collection.breakOut)
     }
 
     override def propertyChange(event: PropertyChangeEvent): Unit = {
+      event.getProperty() match {
+        case ScalaSyntaxClasses.STRIKETHROUGH_DEPRECATED =>
+//          val syms: Set[Int] = positionsTracker.deprecatedPositions.map(_.kind.id)(collection.breakOut)
+//          val ss = syms map (SymbolTypes(_))
+          val syms: Set[SymbolTypes.SymbolType] = positionsTracker.deprecatedPositions.map(_.kind)(collection.breakOut)
+          for (symType <- syms) {
+            semanticCategory2style += symType -> HighlightingStyle(preferences, symType)
+            positionsTracker.deletesPositionsOfType(symType)
+            reconciler.schedule()
+          }
+        case _ =>
+      }
       for {
         semanticCategory <- ScalaSyntaxClasses.scalaSemanticCategory.children
         if event.getProperty().startsWith(semanticCategory.baseName)
