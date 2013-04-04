@@ -1,9 +1,9 @@
 package scala.tools.eclipse.semantichighlighting.classifier
 
-import scala.tools.refactoring.common.CompilerAccess
-import scala.tools.refactoring.common.PimpedTrees
 import scala.tools.eclipse.ScalaPresentationCompiler
+import scala.tools.eclipse.semantichighlighting.classifier.SymbolTypes._
 import scala.tools.nsc.util.SourceFile
+import scala.tools.refactoring.common.{ CompilerAccess, PimpedTrees }
 
 /**
  * Return the Symbols corresponding to this `Tree`, if any.
@@ -41,6 +41,29 @@ private[classifier] trait SafeSymbol extends CompilerAccess with PimpedTrees {
    * correspondence but still have children that are visible in the source.
    */
   protected def isSourceTree(t: Tree): Boolean = hasSourceCodeRepresentation(t) && !t.pos.isTransparent
+
+  // copy-pasted from scala.reflect.internal.Names because it is only available in 2.11
+  // TODO delete once the code base has moved to 2.11
+  private object TermName {
+    def apply(s: String) = newTermName(s)
+    def unapply(name: TermName): Option[String] = Some(name.toString)
+  }
+
+  /**
+   * Finds all occurrences of dynamic method calls. Because such method calls are
+   * transformed by the compiler, no symbols exist for them. Thus, this method
+   * returns the SymbolType directly.
+   */
+  protected def findDynamicSymbols(t: Tree): List[(SymbolType, Position)] = t match {
+
+    case Apply(Select(_, TermName("selectDynamic" | "updateDynamic")), List(name)) =>
+      List(TemplateVar -> name.pos)
+
+    case Apply(Select(_, TermName("applyDynamic" | "applyDynamicNamed")), List(name)) =>
+      List(Method -> name.pos)
+
+    case _ => Nil
+  }
 
   protected def safeSymbol(t: Tree): List[(Symbol, Position)] = t match {
 

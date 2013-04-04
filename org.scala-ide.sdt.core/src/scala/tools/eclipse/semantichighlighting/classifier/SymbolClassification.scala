@@ -38,7 +38,7 @@ class SymbolClassification(protected val sourceFile: SourceFile, val global: Sca
   extends SafeSymbol with TypeTreeTraverser with SymbolClassificationDebugger with SymbolTests with HasLogger {
 
   import SymbolClassification._
-  import global.{ Symbol, Position, NoSymbol }
+  import global.{ Symbol, Position, NoSymbol, Tree }
   
   def compilationUnitOfFile(f: AbstractFile) = global.unitOfFile.get(f)
 
@@ -103,7 +103,28 @@ class SymbolClassification(protected val sourceFile: SourceFile, val global: Sca
     val symbolInfosFromSyntax = getSymbolInfosFromSyntax(syntacticInfo, localVars, all)
     if (progressMonitor.isCanceled()) return Nil
 
-    (symbolInfosFromSyntax ++ prunedSymbolInfos) filter { _.regions.nonEmpty } distinct
+    val dynamicSymbolInfos = getDynamicSymbolInfos(tree)
+    if (progressMonitor.isCanceled()) return Nil
+
+    (symbolInfosFromSyntax ++ prunedSymbolInfos ++ dynamicSymbolInfos) filter { _.regions.nonEmpty } distinct
+  }
+
+  private def getDynamicSymbolInfos(tree: Tree): Seq[SymbolInfo] = {
+
+    def posToRegion(p: Position) = new Region(p.start, p.end - p.start)
+
+    val symbols = for {
+      t <- tree
+      // Tree doesn't support a map operation
+      if true
+      sym <- findDynamicSymbols(t)
+    } yield sym
+
+    List(
+      SymbolInfo(Method, symbols collect { case (Method, r) => posToRegion(r) }, deprecated = false),
+      SymbolInfo(TemplateVar, symbols collect { case (TemplateVar, r) => posToRegion(r) }, deprecated = false),
+      SymbolInfo(Param, symbols collect { case (Param, r) => posToRegion(r) }, deprecated = false)
+    )
   }
 
   private def getSymbolInfo(sym: Symbol, poss: List[Position]): SymbolInfo = {
