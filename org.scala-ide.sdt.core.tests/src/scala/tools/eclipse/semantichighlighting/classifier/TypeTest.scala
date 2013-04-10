@@ -107,4 +107,18 @@ class TypeTest extends AbstractSymbolClassifierTest {
       Map("O" -> Object))
   }
 
+  @Test
+  def type_ascription_at_lazy_val() {
+    checkSymbolClassification("""
+      object X {
+        lazy val xs: Seq[String] = ???
+      }
+      """, """
+      object X {
+        lazy val xs: $T$[$T   $] = ???
+      }
+      """,
+      Map("T" -> Type))
+  }
+
 }
