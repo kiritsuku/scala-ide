@@ -90,6 +90,7 @@ class ScalaSourceViewerConfiguration(store: IPreferenceStore, scalaPreferenceSto
       }
 
       override def formatSingleMessage(message: String) = {
+        println(message)
         import HTMLPrinter._
         val buffer = new StringBuffer(message.length())
         addPageProlog(buffer)

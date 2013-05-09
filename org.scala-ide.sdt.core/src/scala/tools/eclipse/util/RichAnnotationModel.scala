@@ -20,19 +20,25 @@ class RichAnnotationModel(annotationModel: IAnnotationModel) {
   def withLock[T](f: => T): T = annotationModel match {
     case synchronizable: ISynchronizable =>
       synchronizable.getLockObject.synchronized { f }
-    case _ => 
+    case _ =>
       f
   }
-  
+
   def getAnnotations: List[Annotation] =
     annotationModel.getAnnotationIterator collect { case ann: Annotation => ann } toList
 
   def replaceAnnotations(annotations: Iterable[Annotation], replacements: Map[Annotation, Position]) {
-    annotationModel.asInstanceOf[IAnnotationModelExtension].replaceAnnotations(annotations.toArray, replacements)
+//    annotationModel.asInstanceOf[IAnnotationModelExtension].replaceAnnotations(annotations.toArray, replacements)
+    val x = annotationModel.asInstanceOf[IAnnotationModelExtension]
+    val y = annotations.toArray
+    val z = mapAsJavaMap(replacements)
+//    println("Stack>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
+//    Thread.currentThread().getStackTrace().drop(1).take(20) foreach println
+    x.replaceAnnotations(y, z)
   }
-    
+
   def deleteAnnotations(annotations: Iterable[Annotation]) {
     replaceAnnotations(annotations, Map())
-  }  
+  }
 
 }
