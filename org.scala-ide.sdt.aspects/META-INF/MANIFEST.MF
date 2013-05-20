@@ -33,7 +33,8 @@ Eclipse-SupplementBundle:
  org.eclipse.jdt.ui,
  org.eclipse.pde.ui,
  org.eclipse.jdt.groovy.core,
- org.eclipse.jdt.junit
+ org.eclipse.jdt.junit,
+ org.eclipse.jface.text.source
 Bundle-ActivationPolicy: lazy
 Export-Package: 
  scala.tools.eclipse.contribution.weaving.jdt,
@@ -55,7 +56,8 @@ Export-Package:
  scala.tools.eclipse.contribution.weaving.jdt.ui.javaeditor,
  scala.tools.eclipse.contribution.weaving.jdt.ui.javaeditor.formatter,
  scala.tools.eclipse.contribution.weaving.pde.ui,
- scala.tools.eclipse.contribution.weaving.jdt.launching
+ scala.tools.eclipse.contribution.weaving.jdt.launching,
+ scala.tools.eclipse.contribution.weaving.jface
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Import-Package: org.eclipse.equinox.frameworkadmin,
  org.eclipse.equinox.internal.simpleconfigurator.manipulator,
