@@ -47,6 +47,9 @@ import scala.tools.eclipse.ui.MultiLineStringAutoEditStrategy
 import org.eclipse.jdt.internal.ui.text.HTMLAnnotationHover
 import org.eclipse.jface.text.source.Annotation
 import org.eclipse.jface.internal.text.html.HTMLPrinter
+import org.eclipse.jface.text.source.ISourceViewerExtension2
+import org.eclipse.jface.text.Position
+import org.eclipse.jface.text.source.projection.AnnotationBag
 
 class ScalaSourceViewerConfiguration(store: IPreferenceStore, scalaPreferenceStore: IPreferenceStore, editor: ITextEditor)
    extends JavaSourceViewerConfiguration(JavaPlugin.getDefault.getJavaTextTools.getColorManager, store, editor, IJavaPartitions.JAVA_PARTITIONING) {
@@ -84,21 +87,7 @@ class ScalaSourceViewerConfiguration(store: IPreferenceStore, scalaPreferenceSto
   }
 
   override def getAnnotationHover(sourceViewer: ISourceViewer) = {
-    new HTMLAnnotationHover(false) {
-      override def isIncluded(annotation: Annotation) = {
-        isShowInVerticalRuler(annotation)
-      }
-
-      override def formatSingleMessage(message: String) = {
-        println(message)
-        import HTMLPrinter._
-        val buffer = new StringBuffer(message.length())
-        addPageProlog(buffer)
-        addParagraph(buffer, "<pre><code>"+message+"</code></pre>")
-        addPageEpilog(buffer)
-        buffer.toString()
-      }
-    }
+    new DefaultAnnotationHover(false)
   }
 
   override def getPresentationReconciler(sourceViewer: ISourceViewer): ScalaPresentationReconciler = {
@@ -190,4 +179,112 @@ class ScalaSourceViewerConfiguration(store: IPreferenceStore, scalaPreferenceSto
 
    override def affectsTextPresentation(event: PropertyChangeEvent) = true
 
+//   class ScalaAnnotationHover extends HTMLAnnotationHover(false) {
+//
+//
+////    def annotationsForLine(viewer: ISourceViewer, line: Int): List[_] = {
+////      val doc = viewer.getDocument()
+////      val model = viewer match {
+////        case v: ISourceViewerExtension2 => v.getVisualAnnotationModel()
+////        case v => v.getAnnotationModel()
+////      }
+////      if (model == null) return null
+////
+////      def isRulerLine(pos: Position) = {
+////        // TODO refactoring
+////        if (pos.getOffset() > -1 && pos.getLength() > -1 && pos.getOffset() < doc.getLength())
+////          line == doc.getLineOfOffset(pos.getOffset())
+////        else false
+////      }
+////
+////      def includeAnnotation(a: Annotation, pos: Position) = {
+////        a.getText()
+////      }
+////
+////      import scala.collection.JavaConverters._
+////
+////      def check(a: Annotation) = a match {
+////        case bag: AnnotationBag =>
+////          for {
+////            a <- bag.iterator().asInstanceOf[java.util.Iterator[Annotation]].asScala
+////            pos = model.getPosition(a)
+////            if pos != null
+////          }
+////
+////      }
+////
+////      for {
+////        a <- model.getAnnotationIterator().asInstanceOf[java.util.Iterator[Annotation]].asScala
+////        pos = model.getPosition(a)
+////        if pos != null && isRulerLine(pos)
+////
+////      } {
+////
+////      }
+////
+////      ???
+////    }
+//
+//
+//
+//    override def getHoverInfo(sourceViewer: ISourceViewer, lineNumber: Int) = {
+////      import scala.collection.JavaConverters._
+////
+////      val method = this.getClass().getMethods().find(_.getName() == "getAnnotationsForLine").get
+////      method.setAccessible(true)
+////
+////      val javaAnnotations = method.invoke(this, sourceViewer, lineNumber.asInstanceOf[Integer]).asInstanceOf[java.util.List[Annotation]].asScala
+////
+////      val field = this.getClass().getFields().find(_.getName() == "fShowLineNumber").get
+////      field.setAccessible(true)
+////      val showLineNumber = field.getBoolean(this)
+////
+////      def formatMessage = {
+////        if (javaAnnotations.size == 1) {
+////          val msg = javaAnnotations.head.getText()
+////          if (msg != null && msg.trim().length() > 0) {
+////            val method = this.getClass().getMethods().find(_.getName() == "formatSingleMessage").get
+////            method.setAccessible(true)
+////            method.invoke(this, msg).asInstanceOf[String]
+////          }
+////          else null
+////        } else {
+////          val msgs = for {
+////            a <- javaAnnotations
+////            msg = a.getText()
+////            if msg != null && msg.trim().length() > 0
+////          } yield msg.trim()
+////          if (msgs.size == 1) {
+////            val method = this.getClass().getMethods().find(_.getName() == "formatSingleMessage").get
+////            method.setAccessible(true)
+////            method.invoke(this, msgs.head).asInstanceOf[String]
+////          }
+////        }
+////
+////      }
+////
+////      if (javaAnnotations != null)
+////        formatMessage
+////      else if (showLineNumber && lineNumber > -1)
+////        s"Line: ${lineNumber+1}"
+////      else
+////        null
+//
+//      super.getHoverInfo(sourceViewer, lineNumber)
+//    }
+//
+//    override def isIncluded(annotation: Annotation) = {
+//      isShowInVerticalRuler(annotation)
+//    }
+//
+//    override def formatSingleMessage(message: String) = {
+//      println(message)
+//      import HTMLPrinter._
+//      val buffer = new StringBuffer(message.length())
+//      addPageProlog(buffer)
+//      addParagraph(buffer, "<pre><code>"+message+"</code></pre>")
+//      addPageEpilog(buffer)
+//      buffer.toString()
+//    }
+//  }
 }
