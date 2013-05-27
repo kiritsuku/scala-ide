@@ -19,6 +19,7 @@ trait ScaladocAnnotationAutoEditStrategy extends HasLogger {
 //  def x(icu: InteractiveCompilationUnit, index: Int): Option[List[ScaladocTag]] = {
   def findTags(index: Int, isCommentClosed: Boolean = true): Option[List[ScaladocTag]] = {
     EditorHelpers.withScalaFileAndSelection { (icu, _) =>
+      // check if there is already a Scaladoc comment
       icu.withSourceFile({ (sourceFile, compiler) =>
         findStartOfExpr(sourceFile.content, index, isCommentClosed) flatMap { index =>
           logger.debug(new StringBuilder(sourceFile.content.mkString).insert(index, "^").subSequence(index-50, index+50).toString())
@@ -87,6 +88,7 @@ trait ScaladocAnnotationAutoEditStrategy extends HasLogger {
     for {
       i <- if (isCommentClosed) eatComment(index) else Some(index)
       j <- eatWhitespace(i)
+      // eat single and multi line comments here
       if !isScaladocStartAt(j)
     } yield j
   }

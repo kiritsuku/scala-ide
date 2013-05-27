@@ -66,15 +66,15 @@ class CommentAutoIndentStrategy(prefStore: IPreferenceStore, partitioning: Strin
               cmd.addCommand(cmd.offset, restAfterCaret.length(), "", null)
             }
 
-//            if (isScaladoc) {
-//              doc.replace(cmd.offset, 0, "*/")
-//              val tags = scaladocStrategy.findTags(cmd.offset, isCommentClosed = true)
-//              logger.debug(">>>>>>>>>>>>>>>>>>>>>>>>"+tags)
-//              doc.replace(cmd.offset, 2, "")
-//
-//              for (ts <- tags; t <- ts)
-//                buf.append("\n").append(indent).append(" * ").append(t)
-//            }          
+            if (isScaladoc) {
+              doc.replace(cmd.offset, 0, "*/")
+              val tags = scaladocStrategy.findTags(cmd.offset, isCommentClosed = true)
+              logger.debug(">>>>>>>>>>>>>>>>>>>>>>>>"+tags)
+              doc.replace(cmd.offset, 2, "")
+
+              for (ts <- tags; t <- ts)
+                buf.append("\n").append(indent).append(" * ").append(t)
+            }
 
             // we want the caret before the closing comment
             cmd.caretOffset = cmd.offset + buf.length - restAfterCaret.length()

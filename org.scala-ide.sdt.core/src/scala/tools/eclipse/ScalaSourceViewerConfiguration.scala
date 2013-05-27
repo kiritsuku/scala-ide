@@ -45,6 +45,8 @@ import scala.tools.eclipse.ui.LiteralAutoEditStrategy
 import scala.tools.eclipse.ui.StringAutoEditStrategy
 import scala.tools.eclipse.ui.MultiLineStringAutoEditStrategy
 import scala.tools.eclipse.ui.ScaladocAnnotationAutoEditStrategy
+import scala.tools.eclipse.completion.ScaladocContentAssistProcessor
+import org.eclipse.swt.graphics.RGB
 
 class ScalaSourceViewerConfiguration(store: IPreferenceStore, scalaPreferenceStore: IPreferenceStore, editor: ITextEditor)
    extends JavaSourceViewerConfiguration(JavaPlugin.getDefault.getJavaTextTools.getColorManager, store, editor, IJavaPartitions.JAVA_PARTITIONING) {
@@ -125,6 +127,19 @@ class ScalaSourceViewerConfiguration(store: IPreferenceStore, scalaPreferenceSto
 
    def getProject: IJavaProject = {
       getCodeAssist map (_.asInstanceOf[IJavaElement].getJavaProject) orNull
+   }
+
+   override def getContentAssistant(sourceViewer: ISourceViewer): IContentAssistant = {
+     val ca = super.getContentAssistant(sourceViewer).asInstanceOf[ContentAssistant]
+//     val ca = new ContentAssistant
+     val cap = new ScaladocContentAssistProcessor
+     ca.setContentAssistProcessor(cap, IJavaPartitions.JAVA_DOC)
+     ca.enableAutoActivation(true)
+     ca.setAutoActivationDelay(100)
+
+     val color = getColorManager().getColor(new RGB(230, 255, 230))
+     ca.setProposalSelectorBackground(color)
+     ca
    }
 
    /**
