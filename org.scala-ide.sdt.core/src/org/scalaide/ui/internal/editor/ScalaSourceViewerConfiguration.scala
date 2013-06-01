@@ -1,14 +1,5 @@
 package org.scalaide.ui.internal.editor
 
-import org.scalaide.core.internal.formatter.ScalaFormattingStrategy
-import org.scalaide.core.hyperlink.detector.CompositeHyperlinkDetector
-import org.scalaide.core.hyperlink.detector.DeclarationHyperlinkDetector
-import org.scalaide.core.hyperlink.detector.ImplicitHyperlinkDetector
-import org.scalaide.core.internal.jdt.model.ScalaCompilationUnit
-import org.scalaide.core.internal.lexical._
-import org.scalaide.ui.syntax.{ScalaSyntaxClasses => SSC}
-import org.scalaide.ui.internal.reconciliation.ScalaReconcilingStrategy
-import org.scalaide.ui.internal.editor.autoedits._
 import org.eclipse.core.runtime.NullProgressMonitor
 import org.eclipse.jdt.core.ICodeAssist
 import org.eclipse.jdt.core.IJavaElement
@@ -33,9 +24,37 @@ import org.eclipse.jface.text.reconciler.MonoReconciler
 import org.eclipse.jface.text.rules.DefaultDamagerRepairer
 import org.eclipse.jface.text.source.ISourceViewer
 import org.eclipse.jface.util.PropertyChangeEvent
-import scalariform.ScalaVersions
 import org.scalaide.core.ScalaPlugin
+import org.scalaide.core.hyperlink.detector.CompositeHyperlinkDetector
+import org.scalaide.core.hyperlink.detector.DeclarationHyperlinkDetector
+import org.scalaide.core.hyperlink.detector.ImplicitHyperlinkDetector
 import org.scalaide.core.internal.formatter.FormatterPreferences._
+import org.scalaide.core.internal.formatter.ScalaFormattingStrategy
+import org.scalaide.core.internal.jdt.model.ScalaCompilationUnit
+import org.scalaide.core.internal.lexical.ScalaCodeScanner
+import org.scalaide.core.internal.lexical.ScalaCommentScanner
+import org.scalaide.core.internal.lexical.ScalaPartitions
+import org.scalaide.core.internal.lexical.ScaladocTokenScanner
+import org.scalaide.core.internal.lexical.SingleTokenScanner
+import org.scalaide.core.internal.lexical.StringTokenScanner
+import org.scalaide.core.internal.lexical.XmlCDATAScanner
+import org.scalaide.core.internal.lexical.XmlCommentScanner
+import org.scalaide.core.internal.lexical.XmlPIScanner
+import org.scalaide.core.internal.lexical.XmlTagScanner
+import org.scalaide.ui.internal.editor.autoedits.AutoIndentStrategy
+import org.scalaide.ui.internal.editor.autoedits.BracketAutoEditStrategy
+import org.scalaide.ui.internal.editor.autoedits.CommentAutoIndentStrategy
+import org.scalaide.ui.internal.editor.autoedits.LiteralAutoEditStrategy
+import org.scalaide.ui.internal.editor.autoedits.MultiLineStringAutoEditStrategy
+import org.scalaide.ui.internal.editor.autoedits.MultiLineStringAutoIndentStrategy
+import org.scalaide.ui.internal.editor.autoedits.StringAutoEditStrategy
+import org.scalaide.ui.internal.editor.indentation.JdtPreferenceProvider
+import org.scalaide.ui.internal.editor.indentation.JdtUiHandler
+import org.scalaide.ui.internal.editor.indentation.ScalaAutoIndentStrategy
+import org.scalaide.ui.internal.reconciliation.ScalaReconcilingStrategy
+import org.scalaide.ui.syntax.{ScalaSyntaxClasses => SSC}
+
+import scalariform.ScalaVersions
 import scalariform.formatter.preferences._
 
 class ScalaSourceViewerConfiguration(
@@ -178,8 +197,8 @@ class ScalaSourceViewerConfiguration(
    * @see org.eclipse.jface.text.source.SourceViewerConfiguration#getAutoEditStrategies(org.eclipse.jface.text.source.ISourceViewer, java.lang.String)
    */
   override def getAutoEditStrategies(sourceViewer: ISourceViewer, contentType: String): Array[IAutoEditStrategy] = {
-    def prefProvider = new JdtPreferenceProvider(getProject)
     val partitioning = getConfiguredDocumentPartitioning(sourceViewer)
+    def sais = new ScalaAutoIndentStrategy(partitioning, getProject, sourceViewer, new JdtPreferenceProvider(getProject)) with JdtUiHandler
 
     contentType match {
       case IJavaPartitions.JAVA_DOC | IJavaPartitions.JAVA_MULTI_LINE_COMMENT | ScalaPartitions.SCALADOC_CODE_BLOCK =>
@@ -199,15 +218,15 @@ class ScalaSourceViewerConfiguration(
       case IJavaPartitions.JAVA_CHARACTER | IDocument.DEFAULT_CONTENT_TYPE =>
         Array(
           new SmartSemicolonAutoEditStrategy(partitioning),
-          new ScalaAutoIndentStrategy(partitioning, getProject, sourceViewer, prefProvider),
+          sais,
           new AutoIndentStrategy(ScalaPlugin.prefStore),
           new BracketAutoEditStrategy(ScalaPlugin.prefStore),
           new LiteralAutoEditStrategy(ScalaPlugin.prefStore))
 
       case _ =>
         Array(
-            new ScalaAutoIndentStrategy(partitioning, getProject, sourceViewer, prefProvider),
-            new AutoIndentStrategy(ScalaPlugin.prefStore))
+          sais,
+          new AutoIndentStrategy(ScalaPlugin.prefStore))
     }
   }
 
