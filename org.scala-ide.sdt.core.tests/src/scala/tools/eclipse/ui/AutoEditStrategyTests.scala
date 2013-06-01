@@ -32,6 +32,22 @@ object AutoEditStrategyTests {
 
 abstract class AutoEditStrategyTests(strategy: IAutoEditStrategy) {
 
+  /**
+   * Creates the following DSL for a test:
+   * {{{
+   * @Test
+   * def test() {
+   *   "object A^" becomes "object AB^" after Add("B")
+   * }
+   * }}}
+   */
+  implicit class StringAsTest(input: String) {
+    def becomes(expectedOutput: String) = input -> expectedOutput
+  }
+  implicit class TestExecutor(testData: (String, String)) {
+    def after(operation: Operation) = test(testData._1, testData._2, operation)
+  }
+
   import AutoEditStrategyTests._
 
   sealed abstract class Operation
@@ -80,7 +96,7 @@ abstract class AutoEditStrategyTests(strategy: IAutoEditStrategy) {
     }
 
     val cmd = operation match {
-      case Add(s)    => new TestCommand(textOffset, s.length, s, -1, true, true)
+      case Add(s)    => new TestCommand(textOffset, 0, s, -1, true, true)
       case Remove(s) => new TestCommand(textOffset - s.length, s.length, "", -1, true, true)
     }
 

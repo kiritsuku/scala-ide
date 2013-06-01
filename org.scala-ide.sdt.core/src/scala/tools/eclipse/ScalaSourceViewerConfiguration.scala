@@ -24,11 +24,12 @@ import scala.tools.eclipse.properties.syntaxcolouring.{ScalaSyntaxClasses => SSC
 import scala.tools.eclipse.reconciliation.ScalaReconcilingStrategy
 import scala.tools.eclipse.ui.BracketAutoEditStrategy
 import scala.tools.eclipse.ui.CommentAutoIndentStrategy
-import scala.tools.eclipse.ui.JdtPreferenceProvider
 import scala.tools.eclipse.ui.LiteralAutoEditStrategy
 import scala.tools.eclipse.ui.MultiLineStringAutoEditStrategy
 import scala.tools.eclipse.ui.ScalaAutoIndentStrategy
 import scala.tools.eclipse.ui.StringAutoEditStrategy
+import scala.tools.eclipse.ui.indentation.JdtPreferenceProvider
+import scala.tools.eclipse.ui.indentation.JdtUiHandler
 
 import org.eclipse.core.runtime.NullProgressMonitor
 import org.eclipse.jdt.core.ICodeAssist
@@ -158,8 +159,8 @@ class ScalaSourceViewerConfiguration(
    * @see org.eclipse.jface.text.source.SourceViewerConfiguration#getAutoEditStrategies(org.eclipse.jface.text.source.ISourceViewer, java.lang.String)
    */
   override def getAutoEditStrategies(sourceViewer: ISourceViewer, contentType: String): Array[IAutoEditStrategy] = {
-    def prefProvider = new JdtPreferenceProvider(getProject)
     val partitioning = getConfiguredDocumentPartitioning(sourceViewer)
+    def sais = new ScalaAutoIndentStrategy(partitioning, getProject, sourceViewer, new JdtPreferenceProvider(getProject)) with JdtUiHandler
 
     contentType match {
       case IJavaPartitions.JAVA_DOC | IJavaPartitions.JAVA_MULTI_LINE_COMMENT | ScalaPartitions.SCALADOC_CODE_BLOCK =>
@@ -168,7 +169,7 @@ class ScalaSourceViewerConfiguration(
       case ScalaPartitions.SCALA_MULTI_LINE_STRING =>
         Array(
           new SmartSemicolonAutoEditStrategy(partitioning),
-          new ScalaAutoIndentStrategy(partitioning, getProject, sourceViewer, prefProvider),
+          sais,
           new MultiLineStringAutoEditStrategy(partitioning, ScalaPlugin.prefStore))
 
       case IJavaPartitions.JAVA_STRING =>
@@ -179,12 +180,12 @@ class ScalaSourceViewerConfiguration(
       case IJavaPartitions.JAVA_CHARACTER | IDocument.DEFAULT_CONTENT_TYPE =>
         Array(
           new SmartSemicolonAutoEditStrategy(partitioning),
-          new ScalaAutoIndentStrategy(partitioning, getProject, sourceViewer, prefProvider),
+          sais,
           new BracketAutoEditStrategy(ScalaPlugin.prefStore),
           new LiteralAutoEditStrategy(ScalaPlugin.prefStore))
 
       case _ =>
-        Array(new ScalaAutoIndentStrategy(partitioning, getProject, sourceViewer, prefProvider))
+        Array(sais)
     }
   }
 

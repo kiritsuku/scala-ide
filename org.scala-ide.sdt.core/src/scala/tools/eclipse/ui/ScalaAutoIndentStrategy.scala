@@ -5,69 +5,39 @@
 
 package scala.tools.eclipse.ui
 
-import org.eclipse.core.runtime.Assert;
-
-import org.eclipse.jface.preference.IPreferenceStore;
-
-import org.eclipse.jface.text.BadLocationException;
-import org.eclipse.jface.text.DefaultIndentLineAutoEditStrategy;
-import org.eclipse.jface.text.Document;
-import org.eclipse.jface.text.DocumentCommand;
-import org.eclipse.jface.text.DocumentRewriteSession;
-import org.eclipse.jface.text.DocumentRewriteSessionType;
-import org.eclipse.jface.text.IDocument;
-import org.eclipse.jface.text.IRegion;
-import org.eclipse.jface.text.ITypedRegion;
-import org.eclipse.jface.text.Region;
-import org.eclipse.jface.text.TextUtilities;
-import org.eclipse.jface.text.rules.FastPartitioner;
-import org.eclipse.jface.text.rules.RuleBasedPartitioner
-import org.eclipse.jface.text.source.ISourceViewer;
-
-import org.eclipse.ui.IEditorPart;
-import org.eclipse.ui.IWorkbenchPage;
-
-import org.eclipse.ui.texteditor.ITextEditorExtension3;
-
-import org.eclipse.jdt.core.IJavaProject;
-import org.eclipse.jdt.core.JavaCore;
-import org.eclipse.jdt.core.ToolFactory;
-import org.eclipse.jdt.core.compiler.IProblem;
-import org.eclipse.jdt.core.compiler.IScanner;
-import org.eclipse.jdt.core.compiler.ITerminalSymbols;
-import org.eclipse.jdt.core.compiler.InvalidInputException;
-import org.eclipse.jdt.core.dom.AST;
-import org.eclipse.jdt.core.dom.ASTNode;
-import org.eclipse.jdt.core.dom.ASTParser;
-import org.eclipse.jdt.core.dom.CompilationUnit;
-import org.eclipse.jdt.core.dom.DoStatement;
-import org.eclipse.jdt.core.dom.Expression;
-import org.eclipse.jdt.core.dom.ForStatement;
-import org.eclipse.jdt.core.dom.IfStatement;
-import org.eclipse.jdt.core.dom.Statement;
-import org.eclipse.jdt.core.dom.WhileStatement;
-import org.eclipse.jdt.core.formatter.DefaultCodeFormatterConstants;
-
-import org.eclipse.jdt.internal.corext.dom.NodeFinder;
-import org.eclipse.jdt.internal.corext.util.CodeFormatterUtil;
-
-import org.eclipse.jdt.ui.PreferenceConstants;
-import org.eclipse.jdt.ui.text.IJavaPartitions;
-
-import org.eclipse.jdt.internal.ui.JavaPlugin;
-import org.eclipse.jdt.internal.ui.text.JavaHeuristicScanner;
-import org.eclipse.jdt.internal.ui.text.JavaIndenter;
-import org.eclipse.jdt.internal.ui.text.Symbols;
-
 import scala.tools.eclipse.lexical.ScalaDocumentPartitioner
-
-import scala.util.matching.Regex
-
-import org.eclipse.jdt.internal.ui.text.Symbols;
-
-
-import scala.util.matching.Regex
-
+import scala.tools.eclipse.ui.indentation.PreferenceProvider
+import scala.tools.eclipse.ui.indentation.jdt.Symbols
+import scala.tools.eclipse.ui.indentation.UiHandler
+import scala.tools.eclipse.ui.indentation.jdt.JavaHeuristicScanner
+import org.eclipse.core.runtime.Assert
+import org.eclipse.jdt.core.IJavaProject
+import org.eclipse.jdt.core.JavaCore
+import org.eclipse.jdt.core.ToolFactory
+import org.eclipse.jdt.core.compiler.IProblem
+import org.eclipse.jdt.core.compiler.ITerminalSymbols
+import org.eclipse.jdt.core.compiler.InvalidInputException
+import org.eclipse.jdt.core.dom.AST
+import org.eclipse.jdt.core.dom.ASTNode
+import org.eclipse.jdt.core.dom.ASTParser
+import org.eclipse.jdt.core.dom.CompilationUnit
+import org.eclipse.jdt.core.dom.DoStatement
+import org.eclipse.jdt.core.dom.ForStatement
+import org.eclipse.jdt.core.dom.IfStatement
+import org.eclipse.jdt.core.dom.NodeFinder
+import org.eclipse.jdt.core.dom.WhileStatement
+import org.eclipse.jdt.core.formatter.DefaultCodeFormatterConstants
+import org.eclipse.jdt.ui.text.IJavaPartitions
+import org.eclipse.jface.text.BadLocationException
+import org.eclipse.jface.text.DefaultIndentLineAutoEditStrategy
+import org.eclipse.jface.text.Document
+import org.eclipse.jface.text.DocumentCommand
+import org.eclipse.jface.text.IDocument
+import org.eclipse.jface.text.IRegion
+import org.eclipse.jface.text.Region
+import org.eclipse.jface.text.TextUtilities
+import org.eclipse.jface.text.source.ISourceViewer
+import org.eclipse.jdt.internal.corext.util.CodeFormatterUtil
 
 /**
  * Auto indent strategy sensitive to brackets.
@@ -76,12 +46,12 @@ import scala.util.matching.Regex
  * @param project the project to get formatting preferences from, or null to use default preferences
  * @param viewer the source viewer that this strategy is attached to
  */
-class ScalaAutoIndentStrategy(
+abstract class ScalaAutoIndentStrategy(
     val fPartitioning : String,
     val fProject : IJavaProject,
     val fViewer : ISourceViewer,
     val preferencesProvider : PreferenceProvider
-  ) extends DefaultIndentLineAutoEditStrategy {
+  ) extends DefaultIndentLineAutoEditStrategy with UiHandler {
 
   // The line comment introducer. Value is "{@value}"
   private val LINE_COMMENT= "//"
@@ -91,9 +61,9 @@ class ScalaAutoIndentStrategy(
     var delta : Int
   )
 
-  private def fCloseBrace = preferencesProvider.getBoolean(PreferenceConstants.EDITOR_CLOSE_BRACES)
+  private def fCloseBrace = preferencesProvider.getBoolean(constants.EDITOR_CLOSE_BRACES)
   private var fIsSmartMode = false
-  private def fIsSmartTab = preferencesProvider.getBoolean(PreferenceConstants.EDITOR_SMART_TAB)
+  private def fIsSmartTab = preferencesProvider.getBoolean(constants.EDITOR_SMART_TAB)
 
   // TODO This could be in a singleton as in the original, but that sucks.
   private var fgScanner = ToolFactory.createScanner(false, false, false, false)
@@ -189,7 +159,7 @@ class ScalaAutoIndentStrategy(
   }
 
   private def createIndenter(d : IDocument, scanner : JavaHeuristicScanner) : ScalaIndenter = {
-    return new ScalaIndenter(d, scanner, fProject, preferencesProvider)
+    return new ScalaIndenter(d, scanner, preferencesProvider)
   }
 
   private def smartIndentAfterClosingBracket(d : IDocument, c : DocumentCommand) : Unit = {
@@ -224,7 +194,7 @@ class ScalaAutoIndentStrategy(
       }
     } catch {
       case e : BadLocationException =>
-        JavaPlugin.log(e)
+        log(e)
     }
   }
 
@@ -266,7 +236,7 @@ class ScalaAutoIndentStrategy(
 
     } catch {
       case e : BadLocationException =>
-        JavaPlugin.log(e)
+        log(e)
     }
   }
 
@@ -347,7 +317,7 @@ class ScalaAutoIndentStrategy(
 
     } catch {
       case e : BadLocationException =>
-        JavaPlugin.log(e)
+        log(e)
     }
   }
 
@@ -728,7 +698,7 @@ class ScalaAutoIndentStrategy(
       command.text= newText;
 
     } catch (BadLocationException e) {
-      JavaPlugin.log(e);
+      log(e);
     }
     */
   }
@@ -841,7 +811,7 @@ class ScalaAutoIndentStrategy(
          }
       }
 
-      if (whitespaceCount != 0 && whitespaceCount >= CodeFormatterUtil.getIndentWidth(fProject))
+      if (whitespaceCount != 0 && whitespaceCount >= getIndentWidth(fProject))
         insert = newInsert
     }
 
@@ -935,7 +905,8 @@ class ScalaAutoIndentStrategy(
    *
    * @return the number of spaces displayed for a tabulator in the editor
    */
-  private def getVisualTabLengthPreference : Int = CodeFormatterUtil.getTabWidth(fProject)
+  private def getVisualTabLengthPreference : Int =
+    getTabWidth(fProject)
 
 
   /**
@@ -1188,7 +1159,7 @@ class ScalaAutoIndentStrategy(
 
     } catch {
       case e : BadLocationException =>
-        JavaPlugin.log(e)
+        log(e)
     }
   }
 
@@ -1215,10 +1186,9 @@ class ScalaAutoIndentStrategy(
       smartIndentAfterNewLine(d, c)
     else if (c.text.length() == 1)
       smartIndentOnKeypress(d, c)
-    else if (c.text.length() > 1 && getPreferenceStore.getBoolean(PreferenceConstants.EDITOR_SMART_PASTE) &&
+    else if (c.text.length() > 1 && getPreferenceStore.getBoolean(constants.EDITOR_SMART_PASTE) &&
       (fViewer == null || fViewer.getTextWidget() == null || !fViewer.getTextWidget().getBlockSelection()))
         smartPaste(d, c) // no smart backspace for paste
-
   }
 
 
@@ -1245,25 +1215,11 @@ class ScalaAutoIndentStrategy(
       return text.length() == 1 && text.charAt(0) == '\t'
   }
 
-  private def getPreferenceStore = JavaPlugin.getDefault().getCombinedPreferenceStore()
-
   private def closeBrace : Boolean = fCloseBrace
 
   private def clearCachedValues() {
     preferencesProvider.updateCache
     fIsSmartMode = computeSmartMode
-  }
-
-  protected def computeSmartMode : Boolean = {
-    val page = JavaPlugin.getActivePage()
-    if (page != null) {
-      val part = page.getActiveEditor()
-      if (part.isInstanceOf[ITextEditorExtension3]) {
-        val extension = part.asInstanceOf[ITextEditorExtension3]
-        return extension.getInsertMode() == ITextEditorExtension3.SMART_INSERT
-      }
-    }
-    return false
   }
 
   private def getCompilationUnitForMethod(document : IDocument, offset : Int) : CompilationUnitInfo = {
@@ -1287,7 +1243,7 @@ class ScalaAutoIndentStrategy(
 
     } catch {
       case e : BadLocationException =>
-        JavaPlugin.log(e)
+        log(e)
     }
 
     return null

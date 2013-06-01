@@ -5,92 +5,18 @@
 
 package scala.tools.eclipse.ui
 
-import scalariform.formatter.preferences._
-
-import org.eclipse.core.runtime.Assert
-import org.eclipse.jface.text.BadLocationException
-import org.eclipse.jface.text.IDocument
-import org.eclipse.jface.text.IRegion
-import org.eclipse.jdt.core.IJavaProject
-import org.eclipse.jdt.core.JavaCore
-import org.eclipse.jdt.core.formatter.DefaultCodeFormatterConstants
-import org.eclipse.jdt.internal.ui.JavaPlugin
-import org.eclipse.jdt.internal.ui.text.DocumentCharacterIterator
-import org.eclipse.jdt.internal.ui.text.JavaHeuristicScanner
-import org.eclipse.jdt.internal.ui.text.Symbols
-import org.eclipse.jdt.internal.corext.util.CodeFormatterUtil
-import org.eclipse.jdt.ui.PreferenceConstants
-import java.lang.Math.min
-import scala.collection.mutable.Map
 import scala.annotation.tailrec
-import scala.tools.eclipse.ScalaPlugin
-import scala.tools.eclipse.formatter.FormatterPreferences
-import scalariform.formatter.preferences.IndentSpaces
-
+import scala.tools.eclipse.ui.indentation.PreferenceProvider
+import scala.tools.eclipse.ui.indentation.jdt.Symbols
+import scala.tools.eclipse.ui.indentation.jdt.DocumentCharacterIterator
+import scala.tools.eclipse.ui.indentation.jdt.JavaHeuristicScanner
 import scala.util.control.Exception
 
-// TODO Move this out into a new file
-trait PreferenceProvider {
-  private val preferences = Map.empty[String, String]
-
-  def updateCache(): Unit
-
-  def put(key: String, value: String) {
-    preferences(key) = value
-  }
-
-  def get(key: String): String = {
-    preferences(key)
-  }
-
-  def getBoolean(key: String): Boolean = {
-    get(key).toBoolean
-  }
-
-  def getInt(key: String): Int = {
-    get(key).toInt
-  }
-}
-
-// TODO Move this out into a new file
-class JdtPreferenceProvider(val project: IJavaProject) extends PreferenceProvider {
-  private def preferenceStore = JavaPlugin.getDefault().getCombinedPreferenceStore()
-
-  def updateCache(): Unit = {
-    put(PreferenceConstants.EDITOR_CLOSE_BRACES,
-      preferenceStore.getBoolean(PreferenceConstants.EDITOR_CLOSE_BRACES).toString)
-    put(PreferenceConstants.EDITOR_SMART_TAB,
-      preferenceStore.getBoolean(PreferenceConstants.EDITOR_SMART_TAB).toString)
-
-    val formatterPreferences = FormatterPreferences.getPreferences(project)
-    val indentWithTabs = formatterPreferences(IndentWithTabs).toString
-    val indentSpaces = formatterPreferences(IndentSpaces).toString
-
-    put(ScalaIndenter.TAB_SIZE, indentSpaces)
-    put(ScalaIndenter.INDENT_SIZE, indentSpaces)
-    put(ScalaIndenter.INDENT_WITH_TABS, indentWithTabs)
-
-    def populateFromProject(key: String) = {
-      put(key, project.getOption(key, true))
-    }
-
-    populateFromProject(DefaultCodeFormatterConstants.FORMATTER_TAB_CHAR)
-    populateFromProject(DefaultCodeFormatterConstants.FORMATTER_ALIGNMENT_FOR_EXPRESSIONS_IN_ARRAY_INITIALIZER)
-    populateFromProject(DefaultCodeFormatterConstants.FORMATTER_ALIGNMENT_FOR_CONDITIONAL_EXPRESSION)
-    populateFromProject(DefaultCodeFormatterConstants.FORMATTER_INDENT_SWITCHSTATEMENTS_COMPARE_TO_SWITCH)
-    populateFromProject(DefaultCodeFormatterConstants.FORMATTER_INDENT_SWITCHSTATEMENTS_COMPARE_TO_CASES)
-    populateFromProject(DefaultCodeFormatterConstants.FORMATTER_ALIGNMENT_FOR_PARAMETERS_IN_METHOD_DECLARATION)
-    populateFromProject(DefaultCodeFormatterConstants.FORMATTER_ALIGNMENT_FOR_ARGUMENTS_IN_METHOD_INVOCATION)
-    populateFromProject(DefaultCodeFormatterConstants.FORMATTER_INDENT_STATEMENTS_COMPARE_TO_BLOCK)
-    populateFromProject(DefaultCodeFormatterConstants.FORMATTER_INDENT_STATEMENTS_COMPARE_TO_BODY)
-    populateFromProject(DefaultCodeFormatterConstants.FORMATTER_INDENT_BODY_DECLARATIONS_COMPARE_TO_TYPE_HEADER)
-    populateFromProject(DefaultCodeFormatterConstants.FORMATTER_BRACE_POSITION_FOR_BLOCK)
-    populateFromProject(DefaultCodeFormatterConstants.FORMATTER_BRACE_POSITION_FOR_ARRAY_INITIALIZER)
-    populateFromProject(DefaultCodeFormatterConstants.FORMATTER_BRACE_POSITION_FOR_METHOD_DECLARATION)
-    populateFromProject(DefaultCodeFormatterConstants.FORMATTER_BRACE_POSITION_FOR_TYPE_DECLARATION)
-    populateFromProject(DefaultCodeFormatterConstants.FORMATTER_CONTINUATION_INDENTATION)
-  }
-}
+import org.eclipse.core.runtime.Assert
+import org.eclipse.jdt.core.JavaCore
+import org.eclipse.jdt.core.formatter.DefaultCodeFormatterConstants
+import org.eclipse.jface.text.BadLocationException
+import org.eclipse.jface.text.IDocument
 
 /**
  * Holder for various constants used by the Scala indenter
@@ -120,7 +46,6 @@ object ScalaIndenter {
 class ScalaIndenter(
   val document: IDocument,
   val scanner: JavaHeuristicScanner,
-  val project: IJavaProject,
   val preferencesProvider: PreferenceProvider) {
 
   /**
@@ -423,7 +348,7 @@ class ScalaIndenter(
     var measured = 0
     val chars = reference.length()
     var i = 0
-    while (i < min(indentLength, chars)) {
+    while (i < math.min(indentLength, chars)) {
       val ch = reference.charAt(i)
       ch match {
         case '\t' =>
