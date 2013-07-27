@@ -19,8 +19,107 @@ import org.eclipse.jdt.core.search.TypeNameRequestor
 import org.eclipse.jdt.core.IJavaElement
 import org.junit.Ignore
 import scala.reflect.internal.util.OffsetPosition
+import scala.tools.eclipse.javaelements.ScalaSourceFile
 
-object CompletionTests extends TestProjectSetup("completion")
+object CompletionTests extends TestProjectSetup("completion") {
+
+  def testSourceUnit(source: String, withImportProposal: Boolean)(expectedCompletions: List[String]*) {
+    val path = s"generated-runtime-tests/Test${System.nanoTime}.scala"
+    val p = SDTTestUtils.addFileToProject(project.underlying, s"src/$path", source)
+    testFileUnit(path, withImportProposal)(expectedCompletions: _*)
+  }
+
+  def testFileUnit(path: String, withImportProposal: Boolean)(expectedCompletions: List[String]*) {
+    loadTestUnit(scalaCompilationUnit(path)) { (i, position, compl) =>
+
+      var completions = if (!withImportProposal) compl.filter(!_.needImport) else compl
+
+      // remove parens as the compiler trees' printer has been slightly modified in 2.10
+      // (and we need the test to pass for 2.9.0/-1 and 2.8.x as well).
+      val completionsNoParens: List[String] = completions.map(c => normalizeCompletion(c.display)).sorted
+      val expectedNoParens: List[String] = expectedCompletions(i).map(normalizeCompletion).sorted
+
+      println("Found following completions @ position (%d,%d):".format(position.line, position.column))
+      completionsNoParens.foreach(e => println("\t" + e))
+      println()
+
+      println("Expected completions:")
+      expectedNoParens.foreach(e => println("\t" + e))
+      println()
+
+      assertTrue("Found %d completions @ position (%d,%d), Expected %d"
+        .format(completionsNoParens.size, position.line, position.column, expectedNoParens.size),
+        completionsNoParens.size == expectedNoParens.size) // <-- checked condition
+
+      completionsNoParens.zip(expectedNoParens).foreach {
+        case (found, expected) =>
+          assertEquals("Wrong completion", expected, found)
+      }
+    }
+  }
+
+  def loadTestUnit(unit: ScalaSourceFile)(body: (Int, OffsetPosition, List[CompletionProposal]) => Unit) {
+    // first, 'open' the file by telling the compiler to load it
+    project.withSourceFile(unit) { (src, compiler) =>
+      val dummy = new Response[Unit]
+      compiler.askReload(List(src), dummy)
+      dummy.get
+
+      val tree = new Response[compiler.Tree]
+      compiler.askType(src, true, tree)
+      tree.get
+
+      val contents = unit.getContents
+      // mind that the space in the marker is very important (the presentation compiler
+      // seems to get lost when the position where completion is asked
+      val positions = SDTTestUtils.positionsOf(contents, " /*!*/")
+      assertTrue("Couldn't find a position for the completion marker. Hint: Did you add a space between the element to complete and the marker?", positions.nonEmpty)
+      val content = unit.getContents.mkString
+
+      val completion = new ScalaCompletions
+      for (i <- 0 until positions.size) {
+        val pos = positions(i)
+
+        val position = new scala.reflect.internal.util.OffsetPosition(src, pos)
+        var wordRegion = ScalaWordFinder.findWord(content, position.point)
+
+        //        val selection = mock(classOf[ISelectionProvider])
+
+        /* FIXME:
+         * I would really love to call `completion.computeCompletionProposals`, but for some unclear
+         * reason that call is not working. Some debugging shows that the position is not right (off by one),
+         * however, increasing the position makes the computed `wordRegion` wrong... hard to understand where
+         * the bug is!
+        val textViewer = mock(classOf[ITextViewer])
+        when(textViewer.getSelectionProvider()).thenReturn(selection)
+        val document = mock(classOf[IDocument])
+        when(document.get()).thenReturn(content)
+        when(textViewer.getDocument()).thenReturn(document)
+        val monitor = mock(classOf[IProgressMonitor])
+        val context = new ContentAssistInvocationContext(textViewer, position.offset.get)
+        import collection.JavaConversions._
+        val completions: List[ICompletionProposal] = completion.computeCompletionProposals(context, monitor).map(_.asInstanceOf[ICompletionProposal]).toList
+        */
+
+        val completions = completion.findCompletions(wordRegion)(pos + 1, unit)(src, compiler)
+        val sortedCompletions = completions.sortWith((x,y) => x.relevance >= y.relevance)
+        body(i, position, sortedCompletions)
+      }
+    }()
+  }
+
+  /**
+   * Transform the given completion proposal into a string that is (hopefully)
+   *  compiler-version independent.
+   *
+   *  Transformations are:
+   *    - remove parenthesis
+   *    - java.lang.String => String
+   */
+  private def normalizeCompletion(str: String): String = {
+    str.replace("(", "").replace(")", "").replace("java.lang.String", "String")
+  }
+}
 
 class CompletionTests {
   import CompletionTests._
@@ -114,16 +213,20 @@ class CompletionTests {
     }
   }
 
-  /**
-   * Transform the given completion proposal into a string that is (hopefully)
-   *  compiler-version independent.
-   *
-   *  Transformations are:
-   *    - remove parenthesis
-   *    - java.lang.String => String
-   */
-  private def normalizeCompletion(str: String): String = {
-    str.replace("(", "").replace(")", "").replace("java.lang.String", "String")
+  @Test
+  def xxx() {
+    val source = """
+      object Test extends App {
+        val xs = List("a" -> 1, "b" -> 2, "c" -> 3)
+        xs.map /*!*/
+      }"""
+    val expected = """
+      object Test extends App {
+        val xs = List("a" -> 1, "b" -> 2, "c" -> 3)
+        // xs.map([f])
+        xs.map { case ([a], [b]) => | }
+      }"""
+    testSourceUnit(source, true)()
   }
 
   /**

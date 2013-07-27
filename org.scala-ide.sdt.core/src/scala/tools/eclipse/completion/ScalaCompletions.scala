@@ -64,6 +64,7 @@ class ScalaCompletions extends HasLogger {
 
     for (completions <- completed.get.left.toOption) {
       compiler.askOption { () =>
+        println(completions)
         for (completion <- completions) {
           completion match {
             case compiler.TypeMember(sym, tpe, true, inherited, viaView) if !sym.isConstructor && nameMatches(sym) =>
