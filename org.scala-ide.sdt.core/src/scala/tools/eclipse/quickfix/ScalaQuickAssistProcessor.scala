@@ -3,7 +3,6 @@ package quickfix
 
 import scala.tools.eclipse.javaelements.ScalaSourceFile
 import scala.tools.eclipse.logging.HasLogger
-
 import org.eclipse.jdt.core.ICompilationUnit
 import org.eclipse.jdt.ui.text.java.IInvocationContext
 import org.eclipse.jdt.ui.text.java.IJavaCompletionProposal
@@ -46,7 +45,8 @@ class ScalaQuickAssistProcessor extends IQuickAssistProcessor with HasLogger {
         ExpandCaseClassBindingProposal,
         InlineLocalProposal,
         RenameProposal,
-        ExtractMethodProposal)
+        ExtractMethodProposal,
+        InsertInferredType)
 
     val refactoringSuggestions = try availableAssists.filter(_.isValidProposal) catch {
       case e: Exception =>
