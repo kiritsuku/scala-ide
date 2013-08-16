@@ -1,11 +1,14 @@
 package org.scalaide.core.ui
 
+import indentation._
+
 import org.junit.runner.RunWith
 import org.junit.runners.Suite
 
 @RunWith(classOf[Suite])
 @Suite.SuiteClasses(Array(
-  classOf[ScalaAutoIndentStrategyTest],
+  classOf[DefIndentationTests],
+  classOf[VariousIndentTests],
   classOf[BracketAutoEditStrategyTest],
   classOf[CommentAutoEditStrategyTest],
   classOf[LiteralAutoEditStrategyTest],

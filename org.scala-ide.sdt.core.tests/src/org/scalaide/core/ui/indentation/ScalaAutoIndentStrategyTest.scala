@@ -1,15 +1,16 @@
-package org.scalaide.core.ui
+package org.scalaide.core.ui.indentation
 
 import org.eclipse.jdt.core.IJavaProject
+import org.eclipse.jdt.core.formatter.{DefaultCodeFormatterConstants => DCFC}
 import org.eclipse.jdt.internal.core.JavaProject
 import org.eclipse.jdt.ui.PreferenceConstants
 import org.eclipse.jface.preference.IPreferenceStore
-import org.junit.Test
+import org.scalaide.ui.internal.editor.indentation.UiHandler
 import org.scalaide.logging.HasLogger
 import org.scalaide.ui.internal.editor.indentation.PreferenceProvider
-import org.scalaide.ui.internal.editor.indentation.ScalaAutoIndentStrategy
 import org.scalaide.ui.internal.editor.indentation.ScalaIndenter
-import org.scalaide.ui.internal.editor.indentation.UiHandler
+import org.scalaide.core.ui.AutoEditStrategyTests
+import org.scalaide.ui.internal.editor.indentation.ScalaAutoIndentStrategy
 
 trait MockUiHandler extends UiHandler with HasLogger {
 
@@ -45,6 +46,8 @@ object ScalaAutoIndentStrategyTest {
       DCFC.FORMATTER_INDENT_BODY_DECLARATIONS_COMPARE_TO_TYPE_HEADER -> "true",
       DCFC.FORMATTER_BRACE_POSITION_FOR_TYPE_DECLARATION -> DCFC.END_OF_LINE,
       DCFC.FORMATTER_TAB_CHAR -> "space",
+      DCFC.FORMATTER_INDENT_STATEMENTS_COMPARE_TO_BODY -> "true",
+      DCFC.FORMATTER_BRACE_POSITION_FOR_METHOD_DECLARATION -> DCFC.END_OF_LINE,
       ScalaIndenter.TAB_SIZE -> "2",
       ScalaIndenter.INDENT_SIZE -> "2",
       ScalaIndenter.INDENT_WITH_TABS -> "false")
@@ -55,90 +58,13 @@ object ScalaAutoIndentStrategyTest {
 
 }
 
-class ScalaAutoIndentStrategyTest extends AutoEditStrategyTests(
+abstract class ScalaAutoIndentStrategyTest extends AutoEditStrategyTests(
     new ScalaAutoIndentStrategy(
         null, ScalaAutoIndentStrategyTest.project,
         null, ScalaAutoIndentStrategyTest.preferenceProvider) with MockUiHandler {
       override def computeSmartMode = true
     }) {
 
-  @Test
-  def testClassIndent() = """
-    class X {^
-    """ becomes """
-    class X {
-      ^
-    }
-    """ after Add("\n")
-
-  @Test
-  def testTraitIndent() = """
-    trait X {^
-    """ becomes """
-    trait X {
-      ^
-    }
-    """ after Add("\n")
-
-  @Test
-  def testDefIndent() = """
-    class X {
-      def y = {^
-    }
-    """ becomes """
-    class X {
-      def y = {
-        ^
-      }
-    }
-    """ after Add("\n")
-
-  @Test
-  def defWithType() = """
-    class X {
-      def y: Int = {^
-    }
-    """ becomes """
-    class X {
-      def y: Int = {
-        ^
-      }
-    }
-    """ after Add("\n")
-
-  @Test
-  def testGenericsIndent() = """
-    class X {
-      val xs = List[X]^
-    }
-    """ becomes """
-    class X {
-      val xs = List[X]
-      ^
-    }
-    """ after Add("\n")
-
-  @Test
-  def genericsIndentOverMultipleLines() = """
-    class X {
-      val xs = List[^
-    }
-    """ becomes """
-    class X {
-      val xs = List[
-        ^
-    }
-    """ after Add("\n")
-
-  @Test
-  def afterFunctionCall() = """
-    class X {
-      y()^
-    }
-    """ becomes """
-    class X {
-      y()
-      ^
-    }
-    """ after Add("\n")
+  val newline = Add("\n")
+  val tab = Add("\t")
 }
