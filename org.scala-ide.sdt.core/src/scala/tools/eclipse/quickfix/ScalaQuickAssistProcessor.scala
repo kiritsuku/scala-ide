@@ -47,6 +47,10 @@ class ScalaQuickAssistProcessor extends IQuickAssistProcessor with HasLogger {
         Seq()
     }
 
+    if (refactoringSuggestions.intersect(Seq(StringToInterpolationProposal, InterpolationToStringProposal)).size == 2) {
+
+    }
+
     refactoringSuggestions ++
       (problemMessage match {
         case ImplicitConversionFound(s) => List(new ImplicitConversionExpandingProposal(s, location))
@@ -66,7 +70,9 @@ object ScalaQuickAssistProcessor {
     ExpandCaseClassBindingProposal,
     InlineLocalProposal,
     RenameProposal,
-    ExtractMethodProposal
+    ExtractMethodProposal,
+    StringToInterpolationProposal,
+    InterpolationToStringProposal
   )
 }
 
