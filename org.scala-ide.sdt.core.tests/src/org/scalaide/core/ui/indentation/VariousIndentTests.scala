@@ -5,16 +5,7 @@ import org.junit.Test
 class VariousIndentTests extends ScalaAutoIndentStrategyTest {
 
   @Test
-  def classIndent() = """
-    class X {^
-    """ becomes """
-    class X {
-      ^
-    }
-    """ after newline
-
-  @Test
-  def traitIndent() = """
+  def traitWithBraces() = """
     trait X {^
     """ becomes """
     trait X {
@@ -23,7 +14,7 @@ class VariousIndentTests extends ScalaAutoIndentStrategyTest {
     """ after newline
 
   @Test
-  def objectIndent() =  """
+  def objectWithBraces() =  """
     object X {^
     """ becomes """
     object X {
