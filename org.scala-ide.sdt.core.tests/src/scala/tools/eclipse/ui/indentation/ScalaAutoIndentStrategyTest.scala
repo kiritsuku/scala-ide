@@ -47,6 +47,8 @@ object ScalaAutoIndentStrategyTest {
       DCFC.FORMATTER_TAB_CHAR -> "space",
       DCFC.FORMATTER_INDENT_STATEMENTS_COMPARE_TO_BODY -> "true",
       DCFC.FORMATTER_BRACE_POSITION_FOR_METHOD_DECLARATION -> DCFC.END_OF_LINE,
+      // TODO Find out the exact value that has to be returned here
+      DCFC.FORMATTER_ALIGNMENT_FOR_ARGUMENTS_IN_METHOD_INVOCATION -> "0",
       ScalaIndenter.TAB_SIZE -> "4",
       ScalaIndenter.INDENT_SIZE -> "2",
       ScalaIndenter.INDENT_WITH_TABS -> "false")

@@ -8,6 +8,7 @@ import org.junit.runners.Suite
 @RunWith(classOf[Suite])
 @Suite.SuiteClasses(Array(
   classOf[DefIndentationTests],
+  classOf[ClassIndentationTests],
   classOf[VariousIndentTests],
   classOf[BracketAutoEditStrategyTest],
   classOf[CommentAutoEditStrategyTest],
