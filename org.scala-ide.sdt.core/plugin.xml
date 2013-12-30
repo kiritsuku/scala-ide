@@ -1523,4 +1523,15 @@
        </description>
     </decorator>
  </extension>
+ <extension
+       point="org.eclipse.compare.contentMergeViewers">
+    <viewer
+          class="scala.tools.eclipse.ScalaContentViewerCreator"
+          id="org.scala-ide.sdt.core.contentMergeViewer">
+    </viewer>
+    <contentTypeBinding
+          contentMergeViewerId="org.scala-ide.sdt.core.contentMergeViewer"
+          contentTypeId="scala.tools.eclipse.scalaSource">
+    </contentTypeBinding>
+ </extension>
 </plugin>
