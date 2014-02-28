@@ -296,6 +296,11 @@ class ScalaSourceFileEditor extends CompilationUnitEditor with ScalaCompilationU
   }
 
   override def handlePreferenceStoreChanged(event: PropertyChangeEvent) = {
+    import org.scalaide.core.internal.formatter.FormatterPreferences._
+    import scalariform.formatter.preferences._
+    val IndentSpacesKey = IndentSpaces.eclipseKey
+    val IndentWithTabsKey = IndentWithTabs.eclipseKey
+
     event.getProperty match {
       case ShowInferredSemicolonsAction.PREFERENCE_KEY =>
         getAction(ShowInferredSemicolonsAction.ACTION_ID).asInstanceOf[IUpdate].update()
@@ -309,6 +314,11 @@ class ScalaSourceFileEditor extends CompilationUnitEditor with ScalaCompilationU
           case _ =>
             uninstallOccurrencesFinder()
         }
+
+      case IndentSpacesKey | IndentWithTabsKey =>
+        val tabWidth = getSourceViewerConfiguration().getTabWidth(sourceViewer)
+        sourceViewer.getTextWidget().setTabs(tabWidth)
+        updateIndentPrefixes()
 
       case _ =>
         if (affectsTextPresentation(event)) {
