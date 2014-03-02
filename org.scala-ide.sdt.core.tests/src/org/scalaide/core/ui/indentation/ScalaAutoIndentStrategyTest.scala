@@ -11,6 +11,9 @@ import org.scalaide.ui.internal.editor.indentation.PreferenceProvider
 import org.scalaide.ui.internal.editor.indentation.ScalaIndenter
 import org.scalaide.core.ui.AutoEditStrategyTests
 import org.scalaide.ui.internal.editor.indentation.ScalaAutoIndentStrategy
+import org.junit.Before
+
+import AutoEditStrategyTests._
 
 trait MockUiHandler extends UiHandler with HasLogger {
 
@@ -28,44 +31,32 @@ trait MockUiHandler extends UiHandler with HasLogger {
 object ScalaAutoIndentStrategyTest {
 
   val project = new JavaProject()
-
-  val preferenceProvider = {
-
-    val p = new PreferenceProvider {
-      // Nothing to do - we rely on someone setting up this cache
-      def updateCache() {}
-    }
-
-    import org.eclipse.jdt.core.formatter.{ DefaultCodeFormatterConstants => DCFC }
-
-    for { (k, v) <- Seq(
-      PreferenceConstants.EDITOR_CLOSE_BRACES -> "true",
-      PreferenceConstants.EDITOR_SMART_TAB -> "true",
-      DCFC.FORMATTER_INDENT_STATEMENTS_COMPARE_TO_BLOCK -> "true",
-      DCFC.FORMATTER_BRACE_POSITION_FOR_BLOCK -> DCFC.END_OF_LINE,
-      DCFC.FORMATTER_INDENT_BODY_DECLARATIONS_COMPARE_TO_TYPE_HEADER -> "true",
-      DCFC.FORMATTER_BRACE_POSITION_FOR_TYPE_DECLARATION -> DCFC.END_OF_LINE,
-      DCFC.FORMATTER_TAB_CHAR -> "space",
-      DCFC.FORMATTER_INDENT_STATEMENTS_COMPARE_TO_BODY -> "true",
-      DCFC.FORMATTER_BRACE_POSITION_FOR_METHOD_DECLARATION -> DCFC.END_OF_LINE,
-      // TODO Find out the exact value that has to be returned here
-      DCFC.FORMATTER_ALIGNMENT_FOR_ARGUMENTS_IN_METHOD_INVOCATION -> "0",
-      ScalaIndenter.TAB_SIZE -> "2",
-      ScalaIndenter.INDENT_SIZE -> "2",
-      ScalaIndenter.INDENT_WITH_TABS -> "false")
-    } p.put(k, v)
-
-    p
-  }
-
 }
 
 abstract class ScalaAutoIndentStrategyTest extends AutoEditStrategyTests(
     new ScalaAutoIndentStrategy(
-        null, ScalaAutoIndentStrategyTest.project,
-        null, ScalaAutoIndentStrategyTest.preferenceProvider) with MockUiHandler {
+        prefStore, null,
+        ScalaAutoIndentStrategyTest.project, null) with MockUiHandler {
       override def computeSmartMode = true
     }) {
+
+  @Before
+  def startup() = {
+    enable(PreferenceConstants.EDITOR_CLOSE_BRACES, true)
+    enable(PreferenceConstants.EDITOR_SMART_TAB, true)
+    enable(DCFC.FORMATTER_INDENT_STATEMENTS_COMPARE_TO_BLOCK, true)
+    setStringPref(DCFC.FORMATTER_BRACE_POSITION_FOR_BLOCK, DCFC.END_OF_LINE)
+    enable(DCFC.FORMATTER_INDENT_BODY_DECLARATIONS_COMPARE_TO_TYPE_HEADER, true)
+    setStringPref(DCFC.FORMATTER_BRACE_POSITION_FOR_TYPE_DECLARATION, DCFC.END_OF_LINE)
+    setStringPref(DCFC.FORMATTER_TAB_CHAR, "space")
+    enable(DCFC.FORMATTER_INDENT_STATEMENTS_COMPARE_TO_BODY, true)
+    setStringPref(DCFC.FORMATTER_BRACE_POSITION_FOR_METHOD_DECLARATION, DCFC.END_OF_LINE)
+    // TODO Find out the exact value that has to be returned here
+    setStringPref(DCFC.FORMATTER_ALIGNMENT_FOR_ARGUMENTS_IN_METHOD_INVOCATION, "0")
+    setIntPref(ScalaIndenter.TAB_SIZE, 2)
+    setIntPref(ScalaIndenter.INDENT_SIZE, 2)
+    enable(ScalaIndenter.INDENT_WITH_TABS, false)
+  }
 
   val newline = Add("\n")
   val tab = Add("\t")

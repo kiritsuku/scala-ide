@@ -198,7 +198,7 @@ class ScalaSourceViewerConfiguration(
    */
   override def getAutoEditStrategies(sourceViewer: ISourceViewer, contentType: String): Array[IAutoEditStrategy] = {
     val partitioning = getConfiguredDocumentPartitioning(sourceViewer)
-    def sais = new ScalaAutoIndentStrategy(partitioning, getProject, sourceViewer, new JdtPreferenceProvider(getProject)) with JdtUiHandler
+    def sais = new ScalaAutoIndentStrategy(javaPreferenceStore, partitioning, getProject, sourceViewer) with JdtUiHandler
 
     contentType match {
       case IJavaPartitions.JAVA_DOC | IJavaPartitions.JAVA_MULTI_LINE_COMMENT | ScalaPartitions.SCALADOC_CODE_BLOCK =>

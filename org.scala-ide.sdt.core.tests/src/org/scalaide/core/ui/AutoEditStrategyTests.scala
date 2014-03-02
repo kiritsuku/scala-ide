@@ -24,12 +24,16 @@ object AutoEditStrategyTests {
 
   val prefStore = mock(classOf[IPreferenceStore])
 
-  def enable(property: String, enable: Boolean) {
+  def enable(property: String, enable: Boolean): Unit = {
     when(prefStore.getBoolean(property)).thenReturn(enable)
   }
 
-  def setIntPref(property: String, value: Int) {
+  def setIntPref(property: String, value: Int): Unit = {
     when(prefStore.getInt(property)).thenReturn(value)
+  }
+
+  def setStringPref(property: String, value: String): Unit = {
+    when(prefStore.getString(property)).thenReturn(value)
   }
 
   def enabled(property: String)(f: => Unit) = {
