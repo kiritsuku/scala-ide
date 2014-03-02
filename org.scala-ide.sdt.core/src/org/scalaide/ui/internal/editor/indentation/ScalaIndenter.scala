@@ -2,7 +2,6 @@ package org.scalaide.ui.internal.editor.indentation
 
 import scala.annotation.tailrec
 import scala.util.control.Exception
-
 import org.eclipse.core.runtime.Assert
 import org.eclipse.jdt.core.JavaCore
 import org.eclipse.jdt.core.formatter.DefaultCodeFormatterConstants
@@ -11,6 +10,7 @@ import org.eclipse.jface.text.IDocument
 import org.scalaide.ui.internal.editor.indentation.jdt.DocumentCharacterIterator
 import org.scalaide.ui.internal.editor.indentation.jdt.JavaHeuristicScanner
 import org.scalaide.ui.internal.editor.indentation.jdt.Symbols
+import org.eclipse.jface.preference.IPreferenceStore
 
 /**
  * Holder for various constants used by the Scala indenter
@@ -40,7 +40,7 @@ object ScalaIndenter {
 class ScalaIndenter(
   val document: IDocument,
   val scanner: JavaHeuristicScanner,
-  val preferencesProvider: PreferenceProvider) {
+  prefStore: IPreferenceStore) {
 
   /**
    * Returns the possibly project-specific core preference defined under <code>key</code>.
@@ -49,15 +49,15 @@ class ScalaIndenter(
    * @return the value of the preference
    * @since 3.1
    */
-  protected def getCoreFormatterOption(key: String): String = preferencesProvider.get(key)
+  protected def getCoreFormatterOption(key: String): String = prefStore.getString(key)
 
-  private def prefUseTabs = preferencesProvider.getBoolean(ScalaIndenter.INDENT_WITH_TABS)
+  private def prefUseTabs = prefStore.getBoolean(ScalaIndenter.INDENT_WITH_TABS)
 
   private def prefTabChar = if (prefUseTabs) JavaCore.TAB else JavaCore.SPACE
 
-  private def prefTabSize = preferencesProvider.getInt(ScalaIndenter.TAB_SIZE)
+  private def prefTabSize = prefStore.getInt(ScalaIndenter.TAB_SIZE)
 
-  private def prefIndentationSize = preferencesProvider.getInt(ScalaIndenter.INDENT_SIZE)
+  private def prefIndentationSize = prefStore.getInt(ScalaIndenter.INDENT_SIZE)
 
   private def prefArrayDimensionsDeepIndent = true; // sensible default, no formatter setting
 

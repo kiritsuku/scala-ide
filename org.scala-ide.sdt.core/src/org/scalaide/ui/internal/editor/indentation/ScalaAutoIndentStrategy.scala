@@ -30,6 +30,7 @@ import org.eclipse.jface.text.source.ISourceViewer
 import org.scalaide.core.internal.lexical.ScalaDocumentPartitioner
 import org.scalaide.ui.internal.editor.indentation.jdt.JavaHeuristicScanner
 import org.scalaide.ui.internal.editor.indentation.jdt.Symbols
+import org.eclipse.jface.preference.IPreferenceStore
 
 /**
  * Auto indent strategy sensitive to brackets.
@@ -39,10 +40,10 @@ import org.scalaide.ui.internal.editor.indentation.jdt.Symbols
  * @param viewer the source viewer that this strategy is attached to
  */
 abstract class ScalaAutoIndentStrategy(
+    prefStore: IPreferenceStore,
     val fPartitioning : String,
     val fProject : IJavaProject,
-    val fViewer : ISourceViewer,
-    val preferencesProvider : PreferenceProvider
+    val fViewer : ISourceViewer
   ) extends DefaultIndentLineAutoEditStrategy with UiHandler {
 
   // The line comment introducer. Value is "{@value}"
@@ -53,9 +54,9 @@ abstract class ScalaAutoIndentStrategy(
     var delta : Int
   )
 
-  private def fCloseBrace = preferencesProvider.getBoolean(constants.EDITOR_CLOSE_BRACES)
+  private def fCloseBrace = prefStore.getBoolean(constants.EDITOR_CLOSE_BRACES)
   private var fIsSmartMode = false
-  private def fIsSmartTab = preferencesProvider.getBoolean(constants.EDITOR_SMART_TAB)
+  private def fIsSmartTab = prefStore.getBoolean(constants.EDITOR_SMART_TAB)
 
   // TODO This could be in a singleton as in the original, but that sucks.
   private var fgScanner = ToolFactory.createScanner(false, false, false, false)
@@ -151,7 +152,7 @@ abstract class ScalaAutoIndentStrategy(
   }
 
   private def createIndenter(d : IDocument, scanner : JavaHeuristicScanner) : ScalaIndenter = {
-    return new ScalaIndenter(d, scanner, preferencesProvider)
+    return new ScalaIndenter(d, scanner, prefStore)
   }
 
   private def smartIndentAfterClosingBracket(d : IDocument, c : DocumentCommand) : Unit = {
@@ -1210,7 +1211,6 @@ abstract class ScalaAutoIndentStrategy(
   private def closeBrace : Boolean = fCloseBrace
 
   private def clearCachedValues() {
-    preferencesProvider.updateCache
     fIsSmartMode = computeSmartMode
   }
 
