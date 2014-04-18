@@ -1,10 +1,24 @@
 package org.scalaide.core.ui
 
+import scala.reflect.internal.util.BatchSourceFile
+import scala.reflect.internal.util.SourceFile
+import org.eclipse.core.runtime.NullProgressMonitor
 import org.eclipse.jdt.ui.text.IJavaPartitions
 import org.eclipse.jface.text.Document
 import org.eclipse.jface.text.IDocumentExtension3
+import org.junit.After
+import org.junit.Before
 import org.junit.ComparisonFailure
+import org.scalaide.core.EclipseUserSimulator
+import org.scalaide.core.ScalaPlugin
+import org.scalaide.core.compiler.ScalaPresentationCompiler
 import org.scalaide.core.internal.lexical.ScalaDocumentPartitioner
+import org.scalaide.core.internal.project.ScalaProject
+import org.scalaide.util.internal.eclipse.EclipseUtils
+import scala.reflect.io.VirtualFile
+import scala.reflect.io.PlainFile
+import org.eclipse.core.resources.ResourcesPlugin
+import org.eclipse.core.resources.IResource
 
 /**
  * This class provides basic test behavior for all text changing operations that
@@ -109,4 +123,68 @@ trait EclipseDocumentSupport {
 
   override def source: String =
     doc.get()
+}
+
+trait CompilerSupport extends EclipseDocumentSupport {
+  this: TextEditTests =>
+
+  /** Can be overwritten in a subclass if desired. */
+  val projectName = "text-edit-tests"
+
+  var compiler: ScalaPresentationCompiler = _
+//  var sourceFile: SourceFile = _
+
+  private var project: ScalaProject = _
+
+  def createLoadedSourceFile(source: String): SourceFile = {
+    val workspacePath = ScalaPlugin.plugin.workspaceRoot.getLocation().toOSString()
+    val projectPath = project.javaProject.getPath().toOSString()
+    val fullPath = s"$workspacePath$projectPath/src/testfile${System.nanoTime()}.scala"
+    val f = new PlainFile(fullPath)
+    f.create()
+    val sourceFile = new BatchSourceFile(f, source)
+    compiler.loadedType(sourceFile)
+    ResourcesPlugin.getWorkspace().getRoot().refreshLocal(IResource.DEPTH_INFINITE, new NullProgressMonitor)
+    sourceFile
+  }
+
+//  def createSourceFile(source: String): (ScalaPresentationCompiler, SourceFile) = {
+//    var compiler: ScalaPresentationCompiler = null
+//    project.presentationCompiler { compiler = _ }
+//
+//    val workspacePath = ScalaPlugin.plugin.workspaceRoot.getLocation().toOSString()
+//    val projectPath = project.javaProject.getPath().toOSString()
+//    val fullPath = s"$workspacePath$projectPath/testfile${System.nanoTime()}.scala"
+//    val sourceFile = new BatchSourceFile(new PlainFile(fullPath), source)
+////    val sourceFile = new SourceFile {
+////      def content = doc.get().toArray
+////      def file = new VirtualFile(sourceName)
+////      def isLineBreak(idx: Int) = doc.getChar(idx) == '\n'
+////      def isEndOfLine(idx: Int) = isLineBreak(idx)
+////      def isSelfContained = true
+////      def length = doc.getLength()
+////      def offsetToLine(offset: Int) = doc.getLineOfOffset(offset)
+////      def lineToOffset(line: Int) = doc.getLineOffset(line)
+////    }
+//    compiler.loadedType(sourceFile)
+//    (compiler, sourceFile)
+//  }
+
+//  override def source: String =
+//    sourceFile.content.mkString
+
+  // TODO remove before and after
+  @Before
+  def createProject(): Unit = {
+    val simulator = new EclipseUserSimulator
+    project = simulator.createProjectInWorkspace(projectName)
+    project.presentationCompiler { compiler = _ }
+  }
+
+  @After
+  def deleteProject(): Unit = {
+    EclipseUtils.workspaceRunnableIn(ScalaPlugin.plugin.workspaceRoot.getWorkspace) { _ =>
+      project.underlying.delete(/* force */ true, new NullProgressMonitor)
+    }
+  }
 }

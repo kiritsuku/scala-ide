@@ -2,6 +2,7 @@ package org.scalaide.core.ui
 
 import org.junit.runner.RunWith
 import org.junit.runners.Suite
+import org.scalaide.core.ui.clipboard.ClipboardOperationTest
 
 @RunWith(classOf[Suite])
 @Suite.SuiteClasses(Array(
@@ -13,6 +14,7 @@ import org.junit.runners.Suite
   classOf[MultiLineStringAutoEditStrategyTest],
   classOf[IndentGuideGeneratorTest],
   classOf[MultiLineStringAutoIndentStrategyTest],
-  classOf[AutoIndentStrategyTest]
+  classOf[AutoIndentStrategyTest],
+  classOf[ClipboardOperationTest]
 ))
 class UITestSuite

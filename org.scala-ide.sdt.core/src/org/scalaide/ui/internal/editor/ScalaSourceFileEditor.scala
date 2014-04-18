@@ -60,6 +60,9 @@ import org.scalaide.util.internal.eclipse.EclipseUtils
 import org.scalaide.util.internal.eclipse.EditorUtils
 import org.scalaide.util.internal.eclipse.AnnotationUtils._
 import org.scalaide.util.internal.ui.DisplayThread
+import org.scalaide.refactoring
+import org.eclipse.swt.SWT
+import org.scalaide.ui.internal.actions.ScalaClipboardOperationAction
 
 
 class ScalaSourceFileEditor extends CompilationUnitEditor with ScalaCompilationUnitEditor { self =>
@@ -91,17 +94,19 @@ class ScalaSourceFileEditor extends CompilationUnitEditor with ScalaCompilationU
   override protected def createActions() {
     super.createActions()
 
-    val cutAction = new TextOperationAction(bundleForConstructedKeys, "Editor.Cut.", this, ITextOperationTarget.CUT) //$NON-NLS-1$
+    val cutAction = new TextOperationAction(bundleForConstructedKeys, "Editor.Cut.", this, ITextOperationTarget.CUT)
     cutAction.setHelpContextId(IAbstractTextEditorHelpContextIds.CUT_ACTION)
     cutAction.setActionDefinitionId(IWorkbenchCommandConstants.EDIT_CUT)
     setAction(ITextEditorActionConstants.CUT, cutAction)
 
-    val copyAction = new TextOperationAction(bundleForConstructedKeys, "Editor.Copy.", this, ITextOperationTarget.COPY, true) //$NON-NLS-1$
+//    val copyAction = new TextOperationAction(bundleForConstructedKeys, "Editor.Copy.", this, ITextOperationTarget.COPY, true)
+    val copyAction = new ScalaClipboardOperationAction(bundleForConstructedKeys, "Editor.Copy.", this, ITextOperationTarget.COPY)
     copyAction.setHelpContextId(IAbstractTextEditorHelpContextIds.COPY_ACTION)
     copyAction.setActionDefinitionId(IWorkbenchCommandConstants.EDIT_COPY)
     setAction(ITextEditorActionConstants.COPY, copyAction)
 
-    val pasteAction = new TextOperationAction(bundleForConstructedKeys, "Editor.Paste.", this, ITextOperationTarget.PASTE) //$NON-NLS-1$
+//    val pasteAction = new TextOperationAction(bundleForConstructedKeys, "Editor.Paste.", this, ITextOperationTarget.PASTE)
+    val pasteAction = new ScalaClipboardOperationAction(bundleForConstructedKeys, "Editor.Paste.", this, ITextOperationTarget.PASTE)
     pasteAction.setHelpContextId(IAbstractTextEditorHelpContextIds.PASTE_ACTION)
     pasteAction.setActionDefinitionId(IWorkbenchCommandConstants.EDIT_PASTE)
     setAction(ITextEditorActionConstants.PASTE, pasteAction)
