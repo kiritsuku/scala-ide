@@ -6,7 +6,6 @@ import org.scalaide.logging.HasLogger
 import org.scalaide.ui.syntax.ScalaSyntaxClasses
 import org.scalaide.core.internal.decorators.semantichighlighting.PositionsTracker
 import org.scalaide.core.internal.decorators.semantichighlighting.classifier.SymbolTypes
-import org.scalaide.util.internal.eclipse.withDocument
 import org.eclipse.core.runtime.IProgressMonitor
 import org.eclipse.core.runtime.jobs.Job
 import org.eclipse.jdt.core.dom.CompilationUnit
@@ -62,11 +61,12 @@ private class TextPresentationEditorHighlighter(editor: ScalaCompilationUnitEdit
     }
   }
 
-  private def createRepairDescription(damage: IRegion): Option[TextPresentation] = withDocument(sourceViewer) { document =>
-    val configuration = editor.createJavaSourceViewerConfiguration()
-    val presentationReconciler = configuration.getPresentationReconciler(sourceViewer)
-    presentationReconciler.createRepairDescription(damage, document)
-  }
+  private def createRepairDescription(damage: IRegion): Option[TextPresentation] =
+    Option(sourceViewer.getDocument()) flatMap { document =>
+      val configuration = editor.createJavaSourceViewerConfiguration()
+      val presentationReconciler = configuration.getPresentationReconciler(sourceViewer)
+      Option(presentationReconciler.createRepairDescription(damage, document))
+    }
 }
 
 object TextPresentationEditorHighlighter {
