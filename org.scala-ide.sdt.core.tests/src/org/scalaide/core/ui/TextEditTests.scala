@@ -15,6 +15,7 @@ import org.scalaide.core.internal.lexical.ScalaDocumentPartitioner
 import org.scalaide.core.internal.project.ScalaProject
 import org.scalaide.core.testsetup.SDTTestUtils
 import org.scalaide.util.internal.eclipse.EclipseUtils
+import org.junit.AfterClass
 
 /**
  * This class provides basic test behavior for all text changing operations that
@@ -127,18 +128,17 @@ trait CompilerSupport extends EclipseDocumentSupport {
   this: TextEditTests =>
 
   /** Can be overwritten in a subclass if desired. */
-  val projectName = "text-edit-tests"
+  val projectName: String = getClass().getSimpleName()
 
   private val project: ScalaProject = {
     val simulator = new EclipseUserSimulator
     simulator.createProjectInWorkspace(projectName)
   }
 
-  final val compiler: ScalaPresentationCompiler = {
-    var c: ScalaPresentationCompiler = null
-    project.presentationCompiler { c = _ }
-    c
-  }
+  def withCompiler(f: ScalaPresentationCompiler => Unit): Unit =
+    project.presentationCompiler { compiler =>
+      f(compiler)
+    }
 
   /**
    * Creates a compilation unit whose underlying source file physically exists
@@ -156,7 +156,7 @@ trait CompilerSupport extends EclipseDocumentSupport {
   final def mkScalaCompilationUnit(source: String): ScalaCompilationUnit =
     mkCompilationUnit(source).asInstanceOf[ScalaCompilationUnit]
 
-  @After
+  @AfterClass
   final def deleteProject(): Unit = {
     EclipseUtils.workspaceRunnableIn(ScalaPlugin.plugin.workspaceRoot.getWorkspace()) { _ =>
       project.underlying.delete(/* force */ true, new NullProgressMonitor)
