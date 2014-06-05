@@ -36,12 +36,12 @@ class XmlTagScanner(val preferenceStore: IPreferenceStore) extends AbstractScala
     this.end = offset + length - 1
   }
 
-  private def ch = if (pos > end) EOF else document.getChar(pos)
+  private def ch = if (pos > end) Eof else document.getChar(pos)
 
   private def ch(lookahead: Int) = {
     val offset = pos + lookahead
     if (offset > end || offset < 0)
-      EOF
+      Eof
     else
       document.getChar(offset)
   }
@@ -58,25 +58,25 @@ class XmlTagScanner(val preferenceStore: IPreferenceStore) extends AbstractScala
       case '<' =>
         accept()
         afterTagStart = true
-        getToken(XML_TAG_DELIMITER)
-      case EOF => Token.EOF
+        getToken(XmlTagDelimiter)
+      case Eof => Token.EOF
       case '\'' =>
         accept()
         getXmlAttributeValue('\'')
-        getToken(XML_ATTRIBUTE_VALUE)
+        getToken(XmlAttributeValue)
       case '"' =>
         accept()
         getXmlAttributeValue('"')
-        getToken(XML_ATTRIBUTE_VALUE)
+        getToken(XmlAttributeValue)
       case '/' if (ch(1) == '>') =>
         accept(2)
-        getToken(XML_TAG_DELIMITER)
+        getToken(XmlTagDelimiter)
       case '>' =>
         accept()
-        getToken(XML_TAG_DELIMITER)
+        getToken(XmlTagDelimiter)
       case '=' =>
         accept()
-        getToken(XML_ATTRIBUTE_EQUALS)
+        getToken(XmlAttributeEquals)
       case ' ' | '\r' | '\n' | '\t' =>
         accept()
         getWhitespace
@@ -84,11 +84,11 @@ class XmlTagScanner(val preferenceStore: IPreferenceStore) extends AbstractScala
       case _ if wasAfterTagStart =>
         accept()
         getXmlName
-        getToken(XML_TAG_NAME)
+        getToken(XmlTagName)
       case _ =>
         accept()
         getXmlName
-        getToken(XML_ATTRIBUTE_NAME)
+        getToken(XmlAttributeName)
     }
     tokenOffset = start
     tokenLength = pos - start
@@ -98,7 +98,7 @@ class XmlTagScanner(val preferenceStore: IPreferenceStore) extends AbstractScala
   @tailrec
   private def getXmlName(): Unit =
     (ch: @switch) match {
-      case ' ' | '\r' | '\n' | '\t' | EOF | '\'' | '\"' | '>' | '/' | '<' | '=' =>
+      case ' ' | '\r' | '\n' | '\t' | Eof | '\'' | '\"' | '>' | '/' | '<' | '=' =>
       case _ =>
         accept()
         getXmlName
@@ -116,7 +116,7 @@ class XmlTagScanner(val preferenceStore: IPreferenceStore) extends AbstractScala
   @tailrec
   private def getXmlAttributeValue(quote: Char): Unit =
     ch match {
-      case EOF =>
+      case Eof =>
       case `quote` =>
         accept()
       case _ =>
@@ -129,6 +129,6 @@ class XmlTagScanner(val preferenceStore: IPreferenceStore) extends AbstractScala
 
 object XmlTagScanner {
 
-  final val EOF = '\u001A'
+  final val Eof = '\u001A'
 
 }

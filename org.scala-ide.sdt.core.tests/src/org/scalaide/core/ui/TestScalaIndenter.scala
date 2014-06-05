@@ -82,7 +82,7 @@ class TestScalaIndenter {
     val document = new Document(textSoFar.replace(CARET, ""))
     val partitioner = new ScalaDocumentPartitioner
     partitioner.connect(document)
-    document.setDocumentPartitioner(ScalaPartitions.SCALA_PARTITIONING, partitioner)
+    document.setDocumentPartitioner(ScalaPartitions.ScalaPartitioning, partitioner)
 
 
     // Create the command with all needed information
@@ -106,13 +106,13 @@ class TestScalaIndenter {
     preferenceProvider.put(Dcfc.FORMATTER_INDENT_BODY_DECLARATIONS_COMPARE_TO_TYPE_HEADER, "true")
     preferenceProvider.put(Dcfc.FORMATTER_BRACE_POSITION_FOR_TYPE_DECLARATION, Dcfc.END_OF_LINE)
     preferenceProvider.put(Dcfc.FORMATTER_TAB_CHAR, "space")
-    preferenceProvider.put(ScalaIndenter.TAB_SIZE, "2")
-    preferenceProvider.put(ScalaIndenter.INDENT_SIZE, "2")
-    preferenceProvider.put(ScalaIndenter.INDENT_WITH_TABS, "false")
+    preferenceProvider.put(ScalaIndenter.TabSize, "2")
+    preferenceProvider.put(ScalaIndenter.IndentSize, "2")
+    preferenceProvider.put(ScalaIndenter.IndentWithTabs, "false")
 
     val project = new JavaProject()
 
-    val indentStrategy = new TestScalaAutoIndentStrategy(ScalaPartitions.SCALA_PARTITIONING, project, null, preferenceProvider)
+    val indentStrategy = new TestScalaAutoIndentStrategy(ScalaPartitions.ScalaPartitioning, project, null, preferenceProvider)
     indentStrategy.customizeDocumentCommand(document, command)
 
     // Allow for not moving the offset

@@ -20,13 +20,13 @@ class AutoIndentStrategyTest extends AutoEditStrategyTests {
 
   @Before
   def startup(): Unit = {
-    enable(P_ENABLE_AUTO_INDENT_ON_TAB, true)
+    enable(EnableAutoIndentOnTab, true)
     enable(IndentWithTabs.eclipseKey, false)
     setIntPref(IndentSpaces.eclipseKey, 2)
   }
 
   @Test
-  def no_extra_indent_on_tab_when_feature_not_enabled() = disabled(P_ENABLE_AUTO_INDENT_ON_TAB) { """
+  def no_extra_indent_on_tab_when_feature_not_enabled() = disabled(EnableAutoIndentOnTab) { """
     class X {
       def f = {
         val x = 0
@@ -44,7 +44,7 @@ class AutoIndentStrategyTest extends AutoEditStrategyTests {
   }
 
   @Test
-  def indent_with_tab_when_feature_not_enabled() = disabled(P_ENABLE_AUTO_INDENT_ON_TAB) { enabled(IndentWithTabs.eclipseKey) { """
+  def indent_with_tab_when_feature_not_enabled() = disabled(EnableAutoIndentOnTab) { enabled(IndentWithTabs.eclipseKey) { """
     class X {
     ^
     }

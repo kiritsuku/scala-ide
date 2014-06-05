@@ -40,11 +40,11 @@ private[logging] abstract class Log4JFacade {
   }
 
   private def toLog4JLevel(level: Level.Value): Log4JLevel = level match {
-    case Level.DEBUG => Log4JLevel.DEBUG
-    case Level.INFO => Log4JLevel.INFO
-    case Level.WARN => Log4JLevel.WARN
-    case Level.ERROR => Log4JLevel.ERROR
-    case Level.FATAL => Log4JLevel.FATAL
+    case Level.Debug => Log4JLevel.DEBUG
+    case Level.Info => Log4JLevel.INFO
+    case Level.Warn => Log4JLevel.WARN
+    case Level.Error => Log4JLevel.ERROR
+    case Level.Fatal => Log4JLevel.FATAL
   }
 
   protected def updateConsoleAppender(enable: Boolean) {

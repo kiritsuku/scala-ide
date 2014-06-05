@@ -8,39 +8,39 @@ import org.osgi.framework.Bundle
 import org.scalaide.core.ScalaPlugin
 
 object ScalaImages {
-  val MISSING_ICON = ImageDescriptor.getMissingImageDescriptor
+  val MissingIcon = ImageDescriptor.getMissingImageDescriptor
 
-  val SCALA_FILE = fromCoreBundle("/icons/full/obj16/scu_obj.gif")
-  val SCALA_CLASS_FILE = fromCoreBundle("/icons/full/obj16/sclassf_obj.gif")
-  val EXCLUDED_SCALA_FILE = fromCoreBundle("/icons/full/obj16/scu_resource_obj.gif")
+  val ScalaFile = fromCoreBundle("/icons/full/obj16/scu_obj.gif")
+  val ScalaClassFile = fromCoreBundle("/icons/full/obj16/sclassf_obj.gif")
+  val ExcludedScalaFile = fromCoreBundle("/icons/full/obj16/scu_resource_obj.gif")
 
-  val SCALA_CLASS = fromCoreBundle("/icons/full/obj16/class_obj.gif")
-  val SCALA_TRAIT = fromCoreBundle("/icons/full/obj16/trait_obj.gif")
-  val SCALA_OBJECT = fromCoreBundle("/icons/full/obj16/object_obj.gif")
-  val SCALA_PACKAGE_OBJECT = fromCoreBundle("/icons/full/obj16/package_object_obj.png")
+  val ScalaClass = fromCoreBundle("/icons/full/obj16/class_obj.gif")
+  val ScalaTrait = fromCoreBundle("/icons/full/obj16/trait_obj.gif")
+  val ScalaObject = fromCoreBundle("/icons/full/obj16/object_obj.gif")
+  val ScalaPackageObject = fromCoreBundle("/icons/full/obj16/package_object_obj.png")
 
-  val PUBLIC_DEF = fromCoreBundle("/icons/full/obj16/defpub_obj.gif")
-  val PRIVATE_DEF = fromCoreBundle("/icons/full/obj16/defpri_obj.gif")
-  val PROTECTED_DEF = fromCoreBundle("/icons/full/obj16/defpro_obj.gif")
+  val PublicDef = fromCoreBundle("/icons/full/obj16/defpub_obj.gif")
+  val PrivateDef = fromCoreBundle("/icons/full/obj16/defpri_obj.gif")
+  val ProtectedDef = fromCoreBundle("/icons/full/obj16/defpro_obj.gif")
 
-  val PUBLIC_VAL = fromCoreBundle("/icons/full/obj16/valpub_obj.gif")
-  val PROTECTED_VAL = fromCoreBundle("/icons/full/obj16/valpro_obj.gif")
-  val PRIVATE_VAL = fromCoreBundle("/icons/full/obj16/valpri_obj.gif")
+  val PublicVal = fromCoreBundle("/icons/full/obj16/valpub_obj.gif")
+  val ProtectedVal = fromCoreBundle("/icons/full/obj16/valpro_obj.gif")
+  val PrivateVal = fromCoreBundle("/icons/full/obj16/valpri_obj.gif")
 
-  val SCALA_TYPE = fromCoreBundle("/icons/full/obj16/typevariable_obj.gif")
+  val ScalaType = fromCoreBundle("/icons/full/obj16/typevariable_obj.gif")
 
-  val SCALA_PROJECT_WIZARD = fromCoreBundle("/icons/full/wizban/newsprj_wiz.png")
+  val ScalaProjectWizard = fromCoreBundle("/icons/full/wizban/newsprj_wiz.png")
 
-  val REFRESH_REPL_TOOLBAR = fromCoreBundle("/icons/full/etool16/refresh_interpreter.gif")
+  val RefreshReplToolbar = fromCoreBundle("/icons/full/etool16/refresh_interpreter.gif")
 
-  val NEW_CLASS = fromCoreBundle("/icons/full/etool16/newclass_wiz.gif")
-  val CORRECTION_RENAME = fromCoreBundle("/icons/full/obj16/correction_rename.gif")
+  val NewClass = fromCoreBundle("/icons/full/etool16/newclass_wiz.gif")
+  val CorrectionRename = fromCoreBundle("/icons/full/obj16/correction_rename.gif")
 
   private[ui] def fromCoreBundle(path: String): ImageDescriptor =
-    imageDescriptor(ScalaPlugin.plugin.pluginId, path) getOrElse MISSING_ICON
+    imageDescriptor(ScalaPlugin.plugin.pluginId, path) getOrElse MissingIcon
 
   private[ui] def fromBundle(bundleId: String, path: String): ImageDescriptor =
-    imageDescriptor(bundleId, path) getOrElse MISSING_ICON
+    imageDescriptor(bundleId, path) getOrElse MissingIcon
 
   /**
    * Creates an `Option` holding an `ImageDescriptor` of an image located in an

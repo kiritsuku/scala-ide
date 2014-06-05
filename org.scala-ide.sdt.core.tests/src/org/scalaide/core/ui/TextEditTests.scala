@@ -113,7 +113,7 @@ trait EclipseDocumentSupport {
     doc = new Document(source)
     val partitioner = new ScalaDocumentPartitioner
 
-    doc.setDocumentPartitioner(ScalaPartitions.SCALA_PARTITIONING, partitioner)
+    doc.setDocumentPartitioner(ScalaPartitions.ScalaPartitioning, partitioner)
     partitioner.connect(doc)
     operation.execute()
   }

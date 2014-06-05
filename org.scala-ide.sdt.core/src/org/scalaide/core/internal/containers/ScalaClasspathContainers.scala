@@ -118,7 +118,7 @@ abstract class ScalaClasspathContainerPage(containerPath: IPath, name: String, o
         link.setText("The best way to handle these two containers' content is through compiler settings. Go to <a>project's compiler settings</a> to set the Scala installation.")
         link.addSelectionListener(() =>
           PreferencesUtil.createPropertyDialogOn(getShell(), javaProject.getProject(),
-            CompilerSettings.PAGE_ID, Array(CompilerSettings.PAGE_ID), null).open()
+            CompilerSettings.PageId, Array(CompilerSettings.PageId), null).open()
         )
         setControl(composite)
       }
@@ -157,7 +157,7 @@ abstract class ScalaClasspathContainerPage(containerPath: IPath, name: String, o
       finishDelegate = { () =>
         scalaProject foreach { pr =>
           Option(choiceOfScalaInstallation) foreach { sc =>
-            pr.projectSpecificStorage.setValue(SettingConverterUtil.SCALA_DESIRED_INSTALLATION, sc.toString())
+            pr.projectSpecificStorage.setValue(SettingConverterUtil.ScalaDesiredInstallation, sc.toString())
           }
         }
         scalaProject.isDefined

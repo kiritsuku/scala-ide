@@ -90,7 +90,7 @@ trait ScalaPluginPreferencePage extends HasLogger {
           case ms: Settings#MultiStringSetting => ms.value == Nil
           case cs: Settings#ChoiceSetting      => cs.value == cs.default
         }
-        if (!store.getBoolean(USE_PROJECT_SETTINGS_PREFERENCE) && isDefault)
+        if (!store.getBoolean(UseProjectSettingsPreference) && isDefault)
           store.setToDefault(name)
         else {
           val value = setting match {
@@ -179,9 +179,9 @@ class CompilerSettings extends PropertyPage with IWorkbenchPreferencePage with E
 
     val classpathChangesListener: IPropertyChangeListener = {(event: PropertyChangeEvent) =>
         event.getProperty() match {
-          case SettingConverterUtil.USE_PROJECT_SETTINGS_PREFERENCE => wasProjectSettingsChanged.set(true)
-          case CompilerSettings.ADDITIONAL_PARAMS => wereAdditionalParamsChanged.set(true)
-          case SettingConverterUtil.SCALA_DESIRED_INSTALLATION => wasDesiredInstallationChanged.set(true)
+          case SettingConverterUtil.UseProjectSettingsPreference => wasProjectSettingsChanged.set(true)
+          case CompilerSettings.AdditionalParams => wereAdditionalParamsChanged.set(true)
+          case SettingConverterUtil.ScalaDesiredInstallation => wasDesiredInstallationChanged.set(true)
           case _ =>
         }
     }
@@ -391,13 +391,13 @@ class CompilerSettings extends PropertyPage with IWorkbenchPreferencePage with E
   }
 
   /** This widget should only be used on project property pages. */
-  class UseProjectSettingsWidget(parent:Composite) extends SWTUtils.CheckBox(preferenceStore0, SettingConverterUtil.USE_PROJECT_SETTINGS_PREFERENCE, "Use Project Settings", parent)
+  class UseProjectSettingsWidget(parent:Composite) extends SWTUtils.CheckBox(preferenceStore0, SettingConverterUtil.UseProjectSettingsPreference, "Use Project Settings", parent)
   with Subscriber[ScalaInstallationChange, Publisher[ScalaInstallationChange]]{
     import SettingConverterUtil._
 
     // TODO - Does this belong here?  For now it's the only place we can really check...
-    if (!getPreferenceStore().contains(USE_PROJECT_SETTINGS_PREFERENCE)) {
-      getPreferenceStore.setDefault(USE_PROJECT_SETTINGS_PREFERENCE, false)
+    if (!getPreferenceStore().contains(UseProjectSettingsPreference)) {
+      getPreferenceStore.setDefault(UseProjectSettingsPreference, false)
     }
     this += ((e) => handleToggle())
     getConcernedProject() flatMap (ScalaPlugin.plugin.asScalaProject(_)) foreach {_.subscribe(this)}
@@ -443,7 +443,7 @@ class CompilerSettings extends PropertyPage with IWorkbenchPreferencePage with E
     }
 
   class DesiredInstallationWidget(parent:Composite) extends ComboFieldEditor(
-        SettingConverterUtil.SCALA_DESIRED_INSTALLATION,
+        SettingConverterUtil.ScalaDesiredInstallation,
         "Scala Installation",
         choicesOfScalaInstallations(),
         parent) with Subscriber[ScalaInstallationChange, Publisher[ScalaInstallationChange]]{
@@ -455,7 +455,7 @@ class CompilerSettings extends PropertyPage with IWorkbenchPreferencePage with E
     // it has to be done through value tracking
     // initialValue is only modified through backend changes (through the subscriber mechanism)
     // currentValue is only modified in this dialog, through selections
-    private var initialValue = getPreferenceStore().getString(SettingConverterUtil.SCALA_DESIRED_INSTALLATION)
+    private var initialValue = getPreferenceStore().getString(SettingConverterUtil.ScalaDesiredInstallation)
     private var currentValue = initialValue
 
     def isChanged() = !(currentValue equals initialValue)
@@ -463,7 +463,7 @@ class CompilerSettings extends PropertyPage with IWorkbenchPreferencePage with E
     override def notify(pub: Publisher[ScalaInstallationChange], event: ScalaInstallationChange): Unit = {
       // the semantics of the initial value have changed through this backend update
       // it's very important to do this before the Load (platform checks on file IO)
-      initialValue = getPreferenceStore().getString(SettingConverterUtil.SCALA_DESIRED_INSTALLATION)
+      initialValue = getPreferenceStore().getString(SettingConverterUtil.ScalaDesiredInstallation)
       fireValueChanged(FieldEditor.VALUE, "", initialValue)
       DisplayThread.asyncExec(doLoad())
       DisplayThread.asyncExec(updateApply())
@@ -490,7 +490,7 @@ class CompilerSettings extends PropertyPage with IWorkbenchPreferencePage with E
   }
 
   // LUC_B: it would be nice to have this widget behave like the other 'EclipseSettings', to avoid unnecessary custom code
-  class AdditionalParametersWidget(parent:Composite) extends StringFieldEditor(CompilerSettings.ADDITIONAL_PARAMS, "Additional command line parameters:", StringFieldEditor.UNLIMITED, parent)
+  class AdditionalParametersWidget(parent:Composite) extends StringFieldEditor(CompilerSettings.AdditionalParams, "Additional command line parameters:", StringFieldEditor.UNLIMITED, parent)
   with Subscriber[ScalaInstallationChange, Publisher[ScalaInstallationChange]] {
     import org.scalaide.util.internal.eclipse.SWTUtils._
     setPreferenceStore(preferenceStore0)
@@ -569,11 +569,11 @@ class CompilerSettings extends PropertyPage with IWorkbenchPreferencePage with E
       originalValue != additionalCompParams
 
     def save() {
-      preferenceStore0.setValue(CompilerSettings.ADDITIONAL_PARAMS, additionalCompParams)
+      preferenceStore0.setValue(CompilerSettings.AdditionalParams, additionalCompParams)
     }
 
     def reset() {
-      additionalParametersControl.setText(preferenceStore0.getString(CompilerSettings.ADDITIONAL_PARAMS))
+      additionalParametersControl.setText(preferenceStore0.getString(CompilerSettings.AdditionalParams))
     }
 
     def setEnabled(value: Boolean) {
@@ -583,6 +583,6 @@ class CompilerSettings extends PropertyPage with IWorkbenchPreferencePage with E
 }
 
 object CompilerSettings {
-  final val ADDITIONAL_PARAMS = "scala.compiler.additionalParams"
-  val PAGE_ID = "org.scalaide.ui.preferences.compiler"
+  final val AdditionalParams = "scala.compiler.additionalParams"
+  val PageId = "org.scalaide.ui.preferences.compiler"
 }

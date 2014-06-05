@@ -11,25 +11,25 @@ import org.eclipse.core.runtime.content.IContentDescription
 import org.scalaide.logging.HasLogger
 
 object ScalaClassFileDescriber extends HasLogger {
-  final val JAVA_MAGIC = 0xCAFEBABE
-  final val CONSTANT_UTF8 = 1
-  final val CONSTANT_UNICODE = 2
-  final val CONSTANT_INTEGER = 3
-  final val CONSTANT_FLOAT = 4
-  final val CONSTANT_LONG = 5
-  final val CONSTANT_DOUBLE = 6
-  final val CONSTANT_CLASS = 7
-  final val CONSTANT_STRING = 8
-  final val CONSTANT_FIELDREF = 9
-  final val CONSTANT_METHODREF = 10
-  final val CONSTANT_INTFMETHODREF = 11
-  final val CONSTANT_NAMEANDTYPE = 12
+  final val JavaMagic = 0xCAFEBABE
+  final val ConstantUtf8 = 1
+  final val ConstantUnicode = 2
+  final val ConstantInteger = 3
+  final val ConstantFloat = 4
+  final val ConstantLong = 5
+  final val ConstantDouble = 6
+  final val ConstantClass = 7
+  final val ConstantString = 8
+  final val ConstantFieldref = 9
+  final val ConstantMethodref = 10
+  final val ConstantIntfmethodref = 11
+  final val ConstantNameandtype = 12
 
   def isScala(contents : InputStream) : Option[String] = {
     try {
       val in = new DataInputStream(contents)
 
-      if (in.readInt() != JAVA_MAGIC)
+      if (in.readInt() != JavaMagic)
         return None
       if (in.skipBytes(4) != 4)
         return None
@@ -46,7 +46,7 @@ object ScalaClassFileDescriber extends HasLogger {
       var i = 1
       while (i < poolSize) {
         (in.readByte().toInt: @switch) match {
-          case CONSTANT_UTF8 =>
+          case ConstantUtf8 =>
             val str = in.readUTF()
             pool(i) = str
             if (scalaIndex == -1 || scalaSigIndex == -1 || sourceFileIndex == -1) {
@@ -57,15 +57,15 @@ object ScalaClassFileDescriber extends HasLogger {
               else if (sourceFileIndex == -1 && str == "SourceFile")
                 sourceFileIndex = i
             }
-          case CONSTANT_UNICODE =>
+        case ConstantUnicode =>
             val toSkip = in.readUnsignedShort()
             if (in.skipBytes(toSkip) != toSkip) return None
-          case CONSTANT_CLASS | CONSTANT_STRING =>
+          case ConstantClass | ConstantString =>
             if (in.skipBytes(2) != 2) return None
-          case CONSTANT_FIELDREF | CONSTANT_METHODREF | CONSTANT_INTFMETHODREF
-             | CONSTANT_NAMEANDTYPE | CONSTANT_INTEGER | CONSTANT_FLOAT =>
+          case ConstantFieldref | ConstantMethodref | ConstantIntfmethodref
+             | ConstantNameandtype | ConstantInteger | ConstantFloat =>
             if (in.skipBytes(4) != 4) return None
-          case CONSTANT_LONG | CONSTANT_DOUBLE =>
+          case ConstantLong | ConstantDouble =>
             if (in.skipBytes(8) != 8) return None
             i += 1
           case other =>

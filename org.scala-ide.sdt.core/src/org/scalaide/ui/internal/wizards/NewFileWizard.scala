@@ -261,7 +261,7 @@ trait NewFileWizard extends AnyRef with HasLogger {
 
     def createTemplateContext(doc: IDocument): ScalaTemplateContext = {
       val tm = new ScalaTemplateManager()
-      val ctxType = tm.contextTypeRegistry.getContextType(tm.CONTEXT_TYPE)
+      val ctxType = tm.contextTypeRegistry.getContextType(tm.ContextType)
       val ctx = new ScalaTemplateContext(ctxType, doc, 0, 0)
 
       ctx.getContextType().addResolver(PackageVariableResolver)

@@ -16,7 +16,7 @@ import org.scalaide.core.ScalaPlugin
 import org.scalaide.logging.HasLogger
 
 abstract class BaseHyperlinkDetector extends AbstractHyperlinkDetector with HasLogger {
-  val TIMEOUT = if (ScalaPlugin.plugin.noTimeoutMode) Duration.Inf else 500.millis
+  val Timeout = if (ScalaPlugin.plugin.noTimeoutMode) Duration.Inf else 500.millis
 
   final override def detectHyperlinks(viewer: ITextViewer, currentSelection: IRegion, canShowMultipleHyperlinks: Boolean): Array[IHyperlink] = {
     val textEditor = getAdapter(classOf[ITextEditor]).asInstanceOf[ITextEditor]
@@ -37,7 +37,7 @@ abstract class BaseHyperlinkDetector extends AbstractHyperlinkDetector with HasL
           val hyperlinks = Future { runDetectionStrategy(scu, textEditor, currentSelection) }
 
           try {
-            Await.result(hyperlinks, TIMEOUT) match {
+            Await.result(hyperlinks, Timeout) match {
               // I know you will be tempted to remove this, but don't do it, JDT expects null when no hyperlinks are found.
               case Nil => null
               case links =>

@@ -59,9 +59,9 @@ class JdtPreferenceProvider(val project: IJavaProject) extends PreferenceProvide
     val indentWithTabs = formatterPreferences(IndentWithTabs).toString
     val indentSpaces = formatterPreferences(IndentSpaces).toString
 
-    put(ScalaIndenter.TAB_SIZE, indentSpaces)
-    put(ScalaIndenter.INDENT_SIZE, indentSpaces)
-    put(ScalaIndenter.INDENT_WITH_TABS, indentWithTabs)
+    put(ScalaIndenter.TabSize, indentSpaces)
+    put(ScalaIndenter.IndentSize, indentSpaces)
+    put(ScalaIndenter.IndentWithTabs, indentWithTabs)
 
     def populateFromProject(key: String) = {
       put(key, project.getOption(key, true))
@@ -89,9 +89,9 @@ class JdtPreferenceProvider(val project: IJavaProject) extends PreferenceProvide
  * Holder for various constants used by the Scala indenter
  */
 object ScalaIndenter {
-  val TAB_SIZE = "tab-size"
-  val INDENT_SIZE = "indent-size"
-  val INDENT_WITH_TABS = "indent-with-tabs"
+  val TabSize = "tab-size"
+  val IndentSize = "indent-size"
+  val IndentWithTabs = "indent-with-tabs"
 }
 
 /**
@@ -125,13 +125,13 @@ class ScalaIndenter(
    */
   protected def getCoreFormatterOption(key: String): String = preferencesProvider.get(key)
 
-  private def prefUseTabs = preferencesProvider.getBoolean(ScalaIndenter.INDENT_WITH_TABS)
+  private def prefUseTabs = preferencesProvider.getBoolean(ScalaIndenter.IndentWithTabs)
 
   private def prefTabChar = if (prefUseTabs) JavaCore.TAB else JavaCore.SPACE
 
-  private def prefTabSize = preferencesProvider.getInt(ScalaIndenter.TAB_SIZE)
+  private def prefTabSize = preferencesProvider.getInt(ScalaIndenter.TabSize)
 
-  private def prefIndentationSize = preferencesProvider.getInt(ScalaIndenter.INDENT_SIZE)
+  private def prefIndentationSize = preferencesProvider.getInt(ScalaIndenter.IndentSize)
 
   private def prefArrayDimensionsDeepIndent = true; // sensible default, no formatter setting
 

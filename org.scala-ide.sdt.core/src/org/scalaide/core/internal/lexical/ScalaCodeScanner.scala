@@ -112,7 +112,7 @@ trait ScalaCodeTokenizer {
 
     /* Denotes the class of a token. */
     def tokenClass(token: ScalariformToken, pos: Int) =
-      if (isMacro(token, pos)) ScalaSyntaxClasses.KEYWORD
+      if (isMacro(token, pos)) ScalaSyntaxClasses.Keyword
       else ScalariformToSyntaxClass(token)
 
     token.zipWithIndex map {

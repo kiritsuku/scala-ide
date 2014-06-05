@@ -147,8 +147,8 @@ class ReplConsoleView extends ViewPart with InterpreterConsoleView {
   object refreshOnRebuildAction extends Action("Replay History on Project Rebuild", IAction.AS_CHECK_BOX) with BuildSuccessListener {
     setToolTipText("Replay History on Project Rebuild")
 
-    setImageDescriptor(ScalaImages.REFRESH_REPL_TOOLBAR)
-    setHoverImageDescriptor(ScalaImages.REFRESH_REPL_TOOLBAR)
+    setImageDescriptor(ScalaImages.RefreshReplToolbar)
+    setHoverImageDescriptor(ScalaImages.RefreshReplToolbar)
 
     override def run() {
       if (isChecked) scalaProject addBuildSuccessListener this

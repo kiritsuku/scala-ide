@@ -16,7 +16,7 @@ class BadScalaVersionMarkerResolver extends IMarkerResolutionGenerator {
    val resolution = new IMarkerResolution() {
      def getLabel(): String = "Open Project Preferences to set a compatible Scala Installation"
      def run(marker:IMarker): Unit = {
-       DisplayThread.asyncExec(PropertyDialog.createDialogOn(ScalaPlugin.getShell, CompilerSettings.PAGE_ID, marker.getResource().asInstanceOf[IProject]).open())
+       DisplayThread.asyncExec(PropertyDialog.createDialogOn(ScalaPlugin.getShell, CompilerSettings.PageId, marker.getResource().asInstanceOf[IProject]).open())
      }
    }
 

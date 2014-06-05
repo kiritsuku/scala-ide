@@ -14,7 +14,7 @@ import org.scalaide.ui.internal.preferences.EditorPreferencePage
 
 object InferredSemicolonPainter {
 
-  val SEMICOLON_COLOR = new Color(Display.getDefault, new RGB(160, 160, 160))
+  val SemicolonColor = new Color(Display.getDefault, new RGB(160, 160, 160))
 
 }
 /**
@@ -25,7 +25,7 @@ object InferredSemicolonPainter {
  * @see org.eclipse.jface.text.WhitespaceCharacterPainter
  */
 class InferredSemicolonPainter(textViewer: ISourceViewer with ITextViewerExtension5)
-    extends EditorPainter(textViewer, EditorPreferencePage.P_SHOW_INFERRED_SEMICOLONS) with IDocumentListener {
+    extends EditorPainter(textViewer, EditorPreferencePage.ShowInferredSemicolons) with IDocumentListener {
 
   import InferredSemicolonPainter._
 
@@ -128,7 +128,7 @@ class InferredSemicolonPainter(textViewer: ISourceViewer with ITextViewerExtensi
       val fontBaseline = fontMetrics.getAscent + fontMetrics.getLeading
       val baselineDelta = baseline - fontBaseline
       val pos = widget.getLocationAtOffset(widgetOffset)
-      gc.setForeground(SEMICOLON_COLOR)
+      gc.setForeground(SemicolonColor)
       gc.drawString(";", pos.x, pos.y + baselineDelta, true)
     }
   }

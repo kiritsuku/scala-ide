@@ -52,7 +52,7 @@ class BracketAutoEditStrategy(prefStore: IPreferenceStore) extends IAutoEditStra
 
     def addClosingBrace() {
       val isAutoClosingEnabled = prefStore.getBoolean(
-          EditorPreferencePage.P_ENABLE_AUTO_CLOSING_BRACES)
+          EditorPreferencePage.EnableAutoClosingBraces)
 
       if (isAutoClosingEnabled || autoClosingRequired) {
         command.text = "{}"

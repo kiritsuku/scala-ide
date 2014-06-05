@@ -21,7 +21,7 @@ class ImplicitsHighlightingTest extends HighlightingTestHelpers(ImplicitsHighlig
 
   @Before
   def setPreferences() {
-    ScalaPlugin.plugin.getPreferenceStore.setValue(ImplicitsPreferencePage.P_CONVERSIONS_ONLY, false)
+    ScalaPlugin.plugin.getPreferenceStore.setValue(ImplicitsPreferencePage.ConversionsOnly, false)
   }
 
   @Test

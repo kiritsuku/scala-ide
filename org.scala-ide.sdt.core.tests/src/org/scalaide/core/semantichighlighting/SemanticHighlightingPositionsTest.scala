@@ -46,7 +46,7 @@ class SemanticHighlightingPositionsTest {
 
   private val preferences: Preferences = {
     val store = mock(classOf[IPreferenceStore])
-    when(store.getBoolean(ScalaSyntaxClasses.USE_SYNTACTIC_HINTS)).thenReturn(true)
+    when(store.getBoolean(ScalaSyntaxClasses.UseSyntacticHints)).thenReturn(true)
     new Preferences(store)
   }
 

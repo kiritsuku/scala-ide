@@ -23,7 +23,7 @@ class DeprecationWarningsTests {
   private  def initDeprecationSetting() {
     // enable deprecation warnings for this project
     val storage = deprecationWarningsProject.project.projectSpecificStorage.asInstanceOf[PropertyStore]
-    storage.setValue(SettingConverterUtil.USE_PROJECT_SETTINGS_PREFERENCE, true)
+    storage.setValue(SettingConverterUtil.UseProjectSettingsPreference, true)
     storage.setValue("deprecation", "true")
     storage.save()
   }

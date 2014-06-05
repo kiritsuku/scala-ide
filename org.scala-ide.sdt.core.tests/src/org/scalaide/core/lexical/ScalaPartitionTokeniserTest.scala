@@ -15,14 +15,14 @@ class ScalaPartitionTokeniserTest {
     // 000000000011111111112222222222333333333344444444445
     // 012345678901234567890123456789012345678901234567890
     """def dev = <div class="menu">...</div>""" ==>
-      ((SCALA_DEFAULT_CONTENT, 0, 9), (XML_TAG, 10, 27), (XML_PCDATA, 28, 30), (XML_TAG, 31, 36))
+      ((ScalaDefaultContent, 0, 9), (XmlTag, 10, 27), (XmlPcdata, 28, 30), (XmlTag, 31, 36))
   }
 
   @Test
   def defaultContent() {
     // 000000000011111111112222222222333333333344444444445
     // 012345678901234567890123456789012345678901234567890
-    """package foo""" ==> ((SCALA_DEFAULT_CONTENT, 0, 10))
+    """package foo""" ==> ((ScalaDefaultContent, 0, 10))
   }
 
   @Test
@@ -30,17 +30,17 @@ class ScalaPartitionTokeniserTest {
     // 000000000011111111112222222222333333333344444444445
     // 012345678901234567890123456789012345678901234567890
     """package /* comment */ foo // comment""" ==>
-      ((SCALA_DEFAULT_CONTENT, 0, 7), (SCALA_MULTI_LINE_COMMENT, 8, 20), (SCALA_DEFAULT_CONTENT, 21, 25), (SCALA_SINGLE_LINE_COMMENT, 26, 35))
+      ((ScalaDefaultContent, 0, 7), (ScalaMultiLineComment, 8, 20), (ScalaDefaultContent, 21, 25), (ScalaSingleLineComment, 26, 35))
 
     // 000000000011111111112222222222333333333344444444445
     // 012345678901234567890123456789012345678901234567890
     """/* comment /* nested */ */""" ==>
-      ((SCALA_MULTI_LINE_COMMENT, 0, 25))
+      ((ScalaMultiLineComment, 0, 25))
 
     // 000000000011111111112222222222333333333344444444445
     // 012345678901234567890123456789012345678901234567890
     """/** comment /** nested **/ */""" ==>
-      ((SCALADOC, 0, 28))
+      ((Scaladoc, 0, 28))
 
   }
 
@@ -48,30 +48,30 @@ class ScalaPartitionTokeniserTest {
   def basicXml() {
     // 000000000011111111112222222222333333333344444444445
     // 012345678901234567890123456789012345678901234567890
-    """<foo/>""" ==> ((XML_TAG, 0, 5))
+    """<foo/>""" ==> ((XmlTag, 0, 5))
 
     // 000000000011111111112222222222333333333344444444445
     // 012345678901234567890123456789012345678901234567890
-    """<![CDATA[ <foo/> ]]>""" ==> ((XML_CDATA, 0, 19))
+    """<![CDATA[ <foo/> ]]>""" ==> ((XmlCdata, 0, 19))
 
     // 000000000011111111112222222222333333333344444444445
     // 012345678901234567890123456789012345678901234567890
-    """<!-- comment -->""" ==> ((XML_COMMENT, 0, 15))
+    """<!-- comment -->""" ==> ((XmlComment, 0, 15))
 
     // 000000000011111111112222222222333333333344444444445
     // 012345678901234567890123456789012345678901234567890
-    """<?xml version='1.0' encoding='UTF-8'?>""" ==> ((XML_PI, 0, 37))
+    """<?xml version='1.0' encoding='UTF-8'?>""" ==> ((XmlPi, 0, 37))
   }
 
   @Test
   def strings() {
     // 000000000011111111112222222222333333333344444444445
     // 012345678901234567890123456789012345678901234567890
-    <t>"ordinary string"</t> ==> ((SCALA_STRING, 0, 16));
+    <t>"ordinary string"</t> ==> ((ScalaString, 0, 16));
 
     // 000000000011111111112222222222333333333344444444445
     // 012345678901234567890123456789012345678901234567890
-    <t>"""scala multiline string"""</t> ==> ((SCALA_MULTI_LINE_STRING, 0, 27))
+    <t>"""scala multiline string"""</t> ==> ((ScalaMultiLineString, 0, 27))
   }
 
   @Test
@@ -79,101 +79,101 @@ class ScalaPartitionTokeniserTest {
     // 000000000011111111112222222222333333333344444444445
     // 012345678901234567890123456789012345678901234567890
     <t>s"my name is $name"</t> ==>
-      ((SCALA_DEFAULT_CONTENT, 0, 0), (SCALA_STRING, 1, 13), (SCALA_DEFAULT_CONTENT, 14, 17), (SCALA_STRING, 18, 18))
+      ((ScalaDefaultContent, 0, 0), (ScalaString, 1, 13), (ScalaDefaultContent, 14, 17), (ScalaString, 18, 18))
 
     // 000000000011111111112222222222333333333344444444445
     // 012345678901234567890123456789012345678901234567890
     <t>s"""my name is $name"""</t> ==>
-      ((SCALA_DEFAULT_CONTENT, 0, 0), (SCALA_MULTI_LINE_STRING, 1, 15), (SCALA_DEFAULT_CONTENT, 16, 19), (SCALA_MULTI_LINE_STRING, 20, 22))
+      ((ScalaDefaultContent, 0, 0), (ScalaMultiLineString, 1, 15), (ScalaDefaultContent, 16, 19), (ScalaMultiLineString, 20, 22))
 
     // 000000000011111111112222222222333333333344444444445
     // 012345678901234567890123456789012345678901234567890
     """s"my name is ${person.name}"""" ==>
-      ((SCALA_DEFAULT_CONTENT, 0, 0), (SCALA_STRING, 1, 13), (SCALA_DEFAULT_CONTENT, 14, 26), (SCALA_STRING, 27, 27))
+      ((ScalaDefaultContent, 0, 0), (ScalaString, 1, 13), (ScalaDefaultContent, 14, 26), (ScalaString, 27, 27))
 
     // 0 0 00000001111111111222222222 2 3 33333333344444444445
     // 1 2 34567890123456789012345678 9 0 12345678901234567890
     "s\"\"\"my name is ${person.name}\"\"\"" ==>
-      ((SCALA_DEFAULT_CONTENT, 0, 0), (SCALA_MULTI_LINE_STRING, 1, 15), (SCALA_DEFAULT_CONTENT, 16, 28), (SCALA_MULTI_LINE_STRING, 29, 31))
+      ((ScalaDefaultContent, 0, 0), (ScalaMultiLineString, 1, 15), (ScalaDefaultContent, 16, 28), (ScalaMultiLineString, 29, 31))
 
   }
 
   @Test
   def simple_scaladoc() {
-    "/**doc*/" ==> ((SCALADOC, 0, 7))
+    "/**doc*/" ==> ((Scaladoc, 0, 7))
   }
 
   @Test
   def scaladoc_with_normal_code() {
     "val i = 0; /**doc*/ val j = 0" ==>
-      ((SCALA_DEFAULT_CONTENT, 0, 10), (SCALADOC, 11, 18), (SCALA_DEFAULT_CONTENT, 19, 28))
+      ((ScalaDefaultContent, 0, 10), (Scaladoc, 11, 18), (ScalaDefaultContent, 19, 28))
   }
 
   @Test
   def scaladoc_with_codeblock() {
     "/**{{{val i = 0}}}*/" ==>
-      ((SCALADOC, 0, 2), (SCALADOC_CODE_BLOCK, 3, 17), (SCALADOC, 18, 19))
+      ((Scaladoc, 0, 2), (ScaladocCodeBlock, 3, 17), (Scaladoc, 18, 19))
   }
 
   @Test
   def scaladoc_code_block_terminated_early() {
     """/**{{{ "abc" */ val i = 0""" ==>
-      ((SCALADOC, 0, 2), (SCALADOC, 3, 14), (SCALA_DEFAULT_CONTENT, 15, 24))
+      ((Scaladoc, 0, 2), (Scaladoc, 3, 14), (ScalaDefaultContent, 15, 24))
   }
 
   @Test
   def scaladoc_after_invalid_code_block() {
     "/**}}}{{{*/" ==>
-      ((SCALADOC, 0, 5), (SCALADOC, 6, 10))
+      ((Scaladoc, 0, 5), (Scaladoc, 6, 10))
   }
 
   @Test
   def scaladoc_code_block_with_second_code_block_start() {
     "/**{{{ {{{ }}}*/" ==>
-      ((SCALADOC, 0, 2), (SCALADOC_CODE_BLOCK, 3, 13), (SCALADOC, 14, 15))
+      ((Scaladoc, 0, 2), (ScaladocCodeBlock, 3, 13), (Scaladoc, 14, 15))
   }
 
   @Test
   def scaladoc_code_block_opening_after_another_block() {
     "/**{{{foo}}}{{{*/" ==>
-      ((SCALADOC, 0, 2), (SCALADOC_CODE_BLOCK, 3, 11), (SCALADOC, 12, 16))
+      ((Scaladoc, 0, 2), (ScaladocCodeBlock, 3, 11), (Scaladoc, 12, 16))
   }
   @Test
   def scaladoc_code_block_closing_after_another_block() {
     "/**{{{foo}}}}}}*/" ==>
-      ((SCALADOC, 0, 2), (SCALADOC_CODE_BLOCK, 3, 11), (SCALADOC, 12, 16))
+      ((Scaladoc, 0, 2), (ScaladocCodeBlock, 3, 11), (Scaladoc, 12, 16))
   }
 
   @Test
   def multiple_scaladoc_code_blocks() {
     "/**{{{foo}}}{{{foo}}}*/" ==>
-      ((SCALADOC, 0, 2), (SCALADOC_CODE_BLOCK, 3, 11), (SCALADOC_CODE_BLOCK, 12, 20), (SCALADOC, 21, 22))
+      ((Scaladoc, 0, 2), (ScaladocCodeBlock, 3, 11), (ScaladocCodeBlock, 12, 20), (Scaladoc, 21, 22))
   }
 
   @Test
   def scaladoc_code_block_nested_in_multi_line_comment() {
     "/*/**{{{/**/" ==>
-      ((SCALA_MULTI_LINE_COMMENT, 0, 11))
+      ((ScalaMultiLineComment, 0, 11))
   }
 
   @Test
   def char_literal() {
-    "'a'" ==> ((SCALA_CHARACTER, 0, 2))
+    "'a'" ==> ((ScalaCharacter, 0, 2))
   }
 
   @Test
   def char_literal_containing_escape_sequence() {
-    """'\n'""" ==> ((SCALA_CHARACTER, 0, 3))
+    """'\n'""" ==> ((ScalaCharacter, 0, 3))
   }
 
   @Test
   def char_literal_containing_unicode_sequence() {
-    "'\\u0000'" ==> ((SCALA_CHARACTER, 0, 7))
+    "'\\u0000'" ==> ((ScalaCharacter, 0, 7))
   }
 
   @Test
   def char_literal_containing_octal_sequence() {
-    """'\123'""" ==> ((SCALA_CHARACTER, 0, 5))
+    """'\123'""" ==> ((ScalaCharacter, 0, 5))
   }
 
 }

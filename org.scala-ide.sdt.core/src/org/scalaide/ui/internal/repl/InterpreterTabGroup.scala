@@ -223,7 +223,7 @@ class InterpreterMainTab extends JavaLaunchTab with HasLogger {
 
   private def updateSeedScriptFromConfig(config : ILaunchConfiguration) {
     if(seedScriptText != null) {
-      seedScriptText.setText(config.getAttribute(InterpreterLaunchConstants.SEED_SCRIPT,""))
+      seedScriptText.setText(config.getAttribute(InterpreterLaunchConstants.SeedScript,""))
     }
   }
 
@@ -250,7 +250,7 @@ class InterpreterMainTab extends JavaLaunchTab with HasLogger {
    */
   override def performApply(config : ILaunchConfigurationWorkingCopy)  {
     config.setAttribute(IJavaLaunchConfigurationConstants.ATTR_PROJECT_NAME, fProjText.getText().trim())
-    config.setAttribute(InterpreterLaunchConstants.SEED_SCRIPT, seedScriptText.getText.trim())
+    config.setAttribute(InterpreterLaunchConstants.SeedScript, seedScriptText.getText.trim())
     mapResources()
   }
 
@@ -263,7 +263,7 @@ class InterpreterMainTab extends JavaLaunchTab with HasLogger {
       initializeJavaProject(javaElement, config)
     } else {
       config.setAttribute(IJavaLaunchConfigurationConstants.ATTR_PROJECT_NAME, "")
-      config.setAttribute(InterpreterLaunchConstants.SEED_SCRIPT,"")
+      config.setAttribute(InterpreterLaunchConstants.SeedScript,"")
     }
   }
 }

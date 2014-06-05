@@ -23,7 +23,7 @@ import org.scalaide.ui.internal.preferences.EditorPreferencePage
  * has changed.
  */
 class IndentGuidePainter(viewer: ISourceViewer)
-    extends EditorPainter(viewer, EditorPreferencePage.INDENT_GUIDE_ENABLE)
+    extends EditorPainter(viewer, EditorPreferencePage.IndentGuideEnable)
     with IndentGuideGenerator {
 
   private object config {
@@ -72,7 +72,7 @@ class IndentGuidePainter(viewer: ISourceViewer)
   override def indentWidth: Int = widget.getTabs()
 
   override def loadPreferences(): Unit = {
-    val rgb = PreferenceConverter.getColor(store, EditorPreferencePage.INDENT_GUIDE_COLOR)
+    val rgb = PreferenceConverter.getColor(store, EditorPreferencePage.IndentGuideColor)
     if (color != null)
       color.dispose()
     color = new Color(Display.getCurrent(), rgb)

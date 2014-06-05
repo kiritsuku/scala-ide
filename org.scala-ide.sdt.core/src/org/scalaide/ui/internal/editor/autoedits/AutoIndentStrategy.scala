@@ -13,7 +13,7 @@ class AutoIndentStrategy(prefStore: IPreferenceStore) extends DefaultIndentLineA
 
   override def customizeDocumentCommand(doc: IDocument, cmd: DocumentCommand): Unit = {
     val isAutoIndentEnabled = prefStore.getBoolean(
-      EditorPreferencePage.P_ENABLE_AUTO_INDENT_ON_TAB)
+      EditorPreferencePage.EnableAutoIndentOnTab)
 
     cmd.text match {
       case "\t" if isAutoIndentEnabled => indentOnTab(doc, cmd, indentWithTabs, tabSize)

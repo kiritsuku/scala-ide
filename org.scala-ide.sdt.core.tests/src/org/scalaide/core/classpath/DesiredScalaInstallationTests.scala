@@ -122,7 +122,7 @@ class DesiredScalaInstallationTests {
     val current_choice_before = project.getDesiredInstallationChoice()
     val otherInstallation = anotherBundle(current_dsi)
     val expectedChoice = otherInstallation map {si => ScalaInstallationChoice(si.version)} // the .version ensures a dynamic choice
-    expectedChoice foreach {si => project.projectSpecificStorage.setValue(SettingConverterUtil.SCALA_DESIRED_INSTALLATION, si.toString())}
+    expectedChoice foreach {si => project.projectSpecificStorage.setValue(SettingConverterUtil.ScalaDesiredInstallation, si.toString())}
     assertTrue(s"Switching to a former bundle should show a change in desired installation choices, Found ${project.getDesiredInstallationChoice()}, expected ${expectedChoice.getOrElse("")}", project.getDesiredInstallationChoice() != current_choice_before)
   }
 
@@ -132,7 +132,7 @@ class DesiredScalaInstallationTests {
     val current_dsi  = project.getDesiredInstallation()
     val otherInstallation = anotherBundle(current_dsi)
     val expectedChoice = otherInstallation map {si => ScalaInstallationChoice(si)}
-    expectedChoice foreach {si => project.projectSpecificStorage.setValue(SettingConverterUtil.SCALA_DESIRED_INSTALLATION, si.toString())}
+    expectedChoice foreach {si => project.projectSpecificStorage.setValue(SettingConverterUtil.ScalaDesiredInstallation, si.toString())}
     assertTrue(s"Switching to a former bundle should reflect in configuration, Found ${project.getDesiredInstallationChoice()}, expected ${expectedChoice.getOrElse("")}", project.getDesiredInstallationChoice() == expectedChoice.get)
   }
 
@@ -142,7 +142,7 @@ class DesiredScalaInstallationTests {
     val current_dsi = project.getDesiredInstallation()
     val otherInstallation = anotherBundle(current_dsi)
     val expectedChoice = otherInstallation map {si => ScalaInstallationChoice(si.version)}
-    expectedChoice foreach {c => project.projectSpecificStorage.setValue(SettingConverterUtil.SCALA_DESIRED_INSTALLATION, c.toString())}
+    expectedChoice foreach {c => project.projectSpecificStorage.setValue(SettingConverterUtil.ScalaDesiredInstallation, c.toString())}
     assertTrue(s"Switching to a former bundle should reflect in configuration. Found ${project.getDesiredInstallationChoice()}, expected ${expectedChoice.getOrElse("")}", project.getDesiredInstallationChoice() == expectedChoice.get)
   }
 
@@ -152,7 +152,7 @@ class DesiredScalaInstallationTests {
     val current_dsi  = project.getDesiredInstallation()
     val otherInstallation = anotherBundle(current_dsi)
     val expectedChoice = otherInstallation map {si => ScalaInstallationChoice(si)}
-    expectedChoice foreach {si => project.projectSpecificStorage.setValue(SettingConverterUtil.SCALA_DESIRED_INSTALLATION, si.toString())}
+    expectedChoice foreach {si => project.projectSpecificStorage.setValue(SettingConverterUtil.ScalaDesiredInstallation, si.toString())}
     assertTrue(s"Switching to a former bundle should reflect in configuration, Found ${project.getDesiredInstallationChoice()}, expected ${expectedChoice.getOrElse("")}", project.getDesiredInstallation() == otherInstallation.get)
   }
 
@@ -162,7 +162,7 @@ class DesiredScalaInstallationTests {
     val current_dsi = project.getDesiredInstallation()
     val otherInstallation = anotherBundle(current_dsi)
     val expectedChoice = otherInstallation map {si => ScalaInstallationChoice(si.version)}
-    expectedChoice foreach {c => project.projectSpecificStorage.setValue(SettingConverterUtil.SCALA_DESIRED_INSTALLATION, c.toString())}
+    expectedChoice foreach {c => project.projectSpecificStorage.setValue(SettingConverterUtil.ScalaDesiredInstallation, c.toString())}
     assertTrue(s"Switching to a former bundle should reflect in configuration. Found ${project.getDesiredInstallationChoice()}, expected ${expectedChoice.getOrElse("")}", project.getDesiredInstallation() == otherInstallation.get)
   }
 
@@ -172,7 +172,7 @@ class DesiredScalaInstallationTests {
     val current_dsi = project.getDesiredInstallation()
     val otherInstallation = anotherBundle(current_dsi)
     val expectedChoice = otherInstallation map {si => ScalaInstallationChoice(si.version)}
-    expectedChoice foreach {c => project.projectSpecificStorage.setValue(SettingConverterUtil.SCALA_DESIRED_INSTALLATION, c.toString())}
+    expectedChoice foreach {c => project.projectSpecificStorage.setValue(SettingConverterUtil.ScalaDesiredInstallation, c.toString())}
 
     val libraryPath = getLibraryJar(project) map (_.getPath())
     val newVersion = libraryPath flatMap (ScalaInstallation.extractVersion(_))
@@ -185,7 +185,7 @@ class DesiredScalaInstallationTests {
     val current_dsi = project.getDesiredInstallation()
     val otherInstallation = anotherBundle(current_dsi)
     val expectedChoice = otherInstallation map {si => ScalaInstallationChoice(si.version)}
-    expectedChoice foreach {c => project.projectSpecificStorage.setValue(SettingConverterUtil.SCALA_DESIRED_INSTALLATION, c.toString())}
+    expectedChoice foreach {c => project.projectSpecificStorage.setValue(SettingConverterUtil.ScalaDesiredInstallation, c.toString())}
 
     val compilerPath = getCompilerJar(project) map (_.getPath())
     val newVersion = compilerPath flatMap (ScalaInstallation.extractVersion(_))

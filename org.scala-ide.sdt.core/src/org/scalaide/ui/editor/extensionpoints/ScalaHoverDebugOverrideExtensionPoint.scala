@@ -6,14 +6,14 @@ import org.scalaide.core.internal.jdt.model.ScalaCompilationUnit
 import org.scalaide.util.internal.Utils
 
 object ScalaHoverDebugOverrideExtensionPoint {
-  final val EXTENSION_POINT_ID = "org.scala-ide.sdt.core.scalaHoverDebugOverride"
+  final val ExtensionPointId = "org.scala-ide.sdt.core.scalaHoverDebugOverride"
 
   def hoverFor(scu: ScalaCompilationUnit): Option[ITextHover] = extensionHoverFactory map {_ createFor scu}
 
   private lazy val extensionHoverFactory: Option[TextHoverFactory] = for {
     // A max of 1 extension is allowed for this extension point. In case more than one is available, only one
     // will be used, non-deterministically.
-    configElem <- Platform.getExtensionRegistry.getConfigurationElementsFor(EXTENSION_POINT_ID).headOption
+    configElem <- Platform.getExtensionRegistry.getConfigurationElementsFor(ExtensionPointId).headOption
     f <- Utils.tryExecute(configElem.createExecutableExtension("hoverFactoryClass")) collect {case f: TextHoverFactory => f}
   } yield f
 }

@@ -83,7 +83,7 @@ class ScalaSourceFileEditor extends CompilationUnitEditor with ScalaCompilationU
   private lazy val tpePresenter = {
     val infoPresenter = new InformationPresenter(controlCreator)
     infoPresenter.install(getSourceViewer)
-    infoPresenter.setInformationProvider(actions.TypeOfExpressionProvider, ScalaPartitions.SCALA_DEFAULT_CONTENT)
+    infoPresenter.setInformationProvider(actions.TypeOfExpressionProvider, ScalaPartitions.ScalaDefaultContent)
     infoPresenter
   }
 
@@ -137,7 +137,7 @@ class ScalaSourceFileEditor extends CompilationUnitEditor with ScalaCompilationU
   }
 
   override protected def initializeKeyBindingScopes() {
-    setKeyBindingScopes(Array(SCALA_EDITOR_SCOPE))
+    setKeyBindingScopes(Array(ScalaEditorScope))
   }
 
   override def updateOccurrenceAnnotations(selection: ITextSelection, astRoot: CompilationUnit): Unit = {
@@ -167,7 +167,7 @@ class ScalaSourceFileEditor extends CompilationUnitEditor with ScalaCompilationU
     for {
       Occurrences(name, locations) <- occurrences.toList
       location <- locations
-      annotation = new Annotation(OCCURRENCE_ANNOTATION, false, "Occurrence of '" + name + "'")
+      annotation = new Annotation(OccurrenceAnnotation, false, "Occurrence of '" + name + "'")
       position = new Position(location.getOffset, location.getLength)
     } yield annotation -> position
   }.toMap
@@ -305,7 +305,7 @@ class ScalaSourceFileEditor extends CompilationUnitEditor with ScalaCompilationU
     event.getProperty match {
       case PreferenceConstants.EDITOR_MARK_OCCURRENCES =>
       // swallow the event. We don't want 'mark occurrences' to be linked to the Java editor preference
-      case EditorPreferencePage.P_ENABLE_MARK_OCCURRENCES =>
+      case EditorPreferencePage.EnableMarkOccurrences =>
         (event.getNewValue: Any) match {
           case true =>
             installOccurrencesFinder(true)
@@ -334,7 +334,7 @@ class ScalaSourceFileEditor extends CompilationUnitEditor with ScalaCompilationU
   }
 
   override def isMarkingOccurrences =
-    scalaPrefStore.getBoolean(EditorPreferencePage.P_ENABLE_MARK_OCCURRENCES)
+    scalaPrefStore.getBoolean(EditorPreferencePage.EnableMarkOccurrences)
 
   override def createSemanticHighlighter: TextPresentationHighlighter =
     TextPresentationEditorHighlighter(this, semanticHighlightingPreferences, addReconcilingListener _, removeReconcilingListener _)
@@ -359,12 +359,12 @@ class ScalaSourceFileEditor extends CompilationUnitEditor with ScalaCompilationU
 }
 
 object ScalaSourceFileEditor {
-  private val EDITOR_BUNDLE_FOR_CONSTRUCTED_KEYS = "org.eclipse.ui.texteditor.ConstructedEditorMessages"
-  private val bundleForConstructedKeys = ResourceBundle.getBundle(EDITOR_BUNDLE_FOR_CONSTRUCTED_KEYS)
+  private val EditorBundleForConstructedKeys = "org.eclipse.ui.texteditor.ConstructedEditorMessages"
+  private val bundleForConstructedKeys = ResourceBundle.getBundle(EditorBundleForConstructedKeys)
 
-  private val SCALA_EDITOR_SCOPE = "scala.tools.eclipse.scalaEditorScope"
+  private val ScalaEditorScope = "scala.tools.eclipse.scalaEditorScope"
 
-  private val OCCURRENCE_ANNOTATION = "org.eclipse.jdt.ui.occurrences"
+  private val OccurrenceAnnotation = "org.eclipse.jdt.ui.occurrences"
 
   private object controlCreator extends AbstractReusableInformationControlCreator {
     override def doCreateInformationControl(shell: Shell) =

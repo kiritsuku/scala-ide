@@ -8,7 +8,7 @@ class PreferenceInitializer extends AbstractPreferenceInitializer {
 
   def initializeDefaultPreferences(): Unit = {
     val node = DefaultScope.INSTANCE.getNode("org.scala-ide.sdt.core");
-    node.putBoolean(StartupDiagnostics.ASK_DIAGNOSTICS, true);
+    node.putBoolean(StartupDiagnostics.AskDiagnostics, true);
   }
 
 }

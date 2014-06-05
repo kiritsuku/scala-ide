@@ -83,7 +83,7 @@ class InstalledScalasPreferencePage extends PreferencePage with IWorkbenchPrefer
       dirDialog.setText("Select your scala directory")
       val selectedDir = dirDialog.open()
       if (selectedDir != null) {
-        def genericExceptionStatus(e: IllegalArgumentException) = new Status(IStatus.ERROR, ScalaPlugin.plugin.pluginId, GS.STATUS_CODE_EXCEPTION, "", e)
+        def genericExceptionStatus(e: IllegalArgumentException) = new Status(IStatus.ERROR, ScalaPlugin.plugin.pluginId, GS.StatusCodeException, "", e)
         def manageStatus(status: IStatus) = {
           val handler = DebugPlugin.getDefault().getStatusHandler(status)
           handler.handleStatus(status, this)

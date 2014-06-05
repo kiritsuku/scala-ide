@@ -270,13 +270,13 @@ class ScalaCompletionProposal(proposal: CompletionProposal)
 
 object ScalaCompletionProposal {
   import ScalaImages._
-  val defImage = PUBLIC_DEF.createImage()
-  val classImage = SCALA_CLASS.createImage()
-  val traitImage = SCALA_TRAIT.createImage()
-  val objectImage = SCALA_OBJECT.createImage()
-  val packageObjectImage = SCALA_PACKAGE_OBJECT.createImage()
-  val typeImage = SCALA_TYPE.createImage()
-  val valImage = PUBLIC_VAL.createImage()
+  val defImage = PublicDef.createImage()
+  val classImage = ScalaClass.createImage()
+  val traitImage = ScalaTrait.createImage()
+  val objectImage = ScalaObject.createImage()
+  val packageObjectImage = ScalaPackageObject.createImage()
+  val typeImage = ScalaType.createImage()
+  val valImage = PublicVal.createImage()
 
   val javaInterfaceImage = JavaPluginImages.get(JavaPluginImages.IMG_OBJS_INTERFACE)
   val javaClassImage = JavaPluginImages.get(JavaPluginImages.IMG_OBJS_CLASS)

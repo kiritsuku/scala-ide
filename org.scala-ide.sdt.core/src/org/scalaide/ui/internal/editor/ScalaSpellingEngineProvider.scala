@@ -34,7 +34,7 @@ class ScalaSpellingEngineProvider extends ISpellingEngineProvider {
       try {
         for {
           region <- regions
-          partition <- TextUtilities.computePartitioning(document, SCALA_PARTITIONING, region.getOffset, region.getLength, false)
+          partition <- TextUtilities.computePartitioning(document, ScalaPartitioning, region.getOffset, region.getLength, false)
           if spellCheckablePartitionTypes contains partition.getType
         } {
           if (monitor != null && monitor.isCanceled || listener.isProblemsThresholdReached)
@@ -49,8 +49,8 @@ class ScalaSpellingEngineProvider extends ISpellingEngineProvider {
 
     private def getSpellCheckablePartitionTypes = {
       val ignoreStrings = PreferenceConstants.getPreferenceStore.getBoolean(PreferenceConstants.SPELLING_IGNORE_JAVA_STRINGS)
-      Set(SCALADOC, SCALA_MULTI_LINE_COMMENT, SCALA_SINGLE_LINE_COMMENT) ++
-        (if (ignoreStrings) Set() else Set(SCALA_STRING, SCALA_MULTI_LINE_STRING))
+      Set(Scaladoc, ScalaMultiLineComment, ScalaSingleLineComment) ++
+        (if (ignoreStrings) Set() else Set(ScalaString, ScalaMultiLineString))
     }
 
     private class SpellEventListener(collector: ISpellingProblemCollector, document: IDocument) extends ISpellEventListener {

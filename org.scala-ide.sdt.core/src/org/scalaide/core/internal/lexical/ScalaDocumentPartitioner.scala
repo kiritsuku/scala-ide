@@ -6,13 +6,13 @@ import org.eclipse.jface.text._
 import org.scalaide.core.internal.lexical.ScalaPartitions._
 
 object ScalaDocumentPartitioner {
-  val LEGAL_CONTENT_TYPES = Array[String](
-    SCALA_DEFAULT_CONTENT,
-    SCALA_CHARACTER, SCALA_STRING, SCALA_MULTI_LINE_STRING,
-    SCALA_MULTI_LINE_COMMENT, SCALA_SINGLE_LINE_COMMENT, SCALADOC, SCALADOC_CODE_BLOCK,
-    XML_TAG, XML_CDATA, XML_COMMENT, XML_PI, XML_PCDATA)
+  val LegalContentTypes = Array[String](
+    ScalaDefaultContent,
+    ScalaCharacter, ScalaString, ScalaMultiLineString,
+    ScalaMultiLineComment, ScalaSingleLineComment, Scaladoc, ScaladocCodeBlock,
+    XmlTag, XmlCdata, XmlComment, XmlPi, XmlPcdata)
 
-  val NO_PARTITION_AT_ALL = "__no_partition_at_all"
+  val NoPartitionAtAll = "__no_partition_at_all"
 }
 
 class ScalaDocumentPartitioner(conservative: Boolean = false) extends IDocumentPartitioner with IDocumentPartitionerExtension with IDocumentPartitionerExtension2 {
@@ -75,9 +75,9 @@ class ScalaDocumentPartitioner(conservative: Boolean = false) extends IDocumentP
 
   private def commonPrefixLength[X](xs: List[X], ys: List[X]) = xs.zip(ys).takeWhile(p => p._1 == p._2).size
 
-  def getLegalContentTypes = LEGAL_CONTENT_TYPES
+  def getLegalContentTypes = LegalContentTypes
 
-  def getContentType(offset: Int) = getToken(offset) map { _.contentType } getOrElse SCALA_DEFAULT_CONTENT
+  def getContentType(offset: Int) = getToken(offset) map { _.contentType } getOrElse ScalaDefaultContent
 
   private def getToken(offset: Int) = partitionRegions.find(_.containsPosition(offset))
 
@@ -107,7 +107,7 @@ class ScalaDocumentPartitioner(conservative: Boolean = false) extends IDocumentP
       region.copy(start = math.max(start, offset), end = math.min(end, offset + length - 1))
   }
 
-  def getPartition(offset: Int): ITypedRegion = getToken(offset) getOrElse new TypedRegion(offset, 0, NO_PARTITION_AT_ALL)
+  def getPartition(offset: Int): ITypedRegion = getToken(offset) getOrElse new TypedRegion(offset, 0, NoPartitionAtAll)
 
   def getManagingPositionCategories = null
 
@@ -115,9 +115,9 @@ class ScalaDocumentPartitioner(conservative: Boolean = false) extends IDocumentP
 
   def getPartition(offset: Int, preferOpenPartitions: Boolean): ITypedRegion = {
     val region = getPartition(offset)
-    if (preferOpenPartitions && region.getOffset == offset && region.getType != SCALA_DEFAULT_CONTENT && offset > 0) {
+    if (preferOpenPartitions && region.getOffset == offset && region.getType != ScalaDefaultContent && offset > 0) {
       val previousRegion = getPartition(offset - 1)
-      if (previousRegion.getType == SCALA_DEFAULT_CONTENT)
+      if (previousRegion.getType == ScalaDefaultContent)
         previousRegion
       else region
     } else region

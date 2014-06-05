@@ -10,9 +10,9 @@ class MultiLineStringAutoIndentStrategy(partitioning: String, prefStore: IPrefer
 
   override def customizeDocumentCommand(doc: IDocument, cmd: DocumentCommand): Unit = {
     val isAutoIndentEnabled = prefStore.getBoolean(
-      EditorPreferencePage.P_ENABLE_AUTO_INDENT_MULTI_LINE_STRING)
+      EditorPreferencePage.EnableAutoIndentMultiLineString)
     val isStripMarginEnabled = prefStore.getBoolean(
-      EditorPreferencePage.P_ENABLE_AUTO_STRIP_MARGIN_IN_MULTI_LINE_STRING)
+      EditorPreferencePage.EnableAutoStripMarginInMultiLineString)
 
     def autoIndentAfterNewLine() = {
       val partition = TextUtilities.getPartition(doc, partitioning, cmd.offset, true)

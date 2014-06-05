@@ -21,7 +21,7 @@ case class CreateClassProposal(className: String, compilationUnit: ICompilationU
   extends BasicCompletionProposal(
     relevance = RelevanceValues.CreateClassProposal,
     displayString = s"Create class '$className'",
-    image = ScalaImages.NEW_CLASS.createImage()) {
+    image = ScalaImages.NewClass.createImage()) {
 
   override def apply(document: IDocument): Unit = {
     val wizard = new NewFileWizardAdapter("org.scalaide.ui.wizards.classCreator", className)

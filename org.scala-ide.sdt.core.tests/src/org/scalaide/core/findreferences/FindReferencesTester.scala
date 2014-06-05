@@ -1,7 +1,7 @@
 package org.scalaide.core.findreferences
 
 object FindReferencesTester {
-  final val MODULE_SUFFIX_STRING = "$"
+  final val ModuleSuffixString = "$"
 }
 
 trait FindReferencesTester {
@@ -33,8 +33,8 @@ trait FindReferencesTester {
   def fieldVal(fullName: String): Element = FieldVal(fullName)
   def clazz(fullName: String): Element = Clazz(fullName)
   def clazzConstructor(classFullName: String, args: List[String] = Nil): Element = Method(constructorFullName(classFullName), args)
-  def module(fullName: String): Element = Module(fullName + MODULE_SUFFIX_STRING)
-  def moduleConstructor(fullName: String, args: List[String] = Nil): Element = Method(constructorFullName(fullName + MODULE_SUFFIX_STRING), args)
+  def module(fullName: String): Element = Module(fullName + ModuleSuffixString)
+  def moduleConstructor(fullName: String, args: List[String] = Nil): Element = Method(constructorFullName(fullName + ModuleSuffixString), args)
   def typeAlias(fullName: String): Element = TypeAlias(fullName)
 
   private def constructorFullName(classFullName: String): String = {

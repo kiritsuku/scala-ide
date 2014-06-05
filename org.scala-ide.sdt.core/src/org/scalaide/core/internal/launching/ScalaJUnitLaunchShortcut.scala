@@ -19,7 +19,7 @@ class ScalaJUnitLaunchShortcut extends JUnitLaunchShortcut {
   override def createLaunchConfiguration(element: IJavaElement): ILaunchConfigurationWorkingCopy = {
     val conf = super.createLaunchConfiguration(element)
 
-    conf.setAttribute(JUnitLaunchConfigurationConstants.ATTR_TEST_RUNNER_KIND, ScalaJUnitLaunchShortcut.SCALA_JUNIT_TEST_KIND)
+    conf.setAttribute(JUnitLaunchConfigurationConstants.ATTR_TEST_RUNNER_KIND, ScalaJUnitLaunchShortcut.ScalaJunitTestKind)
     conf
   }
 
@@ -32,5 +32,5 @@ class ScalaJUnitLaunchShortcut extends JUnitLaunchShortcut {
 }
 
 object ScalaJUnitLaunchShortcut {
-  final val SCALA_JUNIT_TEST_KIND = "org.scala-ide.sdt.core.junit"
+  final val ScalaJunitTestKind = "org.scala-ide.sdt.core.junit"
 }

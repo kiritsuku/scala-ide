@@ -11,8 +11,8 @@ class LiteralAutoEditStrategyTest extends AutoEditStrategyTests {
 
   @Before
   def startUp() {
-    enable(P_ENABLE_AUTO_ESCAPE_SIGN, true)
-    enable(P_ENABLE_AUTO_REMOVE_ESCAPED_SIGN, true)
+    enable(EnableAutoEscapeSign, true)
+    enable(EnableAutoRemoveEscapedSign, true)
   }
 
   @Test
@@ -27,7 +27,7 @@ class LiteralAutoEditStrategyTest extends AutoEditStrategyTests {
 
   @Test
   def remove_string_pair_with_auto_remove_escaped_sign_disabled() {
-    enable(P_ENABLE_AUTO_REMOVE_ESCAPED_SIGN, false)
+    enable(EnableAutoRemoveEscapedSign, false)
     test(input = """ "^" """, expectedOutput = """ ^ """, operation = Remove("\""))
   }
 
@@ -53,7 +53,7 @@ class LiteralAutoEditStrategyTest extends AutoEditStrategyTests {
 
   @Test
   def remove_character_pair_with_auto_remove_escaped_sign_disabled() {
-    enable(P_ENABLE_AUTO_REMOVE_ESCAPED_SIGN, false)
+    enable(EnableAutoRemoveEscapedSign, false)
     test(input = """ '^' """, expectedOutput = """ ^ """, operation = Remove("'"))
   }
 
@@ -92,7 +92,7 @@ class LiteralAutoEditStrategyTest extends AutoEditStrategyTests {
 
   @Test
   def not_remove_escaped_character_literal_if_feature_deactivated() {
-    enable(P_ENABLE_AUTO_REMOVE_ESCAPED_SIGN, false)
+    enable(EnableAutoRemoveEscapedSign, false)
     test(input = """ '\'^' """, expectedOutput = """ '\^' """, operation = Remove("'"))
   }
 
@@ -103,7 +103,7 @@ class LiteralAutoEditStrategyTest extends AutoEditStrategyTests {
 
   @Test
   def no_auto_escape_backslash_if_feature_deactivated() {
-    enable(P_ENABLE_AUTO_ESCAPE_SIGN, false)
+    enable(EnableAutoEscapeSign, false)
     test(input = """ '^' """, expectedOutput = """ '\^' """, operation = Add("\\"))
   }
 
@@ -119,7 +119,7 @@ class LiteralAutoEditStrategyTest extends AutoEditStrategyTests {
 
   @Test
   def not_remove_escape_backslash_if_feature_deactivated() {
-    enable(P_ENABLE_AUTO_REMOVE_ESCAPED_SIGN, false)
+    enable(EnableAutoRemoveEscapedSign, false)
     test(input = """ '\\^' """, expectedOutput = """ '\^' """, operation = Remove("\\"))
   }
 
@@ -137,7 +137,7 @@ class LiteralAutoEditStrategyTest extends AutoEditStrategyTests {
 
   @Test
   def not_remove_escaped_sign_if_feature_deactivated() {
-    enable(P_ENABLE_AUTO_REMOVE_ESCAPED_SIGN, false)
+    enable(EnableAutoRemoveEscapedSign, false)
     """btnfr"'\""" foreach { c =>
       test(input = """ '\%c^' """ format c, expectedOutput = """ '\^' """, operation = Remove(c.toString))
     }
@@ -152,7 +152,7 @@ class LiteralAutoEditStrategyTest extends AutoEditStrategyTests {
 
   @Test
   def not_remove_escaped_sign_on_backslash_if_feature_deactivated() {
-    enable(P_ENABLE_AUTO_REMOVE_ESCAPED_SIGN, false)
+    enable(EnableAutoRemoveEscapedSign, false)
     """btnfr"'\""" foreach { c =>
       test(input = """ '\^%c' """ format c, expectedOutput = """ '^%c' """ format c, operation = Remove("\\"))
     }

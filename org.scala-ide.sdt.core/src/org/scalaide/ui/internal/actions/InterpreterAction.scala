@@ -14,7 +14,7 @@ import org.eclipse.jdt.core._
  */
 class InterpreterAction extends IObjectActionDelegate {
   var target : Option[IJavaElement] = None
-  val SCALA_INTERPRETER_LAUNCH_ID = "scala.interpreter"
+  val ScalaInterpreterLaunchId = "scala.interpreter"
   override def setActivePart(action : IAction, targetpart : IWorkbenchPart) = {}
 
   override def run(action: IAction) = {

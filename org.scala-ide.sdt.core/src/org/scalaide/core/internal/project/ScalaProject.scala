@@ -418,7 +418,7 @@ class ScalaProject private (val underlying: IProject) extends ClasspathManagemen
 
       (classpathSettings ++ userSettings) map (_.unparse)
     }
-    val extraArgs = defaultScalaSettings().splitParams(storage.getString(CompilerSettings.ADDITIONAL_PARAMS))
+    val extraArgs = defaultScalaSettings().splitParams(storage.getString(CompilerSettings.AdditionalParams))
     shownArgs.flatten ++ encArgs ++ extraArgs
   }
 
@@ -451,7 +451,7 @@ class ScalaProject private (val underlying: IProject) extends ClasspathManagemen
     }
 
     // handle additional parameters
-    val additional = storage.getString(CompilerSettings.ADDITIONAL_PARAMS)
+    val additional = storage.getString(CompilerSettings.AdditionalParams)
     logger.info("setting additional parameters: " + additional)
     settings.processArgumentString(additional)
   }
@@ -505,7 +505,7 @@ class ScalaProject private (val underlying: IProject) extends ClasspathManagemen
   /** Which Scala source level is this project configured to work with ? */
   def getDesiredSourceLevel(): String = {
     implicit val sourceLevelDefault = ScalaPlugin.plugin.shortScalaVer
-    val sourceLevelPrefName = SettingConverterUtil.SCALA_DESIRED_SOURCELEVEL
+    val sourceLevelPrefName = SettingConverterUtil.ScalaDesiredSourcelevel
     if (!usesProjectSettings) {
       eclipseLog.warn(s"Project ${this.underlying.getName()} has platform default sourceLevel.")
       sourceLevelDefault
@@ -517,7 +517,7 @@ class ScalaProject private (val underlying: IProject) extends ClasspathManagemen
   def getDesiredInstallationChoice(): ScalaInstallationChoice = {
     implicit val desiredInstallationChoiceDefault: ScalaInstallationChoice = ScalaInstallationChoice(ScalaVersion(getDesiredSourceLevel()))
     implicit val desiredInstallationChoicePrefDefault: String = desiredInstallationChoiceDefault.toString()
-    val desiredInstallationChoicePrefName = SettingConverterUtil.SCALA_DESIRED_INSTALLATION
+    val desiredInstallationChoicePrefName = SettingConverterUtil.ScalaDesiredInstallation
     if (!usesProjectSettings) {
       eclipseLog.warn(s"Project ${this.underlying.getName()} runs on platform default installation.")
       desiredInstallationChoiceDefault
@@ -546,7 +546,7 @@ class ScalaProject private (val underlying: IProject) extends ClasspathManagemen
     if (!usesProjectSettings) {
       val pName = this.toString
       eclipseLog.warn(s"Turning on project-specific settings for $pName because of $reason")
-      projectSpecificStorage.setValue(SettingConverterUtil.USE_PROJECT_SETTINGS_PREFERENCE, true)
+      projectSpecificStorage.setValue(SettingConverterUtil.UseProjectSettingsPreference, true)
     }
   }
 
@@ -554,7 +554,7 @@ class ScalaProject private (val underlying: IProject) extends ClasspathManagemen
     if (usesProjectSettings){
       val pName = this.toString
       eclipseLog.warn(s"Turning off project-specific settings for $pName because of $reason")
-      projectSpecificStorage.setValue(SettingConverterUtil.USE_PROJECT_SETTINGS_PREFERENCE, false)
+      projectSpecificStorage.setValue(SettingConverterUtil.UseProjectSettingsPreference, false)
     }
   }
 
@@ -579,7 +579,7 @@ class ScalaProject private (val underlying: IProject) extends ClasspathManagemen
     }
 
     // This is a precaution against scala installation loss and does not set anything by itself, see `SettingConverterUtil.SCALA_DESIRED_SOURCELEVEL`
-    sourceLevel foreach {sl => projectSpecificStorage.setValue(SettingConverterUtil.SCALA_DESIRED_SOURCELEVEL, sl)}
+    sourceLevel foreach {sl => projectSpecificStorage.setValue(SettingConverterUtil.ScalaDesiredSourcelevel, sl)}
     optsi foreach {si => setDesiredSourceLevel(si.version, "requested Scala Installation change", Some(bundleUpdater(si)))}
     publish(ScalaInstallationChange())
   }
@@ -600,7 +600,7 @@ class ScalaProject private (val underlying: IProject) extends ClasspathManagemen
       }
     }
     // The ordering from here until reactivating the listener is important
-    projectSpecificStorage.setValue(SettingConverterUtil.SCALA_DESIRED_SOURCELEVEL, CompilerUtils.shortString(scalaVersion))
+    projectSpecificStorage.setValue(SettingConverterUtil.ScalaDesiredSourcelevel, CompilerUtils.shortString(scalaVersion))
     val updater = customBundleUpdater.getOrElse({() =>
       val setter = new ClasspathContainerSetter(javaProject)
       setter.updateBundleFromSourceLevel(new Path(ScalaPlugin.plugin.scalaLibId), scalaVersion)
@@ -618,19 +618,19 @@ class ScalaProject private (val underlying: IProject) extends ClasspathManagemen
     // initial space here is important
     val optionString = s" -Xsource:$scalaVersionString -Ymacro-expand:none"
     eclipseLog.debug(s"Adding $optionString to compiler arguments of ${this.underlying.getName()} because of: $reason")
-    val extraArgs = ScalaPlugin.defaultScalaSettings().splitParams(storage.getString(CompilerSettings.ADDITIONAL_PARAMS))
+    val extraArgs = ScalaPlugin.defaultScalaSettings().splitParams(storage.getString(CompilerSettings.AdditionalParams))
     val curatedArgs = extraArgs.filter { s => !s.startsWith("-Xsource") && !s.startsWith("-Ymacro-expand") }
-    storage.setValue(CompilerSettings.ADDITIONAL_PARAMS, curatedArgs.mkString(" ") + optionString)
+    storage.setValue(CompilerSettings.AdditionalParams, curatedArgs.mkString(" ") + optionString)
   }
 
   def unSetXSourceAndMaybeUntoggleProjectSettings(reason: String) = {
     if (usesProjectSettings) { // if no project-specific settings, Xsource is ineffective anyway
-      val extraArgs = ScalaPlugin.defaultScalaSettings().splitParams(storage.getString(CompilerSettings.ADDITIONAL_PARAMS))
+      val extraArgs = ScalaPlugin.defaultScalaSettings().splitParams(storage.getString(CompilerSettings.AdditionalParams))
 
       val (superfluousArgs, curatedArgs) = extraArgs.partition { s => s.startsWith("-Xsource") || s.equals("-Ymacro-expand:none") }
       val superfluousString = superfluousArgs.mkString(" ")
       eclipseLog.debug(s"Removing $superfluousString from compiler arguments of ${this.underlying.getName()} because of: $reason")
-      storage.setValue(CompilerSettings.ADDITIONAL_PARAMS, curatedArgs.mkString(" "))
+      storage.setValue(CompilerSettings.AdditionalParams, curatedArgs.mkString(" "))
 
       // values in shownSettings are fetched from currentStorage, which here means projectSpecificSettings
       val projectSettingsSameAsWorkSpace = shownSettings(ScalaPlugin.defaultScalaSettings(), _ => true) forall {
@@ -651,20 +651,20 @@ class ScalaProject private (val underlying: IProject) extends ClasspathManagemen
 
   /** Does this project use project-specific compiler settings? */
   def usesProjectSettings: Boolean =
-    projectSpecificStorage.getBoolean(SettingConverterUtil.USE_PROJECT_SETTINGS_PREFERENCE)
+    projectSpecificStorage.getBoolean(SettingConverterUtil.UseProjectSettingsPreference)
 
   import org.scalaide.util.internal.eclipse.SWTUtils.fnToPropertyChangeListener
   val compilerSettingsListener: IPropertyChangeListener = { (event: PropertyChangeEvent) =>
     {
       import org.scalaide.util.internal.Utils._
-      if (event.getProperty() == SettingConverterUtil.SCALA_DESIRED_INSTALLATION) {
+      if (event.getProperty() == SettingConverterUtil.ScalaDesiredInstallation) {
         val installString = (event.getNewValue()).asInstanceOfOpt[String]
         val installChoice = installString flatMap (parseScalaInstallationChoice(_))
         // This can't use the default argument of setDesiredInstallation: getDesiredXXX() ...
         // will not turn on the project settings and depends on them being set right beforehand
         installChoice foreach (setDesiredInstallation(_))
       }
-      if (event.getProperty() == CompilerSettings.ADDITIONAL_PARAMS || event.getProperty() == SettingConverterUtil.USE_PROJECT_SETTINGS_PREFERENCE) {
+      if (event.getProperty() == CompilerSettings.AdditionalParams || event.getProperty() == SettingConverterUtil.UseProjectSettingsPreference) {
         if (isUnderlyingValid) classpathHasChanged()
       }
     }

@@ -7,6 +7,6 @@ import org.eclipse.jface.preference.IPreferenceStore
 
 class XmlPIScanner(val preferenceStore: IPreferenceStore) extends RuleBasedScanner with AbstractScalaScanner {
 
-  setRules(Array(new MultiLineRule("<?", "?>", getToken(XML_PI))))
+  setRules(Array(new MultiLineRule("<?", "?>", getToken(XmlPi))))
 
 }

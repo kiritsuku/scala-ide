@@ -22,14 +22,14 @@ import org.eclipse.ui.IWorkbench
 
 object NewApplicationWizard {
 
-  private val TEMPLATE_WITHOUT_APP =
+  private val TemplateWithoutApp =
     """object %s {
       |  def main(args: Array[String]) {
       |
       |  }
       |}""".stripMargin
 
-  private val TEMPLATE_WITH_APP =
+  private val TemplateWithApp =
     """object %s extends App {
       |
       |}""".stripMargin
@@ -63,7 +63,7 @@ class NewApplicationWizard extends BasicNewResourceWizard with HasLogger {
   private def createSource(applicationName: String, pkg: IPackageFragment): String = {
     val appExists = try { Class.forName("scala.App"); true } catch { case _: Throwable => false }
     val packageDeclaration = if (pkg.isDefaultPackage) "" else "package " + pkg.getElementName + "\n\n"
-    val objectTemplate = if (appExists) TEMPLATE_WITH_APP else TEMPLATE_WITHOUT_APP
+    val objectTemplate = if (appExists) TemplateWithApp else TemplateWithoutApp
     val unformatted = packageDeclaration + objectTemplate.format(applicationName)
     ScalaFormatter.format(unformatted, FormatterPreferences.getPreferences(pkg.getResource.getProject))
   }

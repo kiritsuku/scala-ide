@@ -12,8 +12,8 @@ import org.scalaide.util.internal.Utils
 import org.scalaide.core.internal.project.ScalaLibraryPluginDependencyUtils
 
 object ToggleScalaNatureAction {
-  val PDE_PLUGIN_NATURE = "org.eclipse.pde.PluginNature" /* == org.eclipse.pde.internal.core.natures.PDE.PLUGIN_NATURE */
-  val PDE_BUNDLE_NAME = "org.eclipse.pde.ui"
+  val PdePluginNature = "org.eclipse.pde.PluginNature" /* == org.eclipse.pde.internal.core.natures.PDE.PLUGIN_NATURE */
+  val PdeBundleName = "org.eclipse.pde.ui"
 }
 
 class ToggleScalaNatureAction extends AbstractPopupAction {
@@ -35,7 +35,7 @@ class ToggleScalaNatureAction extends AbstractPopupAction {
     }
 
   private def doIfPdePresent(project: IProject)(proc: => Unit) =
-    if (project.hasNature(PDE_PLUGIN_NATURE) && Platform.getBundle(PDE_BUNDLE_NAME) != null)
+    if (project.hasNature(PdePluginNature) && Platform.getBundle(PdeBundleName) != null)
       proc
 
   private def updateNatureIds(project: IProject)(natureIdUpdater: Array[String] => Array[String]) {

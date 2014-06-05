@@ -12,7 +12,7 @@ object GenericExceptionStatusHandler {
    * Status code indicating there was an error at launch time
    *  Linked to ScalaLaunchDelegate via our statusHandlers extension (see plugin.xml)
    */
-  final val STATUS_CODE_EXCEPTION = 1010
+  final val StatusCodeException = 1010
 
 }
 
