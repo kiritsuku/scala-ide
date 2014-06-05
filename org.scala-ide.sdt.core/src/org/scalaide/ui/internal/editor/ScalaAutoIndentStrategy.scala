@@ -66,7 +66,7 @@ class ScalaAutoIndentStrategy(
   ) extends DefaultIndentLineAutoEditStrategy {
 
   // The line comment introducer. Value is "{@value}"
-  private val LINE_COMMENT= "//"
+  private val LineComment= "//"
 
   private class CompilationUnitInfo(
     var buffer : Array[Char],
@@ -81,7 +81,7 @@ class ScalaAutoIndentStrategy(
   private var fgScanner = ToolFactory.createScanner(false, false, false, false)
 
   private def javaHeuristicScanner(d: IDocument) =
-    new JavaHeuristicScanner(d, ScalaPartitions.SCALA_PARTITIONING, ScalaPartitions.SCALA_DEFAULT_CONTENT)
+    new JavaHeuristicScanner(d, ScalaPartitions.ScalaPartitioning, ScalaPartitions.ScalaDefaultContent)
 
   /**
    * Determine the count of brackets within a given area of the document
@@ -280,7 +280,7 @@ class ScalaAutoIndentStrategy(
 
       var start = reg.getOffset()
       val region = TextUtilities.getPartition(d, fPartitioning, start, true)
-      if (ScalaPartitions.SCALADOC.equals(region.getType()))
+      if (ScalaPartitions.Scaladoc.equals(region.getType()))
         start = d.getLineInformationOfOffset(region.getOffset()).getOffset()
 
       // insert closing brace on new line after an unclosed opening brace
@@ -483,7 +483,7 @@ class ScalaAutoIndentStrategy(
 
     try {
       val region = TextUtilities.getPartition(document, partitioning, position, false)
-      return region.getType() == ScalaPartitions.SCALA_DEFAULT_CONTENT
+      return region.getType() == ScalaPartitions.ScalaDefaultContent
     } catch {
       case _ : BadLocationException => // Ignore this exception
     }
@@ -596,7 +596,7 @@ class ScalaAutoIndentStrategy(
   private def installJavaStuff(document : Document) : Unit = {
     val partitioner = new ScalaDocumentPartitioner
     partitioner.connect(document)
-    document.setDocumentPartitioner(ScalaPartitions.SCALA_PARTITIONING, partitioner)
+    document.setDocumentPartitioner(ScalaPartitions.ScalaPartitioning, partitioner)
   }
 
   /**
@@ -605,7 +605,7 @@ class ScalaAutoIndentStrategy(
    * @param document the document
    */
   private def removeJavaStuff(document : Document) : Unit = {
-    document.setDocumentPartitioner(ScalaPartitions.SCALA_PARTITIONING, null)
+    document.setDocumentPartitioner(ScalaPartitions.ScalaPartitioning, null)
   }
 
   private def smartPaste(document : IDocument, command : DocumentCommand) : Unit = {
@@ -737,7 +737,7 @@ class ScalaAutoIndentStrategy(
 
     // go behind line comments
     var to = from
-    while (to < endOffset - 2 && document.get(to, 2).equals(LINE_COMMENT))
+    while (to < endOffset - 2 && document.get(to, 2).equals(LineComment))
       to += 2
 
     var done = false
@@ -751,8 +751,8 @@ class ScalaAutoIndentStrategy(
 
     // don't count the space before javadoc like, asterisk-style comment lines
     if (to > from && to < endOffset - 1 && document.get(to - 1, 2).equals(" *")) {
-      val textType = TextUtilities.getContentType(document, ScalaPartitions.SCALA_PARTITIONING, to, true)
-      if (textType.equals(ScalaPartitions.SCALADOC) || textType.equals(ScalaPartitions.SCALA_MULTI_LINE_COMMENT))
+      val textType = TextUtilities.getContentType(document, ScalaPartitions.ScalaPartitioning, to, true)
+      if (textType.equals(ScalaPartitions.Scaladoc) || textType.equals(ScalaPartitions.ScalaMultiLineComment))
         to -= 1
     }
 
@@ -809,7 +809,7 @@ class ScalaAutoIndentStrategy(
 
     // Compute insert after all leading line comment markers
     var newInsert = insert
-    while (newInsert < endOffset - 2 && document.get(newInsert, 2).equals(LINE_COMMENT))
+    while (newInsert < endOffset - 2 && document.get(newInsert, 2).equals(LineComment))
       newInsert += 2
 
     // Heuristic to check whether it is commented code or just a comment
@@ -853,7 +853,7 @@ class ScalaAutoIndentStrategy(
     var toDelete = ptoDelete
 
     // go behind line comments
-    while (from < endOffset - 2 && document.get(from, 2).equals(LINE_COMMENT))
+    while (from < endOffset - 2 && document.get(from, 2).equals(LineComment))
       from += 2
 
     var to = from
@@ -921,7 +921,7 @@ class ScalaAutoIndentStrategy(
    * @return the number of spaces displayed for a tabulator in the editor
    */
   private def getVisualTabLengthPreference: Int =
-    preferencesProvider.getInt(ScalaIndenter.TAB_SIZE)
+    preferencesProvider.getInt(ScalaIndenter.TabSize)
 
   /**
    * The preference setting that tells whether to insert spaces when pressing the Tab key.
@@ -930,7 +930,7 @@ class ScalaAutoIndentStrategy(
    * @since 3.5
    */
   private def isInsertingSpacesForTab: Boolean =
-    preferencesProvider.getBoolean(ScalaIndenter.INDENT_WITH_TABS)
+    preferencesProvider.getBoolean(ScalaIndenter.IndentWithTabs)
 
   /**
    * Returns the possibly <code>project</code>-specific core preference defined under

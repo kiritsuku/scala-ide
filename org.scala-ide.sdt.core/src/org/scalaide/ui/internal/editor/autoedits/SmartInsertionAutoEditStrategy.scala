@@ -26,7 +26,7 @@ trait SmartInsertionLogic extends IAutoEditStrategy {
 
   override def customizeDocumentCommand(doc: IDocument, cmd: DocumentCommand) = {
     val isSmartSemicolonInsertionEnabled = prefStore.getBoolean(
-        EditorPreferencePage.P_ENABLE_SMART_INSERTION_SEMICOLONS)
+        EditorPreferencePage.EnableSmartInsertionSemicolons)
 
     def computeSemicolonInsertPosition(line: IRegion) = {
       val s = doc.get(line.getOffset(), line.getLength())

@@ -90,7 +90,7 @@ class ScalaSourceTypeElement(parent : JavaElement, name : String)
 
 class ScalaClassElement(parent : JavaElement, name : String, synthetic : Boolean)
   extends ScalaSourceTypeElement(parent, name) {
-  override def getImageDescriptor = ScalaImages.SCALA_CLASS
+  override def getImageDescriptor = ScalaImages.ScalaClass
   override def isVisible = !synthetic
 }
 
@@ -101,20 +101,20 @@ class ScalaAnonymousClassElement(parent : JavaElement, name : String)
 
 class ScalaTraitElement(parent : JavaElement, name : String)
   extends ScalaSourceTypeElement(parent, name) {
-  override def getImageDescriptor = ScalaImages.SCALA_TRAIT
+  override def getImageDescriptor = ScalaImages.ScalaTrait
 }
 
 class ScalaModuleElement(parent : JavaElement, name : String, synthetic : Boolean)
   extends ScalaSourceTypeElement(parent, name+"$") {
   override def scalaName = name
   override def getLabelText(flags : Long) = name
-  override def getImageDescriptor = ScalaImages.SCALA_OBJECT
+  override def getImageDescriptor = ScalaImages.ScalaObject
   override def isVisible = !synthetic
 }
 
 class ScalaPackageModuleElement(parent: JavaElement, name: String, synthetic: Boolean)
   extends ScalaModuleElement(parent, name, synthetic) {
-  override def getImageDescriptor = ScalaImages.SCALA_PACKAGE_OBJECT
+  override def getImageDescriptor = ScalaImages.ScalaPackageObject
 }
 
 class ScalaDefElement(parent : JavaElement, name: String, paramTypes : Array[String], synthetic : Boolean, display : String, overrideInfo : Int)
@@ -141,11 +141,11 @@ class ScalaValElement(parent : JavaElement, name: String, display : String)
   override def getImageDescriptor = {
     val flags = getFlags
     if ((flags & ClassFileConstants.AccPublic) != 0)
-      ScalaImages.PUBLIC_VAL
+      ScalaImages.PublicVal
     else if ((flags & ClassFileConstants.AccProtected) != 0)
-      ScalaImages.PROTECTED_VAL
+      ScalaImages.ProtectedVal
     else
-      ScalaImages.PRIVATE_VAL
+      ScalaImages.PrivateVal
   }
 }
 
@@ -157,7 +157,7 @@ class ScalaVarElement(parent : JavaElement, name: String, display : String)
 class ScalaTypeElement(parent : JavaElement, name : String, display : String)
   extends SourceField(parent, name) with ScalaFieldElement {
   override def getLabelText(flags : Long) = display
-  override def getImageDescriptor = ScalaImages.SCALA_TYPE
+  override def getImageDescriptor = ScalaImages.ScalaType
 }
 
 class ScalaLocalVariableElement(

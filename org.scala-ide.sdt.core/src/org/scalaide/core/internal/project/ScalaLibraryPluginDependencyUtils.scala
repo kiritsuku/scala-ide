@@ -50,7 +50,7 @@ object ScalaLibraryPluginDependencyUtils {
 
   private def findOrOpenManifestEditor(project: IProject): (ManifestEditor, Boolean) = {
     val workbenchPage = getWorkbenchPage
-    val manifestFile = project.findMember(new Path(MANIFEST_PATH)).asInstanceOf[IFile]
+    val manifestFile = project.findMember(new Path(ManifestPath)).asInstanceOf[IFile]
     val fileEditorInput = new FileEditorInput(manifestFile)
     val existingEditor = Option(workbenchPage.findEditor(fileEditorInput))
     val manifestEditor = (existingEditor getOrElse workbenchPage.openEditor(fileEditorInput, IPDEUIConstants.MANIFEST_EDITOR_ID))
@@ -59,6 +59,6 @@ object ScalaLibraryPluginDependencyUtils {
     (manifestEditor, alreadyOpen)
   }
 
-  private val MANIFEST_PATH = "META-INF/MANIFEST.MF"
+  private val ManifestPath = "META-INF/MANIFEST.MF"
 
 }

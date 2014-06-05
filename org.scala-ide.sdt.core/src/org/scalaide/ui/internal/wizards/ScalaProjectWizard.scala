@@ -25,7 +25,7 @@ class ScalaProjectWizard extends {
   }
   with JavaProjectWizard(pageOne, pageTwo) {
   setWindowTitle("New Scala Project")
-  setDefaultPageImageDescriptor(ScalaImages.SCALA_PROJECT_WIZARD);
+  setDefaultPageImageDescriptor(ScalaImages.ScalaProjectWizard);
 
   pageOne.setTitle("Create a Scala project")
   pageTwo.setTitle("Scala Settings")

@@ -14,7 +14,7 @@ class ScalaDecorator extends ILightweightLabelDecorator {
       decoration.getDecorationContext() match {
         case dc: DecorationContext =>
           dc.putProperty(IDecoration.ENABLE_REPLACE, true)
-          decoration.addOverlay(ScalaImages.EXCLUDED_SCALA_FILE, IDecoration.REPLACE)
+          decoration.addOverlay(ScalaImages.ExcludedScalaFile, IDecoration.REPLACE)
         case _ =>
       }
     case _ =>

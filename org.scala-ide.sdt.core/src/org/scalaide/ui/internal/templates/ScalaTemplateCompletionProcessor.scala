@@ -20,18 +20,18 @@ import org.eclipse.jface.text.templates.DocumentTemplateContext
  */
 class ScalaTemplateManager {
 
-  val CONTEXT_TYPE = ScalaPlugin.plugin.pluginId + ".templates"
-  val TEMPLATE_STORE_ID = ScalaPlugin.plugin.pluginId + ".preferences.Templates"
+  val ContextType = ScalaPlugin.plugin.pluginId + ".templates"
+  val TemplateStoreId = ScalaPlugin.plugin.pluginId + ".preferences.Templates"
 
   lazy val templateStore = {
-    val b = new ContributionTemplateStore(contextTypeRegistry, ScalaPlugin.prefStore, TEMPLATE_STORE_ID)
+    val b = new ContributionTemplateStore(contextTypeRegistry, ScalaPlugin.prefStore, TemplateStoreId)
     b.load()
     b
   }
 
   lazy val contextTypeRegistry = {
     val b = new ContributionContextTypeRegistry()
-    b.addContextType(CONTEXT_TYPE)
+    b.addContextType(ContextType)
     b
   }
 
@@ -45,7 +45,7 @@ class ScalaTemplateManager {
 class ScalaTemplateCompletionProcessor(val tm : ScalaTemplateManager) extends TemplateCompletionProcessor {
 
   protected override def getContextType(viewer : ITextViewer , region : IRegion) : TemplateContextType = {
-    tm.contextTypeRegistry.getContextType(tm.CONTEXT_TYPE);
+    tm.contextTypeRegistry.getContextType(tm.ContextType);
   }
 
   //TODO provide a icon for template

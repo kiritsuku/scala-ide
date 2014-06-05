@@ -6,19 +6,19 @@ import org.eclipse.jface.text.TextAttribute
 
 class Preferences(val store: IPreferenceStore) {
   def isEnabled(): Boolean =
-    store.getBoolean(ScalaSyntaxClasses.ENABLE_SEMANTIC_HIGHLIGHTING)
+    store.getBoolean(ScalaSyntaxClasses.EnableSemanticHighlighting)
 
   def isStrikethroughDeprecatedDecorationEnabled(): Boolean =
-    store.getBoolean(ScalaSyntaxClasses.STRIKETHROUGH_DEPRECATED)
+    store.getBoolean(ScalaSyntaxClasses.StrikethroughDeprecated)
 
   def isUseSyntacticHintsEnabled(): Boolean =
-    store.getBoolean(ScalaSyntaxClasses.USE_SYNTACTIC_HINTS)
+    store.getBoolean(ScalaSyntaxClasses.UseSyntacticHints)
 
   def isInterpolatedStringCodeDecorationEnabled(): Boolean =
-    ScalaSyntaxClasses.IDENTIFIER_IN_INTERPOLATED_STRING.getStyleInfo(store).enabled
+    ScalaSyntaxClasses.IdentifierInInterpolatedString.getStyleInfo(store).enabled
 
   def interpolatedStringTextAttribute(): TextAttribute =
-    ScalaSyntaxClasses.IDENTIFIER_IN_INTERPOLATED_STRING.getTextAttribute(store)
+    ScalaSyntaxClasses.IdentifierInInterpolatedString.getTextAttribute(store)
 }
 
 object Preferences {

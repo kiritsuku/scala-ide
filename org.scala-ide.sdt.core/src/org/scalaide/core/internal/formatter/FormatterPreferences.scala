@@ -17,9 +17,9 @@ object FormatterPreferences {
 
   implicit class RichFormatterPreference(preference: PreferenceDescriptor[_]) {
 
-    def eclipseKey = PREFIX  + preference.key
+    def eclipseKey = Prefix  + preference.key
 
-    def oldEclipseKey = OLD_PREFIX + preference.key
+    def oldEclipseKey = OldPrefix + preference.key
   }
 
   implicit class RichPreferenceStore(preferenceStore: IPreferenceStore) {
@@ -61,15 +61,15 @@ object FormatterPreferences {
   private def getPreferenceStore(project: IProject): IPreferenceStore = {
     val workspaceStore = ScalaPlugin.prefStore
     val projectStore = new PropertyStore(new ProjectScope(project), ScalaPlugin.plugin.pluginId)
-    val useProjectSettings = projectStore.getBoolean(FormatterPreferences.USE_PROJECT_SPECIFIC_SETTINGS_KEY)
+    val useProjectSettings = projectStore.getBoolean(FormatterPreferences.UseProjectSpecificSettingsKey)
     val prefStore = if (useProjectSettings) projectStore else ScalaPlugin.prefStore
     prefStore
   }
 
-  val OLD_PREFIX = "scala.tools.eclipse.formatter."
+  val OldPrefix = "scala.tools.eclipse.formatter."
 
-  val PREFIX = "formatter."
+  val Prefix = "formatter."
 
-  val USE_PROJECT_SPECIFIC_SETTINGS_KEY = PREFIX + "useProjectSpecificSettings"
+  val UseProjectSpecificSettingsKey = Prefix + "useProjectSpecificSettings"
 
 }

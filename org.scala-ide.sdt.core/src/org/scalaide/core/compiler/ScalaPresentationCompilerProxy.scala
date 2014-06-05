@@ -142,7 +142,7 @@ final class ScalaPresentationCompilerProxy(val project: ScalaProject) extends Ha
     val pcScalaMissingStatuses = new scala.collection.mutable.ListBuffer[IStatus]()
     pcLock.synchronized {
       def updatePcStatus(msg: String, ex: Throwable) = {
-        pcScalaMissingStatuses += new Status(IStatus.ERROR, ScalaPlugin.plugin.pluginId, org.scalaide.ui.internal.handlers.MissingScalaRequirementHandler.STATUS_CODE_SCALA_MISSING, msg, ex)
+        pcScalaMissingStatuses += new Status(IStatus.ERROR, ScalaPlugin.plugin.pluginId, org.scalaide.ui.internal.handlers.MissingScalaRequirementHandler.StatusCodeScalaMissing, msg, ex)
       }
 
       try {
@@ -175,7 +175,7 @@ final class ScalaPresentationCompilerProxy(val project: ScalaProject) extends Ha
         if (!messageShown && pcScalaMissingStatuses.nonEmpty) {
           val firstStatus = pcScalaMissingStatuses.head
           val statuses: Array[IStatus] = pcScalaMissingStatuses.tail.toArray
-          val status = new MultiStatus(ScalaPlugin.plugin.pluginId, org.scalaide.ui.internal.handlers.MissingScalaRequirementHandler.STATUS_CODE_SCALA_MISSING, statuses, firstStatus.getMessage(), firstStatus.getException())
+          val status = new MultiStatus(ScalaPlugin.plugin.pluginId, org.scalaide.ui.internal.handlers.MissingScalaRequirementHandler.StatusCodeScalaMissing, statuses, firstStatus.getMessage(), firstStatus.getException())
           val handler = DebugPlugin.getDefault().getStatusHandler(status)
           // Don't allow asyncExec bec. of the concurrent nature of this call,
           // we're create()-ing instances repeatedly otherwise

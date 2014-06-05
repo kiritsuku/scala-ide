@@ -139,13 +139,13 @@ class JUnit4TestFinder extends ITestFinder with ISearchMethods with HasLogger {
 
   private def likelyTestResources(roots: Seq[IResource], _pm: IProgressMonitor): Seq[IResource] = {
     val pm = SubMonitor.convert(_pm, "Textual search for likely sources that contain tests", roots.size)
-    val scope = TextSearchScope.newSearchScope(roots.toArray, FILE_NAME_PATTERN.pattern, /* visitDerivedResoures = */ false)
+    val scope = TextSearchScope.newSearchScope(roots.toArray, FileNamePattern.pattern, /* visitDerivedResoures = */ false)
 
     if (pm.isCanceled()) Seq()
     else {
       val engine = TextSearchEngine.createDefault()
       val req = new PotentialTestFilesCollector(pm)
-      engine.search(scope, req, TEST_PATTERN.pattern, pm)
+      engine.search(scope, req, TestPattern.pattern, pm)
       pm.done()
       req.files
     }
@@ -199,11 +199,11 @@ class JUnit4TestFinder extends ITestFinder with ISearchMethods with HasLogger {
  *  set of executable JUnit4 test classes and let the user figure out the cause why the test class cannot be run.
  */
 object JUnit4TestFinder {
-  private val MARKER_STRINGS = Set("@Test", "@RunWith")
+  private val MarkerStrings = Set("@Test", "@RunWith")
 
   /** Textual filter, used to find candidate resources for JUnit tests. */
-  private val TEST_PATTERN = MARKER_STRINGS.mkString("|").r
-  private val FILE_NAME_PATTERN = """(.*\.java$)|(.*\.scala$)""".r
+  private val TestPattern = MarkerStrings.mkString("|").r
+  private val FileNamePattern = """(.*\.java$)|(.*\.scala$)""".r
 
   def findTestClasses(scu: ScalaSourceFile): List[IType] = scu.withSourceFile { (source, comp) =>
     import comp.ClassDef

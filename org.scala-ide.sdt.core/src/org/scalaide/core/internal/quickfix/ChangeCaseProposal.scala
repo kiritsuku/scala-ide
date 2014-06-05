@@ -16,7 +16,7 @@ import org.eclipse.jface.text.Position
 case class ChangeCaseProposal(originalName: String, newName: String, pos: Position) extends BasicCompletionProposal(
   relevance = RelevanceValues.ChangeCaseProposal,
   displayString = s"Change to '${newName}'",
-  image = ScalaImages.CORRECTION_RENAME.createImage()) {
+  image = ScalaImages.CorrectionRename.createImage()) {
 
   override def apply(document: IDocument): Unit = {
     val offset = pos.offset + pos.length - originalName.length

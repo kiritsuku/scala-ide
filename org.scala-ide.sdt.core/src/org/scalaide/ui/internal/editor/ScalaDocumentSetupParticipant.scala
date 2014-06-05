@@ -13,6 +13,6 @@ import org.scalaide.core.internal.lexical.ScalaPartitions
 class ScalaDocumentSetupParticipant extends IDocumentSetupParticipant {
   override def setup(doc: IDocument) = {
     val tools = JavaPlugin.getDefault().getJavaTextTools()
-    tools.setupJavaDocumentPartitioner(doc, ScalaPartitions.SCALA_PARTITIONING)
+    tools.setupJavaDocumentPartitioner(doc, ScalaPartitions.ScalaPartitioning)
   }
 }

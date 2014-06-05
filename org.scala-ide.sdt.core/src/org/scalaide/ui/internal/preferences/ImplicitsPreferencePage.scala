@@ -35,11 +35,11 @@ Set the highlighting for implicit conversions and implicit parameters.
   }
 
   override def createFieldEditors() {
-    addField(new BooleanFieldEditor(P_ACTIVE, "Enabled", getFieldEditorParent))
-    addField(new BooleanFieldEditor(P_BOLD, "Bold", getFieldEditorParent))
-    addField(new BooleanFieldEditor(P_ITALIC, "Italic", getFieldEditorParent))
-    addField(new BooleanFieldEditor(P_CONVERSIONS_ONLY, "Only highlight implicit conversions", getFieldEditorParent))
-    addField(new BooleanFieldEditor(P_FIRST_LINE_ONLY, "Only highlight the first line in an implicit conversion", getFieldEditorParent))
+    addField(new BooleanFieldEditor(Active, "Enabled", getFieldEditorParent))
+    addField(new BooleanFieldEditor(Bold, "Bold", getFieldEditorParent))
+    addField(new BooleanFieldEditor(Italic, "Italic", getFieldEditorParent))
+    addField(new BooleanFieldEditor(ConversionsOnly, "Only highlight implicit conversions", getFieldEditorParent))
+    addField(new BooleanFieldEditor(FirstLineOnly, "Only highlight the first line in an implicit conversion", getFieldEditorParent))
   }
 
   def init(workbench: IWorkbench) {}
@@ -47,12 +47,12 @@ Set the highlighting for implicit conversions and implicit parameters.
 }
 
 object ImplicitsPreferencePage {
-  val BASE = "scala.tools.eclipse.ui.preferences.implicit."
-  val P_ACTIVE = BASE + "enabled"
-  val P_BOLD = BASE + "text.bold"
-  val P_ITALIC = BASE + "text.italic"
-  val P_CONVERSIONS_ONLY = BASE + "conversions.only"
-  val P_FIRST_LINE_ONLY  = BASE + "firstline.only"
+  val Base = "scala.tools.eclipse.ui.preferences.implicit."
+  val Active = Base + "enabled"
+  val Bold = Base + "text.bold"
+  val Italic = Base + "text.italic"
+  val ConversionsOnly = Base + "conversions.only"
+  val FirstLineOnly  = Base + "firstline.only"
 }
 
 class ImplicitsPagePreferenceInitializer extends AbstractPreferenceInitializer {
@@ -61,10 +61,10 @@ class ImplicitsPagePreferenceInitializer extends AbstractPreferenceInitializer {
 
   override def initializeDefaultPreferences() {
     val store = ScalaPlugin.plugin.getPreferenceStore
-    store.setDefault(P_ACTIVE, true)
-    store.setDefault(P_BOLD, false)
-    store.setDefault(P_ITALIC, false)
-    store.setDefault(P_CONVERSIONS_ONLY, true)
-    store.setDefault(P_FIRST_LINE_ONLY, true)
+    store.setDefault(Active, true)
+    store.setDefault(Bold, false)
+    store.setDefault(Italic, false)
+    store.setDefault(ConversionsOnly, true)
+    store.setDefault(FirstLineOnly, true)
   }
 }

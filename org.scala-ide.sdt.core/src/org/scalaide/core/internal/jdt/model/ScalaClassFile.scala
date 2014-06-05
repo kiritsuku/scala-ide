@@ -23,7 +23,7 @@ import org.eclipse.jdt.internal.core.util.Util
 
 class ScalaClassFile(parent : PackageFragment, name : String, sourceFile : String)
   extends ClassFile(parent, name) with ScalaCompilationUnit with IScalaClassFile {
-  override def getImageDescriptor = ScalaImages.SCALA_CLASS_FILE
+  override def getImageDescriptor = ScalaImages.ScalaClassFile
 
   override def getElementAt(position : Int) : IJavaElement = {
     val e = getSourceElementAt(position)

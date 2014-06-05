@@ -111,9 +111,9 @@ class InterpreterLaunchConfigurationDelegate extends AbstractJavaLaunchConfigura
          streamProxy.write("\r\n")
        }
       }
-      seedInterpreter(configuration.getAttributeOption(SEED_SCRIPT), false)
-      seedInterpreter(configuration.getAttributeOption(PACKAGE_IMPORT), true)
-      seedInterpreter(configuration.getAttributeOption(OBJECT_IMPORT), true)
+      seedInterpreter(configuration.getAttributeOption(SeedScript), false)
+      seedInterpreter(configuration.getAttributeOption(PackageImport), true)
+      seedInterpreter(configuration.getAttributeOption(ObjectImport), true)
     }
 
     try {

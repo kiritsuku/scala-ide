@@ -20,22 +20,22 @@ class XmlCDATAScanner(val preferenceStore: IPreferenceStore) extends AbstractSca
     /**
      * Dummy token to sit on top of the stack until the first call to nextToken() removes it
      */
-    buffer += RegionToken(0, 0, getToken(DEFAULT))
-    buffer += RegionToken(offset, CDATA_START.length, getToken(XML_CDATA_BORDER))
-    if (length > CDATA_START.length) {
-      if (length < CDATA_START.length + CDATA_END.length - 1)
-        buffer += RegionToken(offset + CDATA_START.length, length - CDATA_START.length, getToken(DEFAULT))
+    buffer += RegionToken(0, 0, getToken(Default))
+    buffer += RegionToken(offset, CdataStart.length, getToken(XmlCdataBorder))
+    if (length > CdataStart.length) {
+      if (length < CdataStart.length + CdataEnd.length - 1)
+        buffer += RegionToken(offset + CdataStart.length, length - CdataStart.length, getToken(Default))
       else {
-        val contentStart = offset + CDATA_START.length
-        val contentEnd = offset + length - CDATA_END.length - 1
+        val contentStart = offset + CdataStart.length
+        val contentEnd = offset + length - CdataEnd.length - 1
         val contentLength = contentEnd - contentStart + 1
-        val endText = document.get(contentEnd + 1, CDATA_END.length)
-        if (endText == CDATA_END) {
+        val endText = document.get(contentEnd + 1, CdataEnd.length)
+        if (endText == CdataEnd) {
           if (contentLength > 0)
-            buffer += RegionToken(contentStart, contentLength, getToken(DEFAULT))
-          buffer += RegionToken(contentEnd + 1, CDATA_END.length, getToken(XML_CDATA_BORDER))
+            buffer += RegionToken(contentStart, contentLength, getToken(Default))
+          buffer += RegionToken(contentEnd + 1, CdataEnd.length, getToken(XmlCdataBorder))
         } else
-          buffer += RegionToken(contentStart, contentLength + CDATA_END.length, getToken(DEFAULT))
+          buffer += RegionToken(contentStart, contentLength + CdataEnd.length, getToken(Default))
       }
     }
     regionTokens = buffer.toList
@@ -57,8 +57,8 @@ class XmlCDATAScanner(val preferenceStore: IPreferenceStore) extends AbstractSca
 
 object XmlCDATAScanner {
 
-  val CDATA_START = "<![CDATA["
+  val CdataStart = "<![CDATA["
 
-  val CDATA_END = "]]>"
+  val CdataEnd = "]]>"
 
 }

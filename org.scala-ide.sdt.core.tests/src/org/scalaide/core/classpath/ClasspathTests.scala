@@ -47,7 +47,7 @@ class ClasspathTests {
 
   // 60s should be enough even for Jenkins builds running under high-load
   // (increased from 10s)
-  val TIMEOUT = 60000
+  val Timeout = 60000
 
   val simulator = new EclipseUserSimulator
 
@@ -66,13 +66,13 @@ class ClasspathTests {
   val projectStore = project.projectSpecificStorage
 
   private def enableProjectSpecificSettings() = {
-    projectStore.setValue(SettingConverterUtil.USE_PROJECT_SETTINGS_PREFERENCE, true)
+    projectStore.setValue(SettingConverterUtil.UseProjectSettingsPreference, true)
     projectStore.save()
   }
 
   @After
   def resetProjectSpecificSettings() = {
-    projectStore.setToDefault(SettingConverterUtil.USE_PROJECT_SETTINGS_PREFERENCE)
+    projectStore.setToDefault(SettingConverterUtil.UseProjectSettingsPreference)
     projectStore.save()
   }
 
@@ -83,7 +83,7 @@ class ClasspathTests {
 
   @After
   def resetPreferences() {
-    projectStore.setToDefault(CompilerSettings.ADDITIONAL_PARAMS)
+    projectStore.setToDefault(CompilerSettings.AdditionalParams)
     projectStore.save()
     ScalaPlugin.prefStore.setToDefault(SettingConverterUtil.convertNameToProperty(ScalaPluginSettings.withVersionClasspathValidator.name))
   }
@@ -139,7 +139,7 @@ class ClasspathTests {
   @Test
   def previousLibraryWithXsourceButNoProjectSpecificSettings() {
       val majorMinor = getPreviousScalaVersion
-      projectStore.setValue(CompilerSettings.ADDITIONAL_PARAMS, "-Xsource:"+majorMinor)
+      projectStore.setValue(CompilerSettings.AdditionalParams, "-Xsource:"+majorMinor)
       val newRawClasspath= cleanRawClasspath :+ createPreviousScalaLibraryEntry()
 
       setRawClasspathAndCheckMarkers(newRawClasspath :+ newLibraryEntry("specs2_%s.2-0.12.3.jar".format(majorMinor)), expectedWarnings = 0, expectedErrors = 2)
@@ -152,7 +152,7 @@ class ClasspathTests {
   def previousLibraryWithXsource() {
       val majorMinor = getPreviousScalaVersion
       enableProjectSpecificSettings()
-      projectStore.setValue(CompilerSettings.ADDITIONAL_PARAMS, "-Xsource:"+majorMinor)
+      projectStore.setValue(CompilerSettings.AdditionalParams, "-Xsource:"+majorMinor)
       val newRawClasspath= cleanRawClasspath :+ createPreviousScalaLibraryEntry()
 
       setRawClasspathAndCheckMarkers(newRawClasspath :+ newLibraryEntry("specs2_%s.2-0.12.3.jar".format(majorMinor)), expectedWarnings = 1, expectedErrors = 0)
@@ -162,7 +162,7 @@ class ClasspathTests {
   def newerLibraryButWithXSource() {
       val majorMinor = getPreviousScalaVersion
       enableProjectSpecificSettings()
-      projectStore.setValue(CompilerSettings.ADDITIONAL_PARAMS, "-Xsource:"+majorMinor)
+      projectStore.setValue(CompilerSettings.AdditionalParams, "-Xsource:"+majorMinor)
 
       setRawClasspathAndCheckMarkers(baseRawClasspath, expectedWarnings = 0, expectedErrors = 1)
   }
@@ -174,7 +174,7 @@ class ClasspathTests {
   @Test
   def previousLibraryWithXsourceAndBadBinary() {
       enableProjectSpecificSettings()
-      projectStore.setValue(CompilerSettings.ADDITIONAL_PARAMS, "-Xsource:"+ getPreviousScalaVersion)
+      projectStore.setValue(CompilerSettings.AdditionalParams, "-Xsource:"+ getPreviousScalaVersion)
       val majorMinor = getIncompatibleScalaVersion
       val newRawClasspath= cleanRawClasspath :+ createPreviousScalaLibraryEntry()
 
@@ -459,7 +459,7 @@ class ClasspathTests {
   def settingErrorsInProjectAreKeptAfterClasspathCheck() {
     enableProjectSpecificSettings()
     // illegal option
-    projectStore.setValue(CompilerSettings.ADDITIONAL_PARAMS, "-Xi_dont_know")
+    projectStore.setValue(CompilerSettings.AdditionalParams, "-Xi_dont_know")
 
     project.underlying.build(IncrementalProjectBuilder.CLEAN_BUILD, new NullProgressMonitor)
     project.underlying.build(IncrementalProjectBuilder.FULL_BUILD, new NullProgressMonitor)
@@ -472,7 +472,7 @@ class ClasspathTests {
     assertTrue("unexpected number of scala problems in project: " + errors, errors.nonEmpty)
 
     // back to normal
-    projectStore.setToDefault(CompilerSettings.ADDITIONAL_PARAMS)
+    projectStore.setToDefault(CompilerSettings.AdditionalParams)
 
     project.underlying.build(IncrementalProjectBuilder.CLEAN_BUILD, new NullProgressMonitor)
     project.underlying.build(IncrementalProjectBuilder.FULL_BUILD, new NullProgressMonitor)
@@ -488,7 +488,7 @@ class ClasspathTests {
   def buildErrorsInProjectAreKeptAfterClasspathCheck() {
     enableProjectSpecificSettings()
     // illegal option
-    projectStore.setValue(CompilerSettings.ADDITIONAL_PARAMS, "-P:unknown:error")
+    projectStore.setValue(CompilerSettings.AdditionalParams, "-P:unknown:error")
 
     project.underlying.build(IncrementalProjectBuilder.CLEAN_BUILD, new NullProgressMonitor)
     project.underlying.build(IncrementalProjectBuilder.FULL_BUILD, new NullProgressMonitor)
@@ -564,7 +564,7 @@ class ClasspathTests {
     assertEquals("Unexpected classpath validity state : " + collectMarkers(scalaProject), expectedNbOfErrorMarker == 0, scalaProject.isClasspathValid())
 
     var actualMarkers = (0, 0)
-    SDTTestUtils.waitUntil(TIMEOUT) {
+    SDTTestUtils.waitUntil(Timeout) {
       actualMarkers = collectMarkers(scalaProject)
       actualMarkers == ((expectedNbOfErrorMarker, expectedNbOfWarningMarker))
     }
@@ -608,7 +608,7 @@ class ClasspathTests {
     job.addJobChangeListener(jobListener)
     job.schedule()
 
-    SDTTestUtils.waitUntil(TIMEOUT) { jobDone }
+    SDTTestUtils.waitUntil(Timeout) { jobDone }
     actualMarkers
   }
 

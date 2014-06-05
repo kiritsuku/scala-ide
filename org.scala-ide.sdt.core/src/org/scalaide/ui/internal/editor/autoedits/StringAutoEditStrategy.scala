@@ -16,11 +16,11 @@ class StringAutoEditStrategy(partitioning: String, prefStore: IPreferenceStore) 
   def customizeDocumentCommand(document: IDocument, command: DocumentCommand) {
 
     val isAutoEscapeLiteralEnabled = prefStore.getBoolean(
-        EditorPreferencePage.P_ENABLE_AUTO_ESCAPE_LITERALS)
+        EditorPreferencePage.EnableAutoEscapeLiterals)
     val isAutoEscapeSignEnabled = prefStore.getBoolean(
-        EditorPreferencePage.P_ENABLE_AUTO_ESCAPE_SIGN)
+        EditorPreferencePage.EnableAutoEscapeSign)
     val isAutoRemoveEscapedSignEnabled = prefStore.getBoolean(
-        EditorPreferencePage.P_ENABLE_AUTO_REMOVE_ESCAPED_SIGN)
+        EditorPreferencePage.EnableAutoRemoveEscapedSign)
 
     def ch(i: Int, c: Char) = {
       val o = command.offset + i

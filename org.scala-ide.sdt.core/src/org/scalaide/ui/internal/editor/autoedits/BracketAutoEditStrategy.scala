@@ -62,9 +62,9 @@ class BracketAutoEditStrategy(prefStore: IPreferenceStore) extends IAutoEditStra
 
     def addClosingBrace() {
       val isAutoClosingEnabled = prefStore.getBoolean(
-          EditorPreferencePage.P_ENABLE_AUTO_CLOSING_BRACES)
+          EditorPreferencePage.EnableAutoClosingBraces)
       val isSmartAutoClosingEnabled = prefStore.getBoolean(
-          EditorPreferencePage.P_ENABLE_SMART_INSERTION_BRACES)
+          EditorPreferencePage.EnableSmartInsertionBraces)
 
       if (isAutoClosingEnabled) {
         if (!isSmartAutoClosingEnabled || (isSmartAutoClosingEnabled && autoClosingRequired))
@@ -93,9 +93,9 @@ class BracketAutoEditStrategy(prefStore: IPreferenceStore) extends IAutoEditStra
     command.text match {
       case "{" => addClosingBrace()
       case c @ ("}" | ")" | "]" | ">") => jumpOver(c.head)
-      case "(" => addClosing(EditorPreferencePage.P_ENABLE_AUTO_CLOSING_PARENS, "()")
-      case "[" => addClosing(EditorPreferencePage.P_ENABLE_AUTO_CLOSING_SQUARE_BRACKETS, "[]")
-      case "<" => addClosing(EditorPreferencePage.P_ENABLE_AUTO_CLOSING_ANGLE_BRACKETS, "<>")
+      case "(" => addClosing(EditorPreferencePage.EnableAutoClosingParens, "()")
+      case "[" => addClosing(EditorPreferencePage.EnableAutoClosingSquareBrackets, "[]")
+      case "<" => addClosing(EditorPreferencePage.EnableAutoClosingAngleBrackets, "<>")
       case ""  => removeClosingBrace()
       case _   =>
     }

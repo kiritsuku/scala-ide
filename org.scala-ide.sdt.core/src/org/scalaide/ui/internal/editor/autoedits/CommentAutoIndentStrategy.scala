@@ -26,7 +26,7 @@ class CommentAutoIndentStrategy(partitioning: String, prefStore: IPreferenceStor
       if (TextUtilities.endsWith(doc.getLegalLineDelimiters(), cmd.text) != -1) {
         val shouldClose = {
           val isAutoClosingEnabled = prefStore.getBoolean(
-              EditorPreferencePage.P_ENABLE_AUTO_CLOSING_COMMENTS)
+              EditorPreferencePage.EnableAutoClosingComments)
           isAutoClosingEnabled && shouldCloseDocComment(doc, cmd.offset)
         }
 
@@ -144,7 +144,7 @@ class CommentAutoIndentStrategy(partitioning: String, prefStore: IPreferenceStor
     }
 
     val enableAutoBreaking = prefStore.getBoolean(
-        EditorPreferencePage.P_ENABLE_AUTO_BREAKING_COMMENTS)
+        EditorPreferencePage.EnableAutoBreakingComments)
 
     if (enableAutoBreaking && cmd.text.nonEmpty) {
       val marginColumn = prefStore.getInt(EDITOR_PRINT_MARGIN_COLUMN)
@@ -180,6 +180,6 @@ class CommentAutoIndentStrategy(partitioning: String, prefStore: IPreferenceStor
 
   private val scaladocPartitions = {
     import org.scalaide.core.internal.lexical.ScalaPartitions._
-    Set(SCALADOC, SCALA_MULTI_LINE_COMMENT)
+    Set(Scaladoc, ScalaMultiLineComment)
   }
 }

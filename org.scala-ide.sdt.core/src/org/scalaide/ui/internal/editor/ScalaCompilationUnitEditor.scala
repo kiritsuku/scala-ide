@@ -82,7 +82,7 @@ trait ScalaCompilationUnitEditor extends JavaEditor with ScalaEditor {
 
   override protected def handlePreferenceStoreChanged(event: PropertyChangeEvent) = {
     event.getProperty match {
-      case ScalaSyntaxClasses.ENABLE_SEMANTIC_HIGHLIGHTING =>
+      case ScalaSyntaxClasses.EnableSemanticHighlighting =>
         // This preference can be changed only via the preference dialog, hence the below block
         // is ensured to be always run within the UI Thread. Check the JavaDoc of `handlePreferenceStoreChanged`
         if (isScalaSemanticHighlightingEnabled) installScalaSemanticHighlighting(forceRefresh = true)

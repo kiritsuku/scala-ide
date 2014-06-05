@@ -78,7 +78,7 @@ trait ScalaPluginPreferencePage extends HasLogger {
           case ms: Settings#MultiStringSetting => ms.value == Nil
           case cs: Settings#ChoiceSetting      => cs.value == cs.default
         }
-        if (!store.getBoolean(USE_PROJECT_SETTINGS_PREFERENCE) && isDefault)
+        if (!store.getBoolean(UseProjectSettingsPreference) && isDefault)
           store.setToDefault(name)
         else {
           val value = setting match {
@@ -153,9 +153,9 @@ class CompilerSettings extends PropertyPage with IWorkbenchPreferencePage with E
     val countingListener = new IPropertyChangeListener{
       def propertyChange(event: PropertyChangeEvent) = {
         event.getProperty() match {
-          case SettingConverterUtil.USE_PROJECT_SETTINGS_PREFERENCE => wasClasspathChanged.lazySet(0, 1)
-          case CompilerSettings.ADDITIONAL_PARAMS => wasClasspathChanged.lazySet(1, 1)
-          case SettingConverterUtil.SCALA_DESIRED_SOURCELEVEL => wasClasspathChanged.lazySet(2, 1)
+          case SettingConverterUtil.UseProjectSettingsPreference => wasClasspathChanged.lazySet(0, 1)
+          case CompilerSettings.AdditionalParams => wasClasspathChanged.lazySet(1, 1)
+          case SettingConverterUtil.ScalaDesiredSourceLevel => wasClasspathChanged.lazySet(2, 1)
           case _ =>
         }
       }
@@ -345,15 +345,15 @@ class CompilerSettings extends PropertyPage with IWorkbenchPreferencePage with E
     import SettingConverterUtil._
 
     // TODO - Does this belong here?  For now it's the only place we can really check...
-    if (!preferenceStore0.contains(USE_PROJECT_SETTINGS_PREFERENCE)) {
-      preferenceStore0.setDefault(USE_PROJECT_SETTINGS_PREFERENCE, false)
+    if (!preferenceStore0.contains(UseProjectSettingsPreference)) {
+      preferenceStore0.setDefault(UseProjectSettingsPreference, false)
     }
 
     var control: Button = _
     def layout = new GridData()
 
     /** Pulls our current value from the preference store */
-    private def getValue = preferenceStore0.getBoolean(USE_PROJECT_SETTINGS_PREFERENCE)
+    private def getValue = preferenceStore0.getBoolean(UseProjectSettingsPreference)
 
     /** Adds our widget to the Property Page */
     def addTo(page: Composite) = {
@@ -379,17 +379,17 @@ class CompilerSettings extends PropertyPage with IWorkbenchPreferencePage with E
 
     def isChanged = getValue != control.getSelection
 
-    def isUseEnabled = preferenceStore0.getBoolean(USE_PROJECT_SETTINGS_PREFERENCE)
+    def isUseEnabled = preferenceStore0.getBoolean(UseProjectSettingsPreference)
 
     /** Saves our value into the preference store*/
     def save() {
-      preferenceStore0.setValue(USE_PROJECT_SETTINGS_PREFERENCE, control.getSelection)
+      preferenceStore0.setValue(UseProjectSettingsPreference, control.getSelection)
     }
   }
 
   class DesiredSourceLevelWidget(parent:Composite) extends
     ComboFieldEditor(
-        SettingConverterUtil.SCALA_DESIRED_SOURCELEVEL,
+        SettingConverterUtil.ScalaDesiredSourceLevel,
         "Scala Source Level",
         Array(Array("2.11", "2.11"),Array("2.10", "2.10")),
         parent) {
@@ -405,7 +405,7 @@ class CompilerSettings extends PropertyPage with IWorkbenchPreferencePage with E
 
     var additionalParametersControl: Text = _
     var additionalCompParams = originalValue
-    def originalValue = preferenceStore0.getString(CompilerSettings.ADDITIONAL_PARAMS)
+    def originalValue = preferenceStore0.getString(CompilerSettings.AdditionalParams)
 
     def addTo(parent: Composite): this.type = {
       val additionalGroup = new Composite(parent, SWT.NONE)
@@ -480,11 +480,11 @@ class CompilerSettings extends PropertyPage with IWorkbenchPreferencePage with E
       originalValue != additionalCompParams
 
     def save() {
-      preferenceStore0.setValue(CompilerSettings.ADDITIONAL_PARAMS, additionalCompParams)
+      preferenceStore0.setValue(CompilerSettings.AdditionalParams, additionalCompParams)
     }
 
     def reset() {
-      additionalParametersControl.setText(preferenceStore0.getDefaultString(CompilerSettings.ADDITIONAL_PARAMS))
+      additionalParametersControl.setText(preferenceStore0.getDefaultString(CompilerSettings.AdditionalParams))
     }
 
     def setEnabled(value: Boolean) {
@@ -494,5 +494,5 @@ class CompilerSettings extends PropertyPage with IWorkbenchPreferencePage with E
 }
 
 object CompilerSettings {
-  final val ADDITIONAL_PARAMS = "scala.compiler.additionalParams"
+  final val AdditionalParams = "scala.compiler.additionalParams"
 }

@@ -13,13 +13,13 @@ case class ScalaSyntaxClass(displayName: String, baseName: String, canBeDisabled
 
   import ScalaSyntaxClasses._
 
-  def enabledKey = baseName + ENABLED_SUFFIX
-  def foregroundColourKey = baseName + FOREGROUND_COLOUR_SUFFIX
-  def backgroundColourKey = baseName + BACKGROUND_COLOUR_SUFFIX
-  def backgroundColourEnabledKey = baseName + BACKGROUND_COLOUR_ENABLED_SUFFIX
-  def boldKey = baseName + BOLD_SUFFIX
-  def italicKey = baseName + ITALIC_SUFFIX
-  def underlineKey = baseName + UNDERLINE_SUFFIX
+  def enabledKey = baseName + EnabledSuffix
+  def foregroundColourKey = baseName + ForegroundColourSuffix
+  def backgroundColourKey = baseName + BackgroundColourSuffix
+  def backgroundColourEnabledKey = baseName + BackgroundColourEnabledSuffix
+  def boldKey = baseName + BoldSuffix
+  def italicKey = baseName + ItalicSuffix
+  def underlineKey = baseName + UnderlineSuffix
 
   /** Secondary constructor for backward compatibility with 3.x.
    *  TODO remove once 3.x compatibility is discarded

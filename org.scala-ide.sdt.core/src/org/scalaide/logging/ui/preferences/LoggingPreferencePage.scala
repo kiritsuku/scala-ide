@@ -47,7 +47,7 @@ class LoggingPreferencePageInitializer extends AbstractPreferenceInitializer {
   override def initializeDefaultPreferences() {
     val store = ScalaPlugin.plugin.getPreferenceStore
     if(ScalaPlugin.plugin.headlessMode) {
-      store.setDefault(LoggingPreferenceConstants.LogLevel, Level.DEBUG.toString)
+      store.setDefault(LoggingPreferenceConstants.LogLevel, Level.Debug.toString)
       store.setDefault(LoggingPreferenceConstants.IsConsoleAppenderEnabled, true)
       store.setDefault(LoggingPreferenceConstants.RedirectStdErrOut, false)
     }

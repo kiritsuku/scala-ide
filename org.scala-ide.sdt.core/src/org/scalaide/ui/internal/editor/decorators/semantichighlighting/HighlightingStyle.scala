@@ -1,7 +1,6 @@
 package org.scalaide.ui.internal.editor.decorators.semantichighlighting
 
 import org.scalaide.ui.syntax.ScalaSyntaxClasses
-import org.scalaide.ui.syntax.ScalaSyntaxClasses._
 import org.scalaide.core.internal.decorators.semantichighlighting.Position
 import org.scalaide.core.internal.decorators.semantichighlighting.classifier.SymbolTypes
 import org.scalaide.core.internal.decorators.semantichighlighting.classifier.SymbolTypes._
@@ -33,32 +32,33 @@ object HighlightingStyle {
     val enabled = syntaxClass.getStyleInfo(preferences.store).enabled
     val deprecation = DeprecationStyle(preferences.isStrikethroughDeprecatedDecorationEnabled())
     val stringInterpolation = StringInterpolationStyle(preferences.isInterpolatedStringCodeDecorationEnabled(), preferences.interpolatedStringTextAttribute())
-    HighlightingStyle(syntaxClass.getTextAttribute(preferences.store), enabled, ScalaSyntaxClasses.DEFAULT.getTextAttribute(preferences.store), deprecation, stringInterpolation)
+    HighlightingStyle(syntaxClass.getTextAttribute(preferences.store), enabled, ScalaSyntaxClasses.Default.getTextAttribute(preferences.store), deprecation, stringInterpolation)
   }
 
   def symbolTypeToSyntaxClass(symbolType: SymbolTypes.SymbolType): ScalaSyntaxClass = {
+    import org.scalaide.ui.syntax.{ScalaSyntaxClasses => ssc}
     symbolType match {
-      case Annotation        => ANNOTATION
-      case CaseClass         => CASE_CLASS
-      case CaseObject        => CASE_OBJECT
-      case Class             => CLASS
-      case LazyLocalVal      => LAZY_LOCAL_VAL
-      case LazyTemplateVal   => LAZY_TEMPLATE_VAL
-      case LocalVal          => LOCAL_VAL
-      case LocalVar          => LOCAL_VAR
-      case Method            => METHOD
-      case Param             => PARAM
-      case Object            => OBJECT
-      case Package           => PACKAGE
-      case TemplateVar       => TEMPLATE_VAR
-      case TemplateVal       => TEMPLATE_VAL
-      case Trait             => TRAIT
-      case Type              => TYPE
-      case TypeParameter     => TYPE_PARAMETER
-      case DynamicSelect     => DYNAMIC_SELECT
-      case DynamicUpdate     => DYNAMIC_UPDATE
-      case DynamicApply      => DYNAMIC_APPLY
-      case DynamicApplyNamed => DYNAMIC_APPLY_NAMED
+      case Annotation        => ssc.Annotation
+      case CaseClass         => ssc.CaseClass
+      case CaseObject        => ssc.CaseObject
+      case Class             => ssc.Class
+      case LazyLocalVal      => ssc.LazyLocalVal
+      case LazyTemplateVal   => ssc.LazyTemplateVal
+      case LocalVal          => ssc.LocalVal
+      case LocalVar          => ssc.LocalVar
+      case Method            => ssc.Method
+      case Param             => ssc.Param
+      case Object            => ssc.Object
+      case Package           => ssc.Package
+      case TemplateVar       => ssc.TemplateVar
+      case TemplateVal       => ssc.TemplateVal
+      case Trait             => ssc.Trait
+      case Type              => ssc.Type
+      case TypeParameter     => ssc.TypeParameter
+      case DynamicSelect     => ssc.DynamicSelect
+      case DynamicUpdate     => ssc.DynamicUpdate
+      case DynamicApply      => ssc.DynamicApply
+      case DynamicApplyNamed => ssc.DynamicApplyNamed
     }
   }
 }

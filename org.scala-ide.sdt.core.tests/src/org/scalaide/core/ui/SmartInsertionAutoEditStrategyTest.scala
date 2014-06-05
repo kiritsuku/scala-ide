@@ -18,12 +18,12 @@ class SmartInsertionAutoEditStrategyTest extends AutoEditStrategyTests {
 
   @Before
   def startUp() = {
-    enable(P_ENABLE_SMART_INSERTION_SEMICOLONS, true)
+    enable(EnableSmartInsertionSemicolons, true)
   }
 
   @Test
   def no_smart_insertion_when_feature_disabled() = {
-    enable(P_ENABLE_SMART_INSERTION_SEMICOLONS, false)
+    enable(EnableSmartInsertionSemicolons, false)
     "val x^ = 0" becomes "val x;^ = 0" after semicolon
   }
 

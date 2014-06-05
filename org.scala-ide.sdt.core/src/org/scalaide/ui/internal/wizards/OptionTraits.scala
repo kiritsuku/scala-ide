@@ -16,8 +16,8 @@ trait ClassOptions extends AbstractNewElementWizardPage {
     var createUnimplemented = true
 
     initializeIfNotNull(dialogSettings) { section =>
-      createConstructors = section.getBoolean(SETTINGS_CREATECONSTR)
-      createUnimplemented = section.getBoolean(SETTINGS_CREATEUNIMPLEMENTED)
+      createConstructors = section.getBoolean(SettingsCreateConstr)
+      createUnimplemented = section.getBoolean(SettingsCreateUnimplemented)
     }
 
     methodStubButtons.enableSelectionButton(0, false)
@@ -48,9 +48,9 @@ trait ObjectOptions extends AbstractNewElementWizardPage {
     var createUnimplemented = false
 
     initializeIfNotNull(dialogSettings) { section =>
-      createMain = section.getBoolean(SETTINGS_CREATEMAIN)
-      createConstructors = section.getBoolean(SETTINGS_CREATECONSTR)
-      createUnimplemented = section.getBoolean(SETTINGS_CREATEUNIMPLEMENTED)
+      createMain = section.getBoolean(SettingsCreateMain)
+      createConstructors = section.getBoolean(SettingsCreateConstr)
+      createUnimplemented = section.getBoolean(SettingsCreateUnimplemented)
     }
 
     methodStubButtons.enableSelectionButton(0, true)
@@ -78,9 +78,9 @@ trait PackageObjectOptions extends AbstractNewElementWizardPage {
     var createUnimplemented = false
 
     initializeIfNotNull(dialogSettings) { section =>
-      createMain = section.getBoolean(SETTINGS_CREATEMAIN)
-      createConstructors = section.getBoolean(SETTINGS_CREATECONSTR)
-      createUnimplemented = section.getBoolean(SETTINGS_CREATEUNIMPLEMENTED)
+      createMain = section.getBoolean(SettingsCreateMain)
+      createConstructors = section.getBoolean(SettingsCreateConstr)
+      createUnimplemented = section.getBoolean(SettingsCreateUnimplemented)
     }
 
     methodStubButtons.enableSelectionButton(0, false)
@@ -104,7 +104,7 @@ trait TraitOptions { self: AbstractNewElementWizardPage =>
     var createUnimplemented = true
 
     initializeIfNotNull(dialogSettings) { section =>
-      createUnimplemented = section.getBoolean(SETTINGS_CREATEUNIMPLEMENTED)
+      createUnimplemented = section.getBoolean(SettingsCreateUnimplemented)
     }
 
     methodStubButtons.enableSelectionButton(0, false)

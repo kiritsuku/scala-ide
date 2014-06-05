@@ -275,10 +275,9 @@ trait ScalaCompilationUnit extends Openable
     import scala.util.control.Exception
 
     val descriptor = Exception.catching(classOf[JavaModelException]).opt(getCorrespondingResource) map { file =>
-      import ScalaImages.SCALA_FILE
-      import ScalaImages.EXCLUDED_SCALA_FILE
+      import ScalaImages._
       val javaProject = JavaCore.create(scalaProject.underlying)
-      if (javaProject.isOnClasspath(file)) SCALA_FILE else EXCLUDED_SCALA_FILE
+      if (javaProject.isOnClasspath(file)) ScalaFile else ExcludedScalaFile
     }
     descriptor.orNull
   }

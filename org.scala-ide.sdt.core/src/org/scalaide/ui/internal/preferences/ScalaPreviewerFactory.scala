@@ -36,7 +36,7 @@ object ScalaPreviewerFactory {
     val document = new Document
     document.set(initialText)
     val partitioners = new HashMap[String, IDocumentPartitioner]
-    partitioners.put(SCALA_PARTITIONING, new ScalaDocumentPartitioner(conservative = true))
+    partitioners.put(ScalaPartitioning, new ScalaDocumentPartitioner(conservative = true))
     TextUtilities.addDocumentPartitioners(document, partitioners)
     previewViewer.setDocument(document)
 

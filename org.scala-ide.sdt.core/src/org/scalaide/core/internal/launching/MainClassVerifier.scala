@@ -37,7 +37,7 @@ class MainClassVerifier {
     if (mainClass.nonEmpty && mainModuleClass.isEmpty) new Status(IStatus.ERROR, ScalaPlugin.plugin.pluginId, s"${mainTypeName} needs to be an `object` (it is currently a `class`).")
     else if (hasBuildErrors) {
       val msg = s"Project ${project.underlying.getName} contains build errors."
-      new Status(IStatus.ERROR, ScalaPlugin.plugin.pluginId, CompilerLaunchErrorHandler.STATUS_CODE_LAUNCH_ERROR, msg, null)
+      new Status(IStatus.ERROR, ScalaPlugin.plugin.pluginId, CompilerLaunchErrorHandler.StatusCodeLaunchError, msg, null)
     }
     else new Status(IStatus.OK, ScalaPlugin.plugin.pluginId, "")
   }

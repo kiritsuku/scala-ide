@@ -39,8 +39,8 @@ class JavaJUnit4TestFinder extends HasLogger {
 
     val scope = SearchEngine.createJavaSearchScope(allClasses.asInstanceOf[Array[IJavaElement]], IJavaSearchScope.SOURCES)
     val matchRule = SearchPattern.R_EXACT_MATCH | SearchPattern.R_CASE_SENSITIVE
-    val runWithPattern = SearchPattern.createPattern(RUN_WITH.name, IJavaSearchConstants.ANNOTATION_TYPE, IJavaSearchConstants.ANNOTATION_TYPE_REFERENCE, matchRule)
-    val testPattern = SearchPattern.createPattern(TEST.name, IJavaSearchConstants.ANNOTATION_TYPE, IJavaSearchConstants.ANNOTATION_TYPE_REFERENCE, matchRule)
+    val runWithPattern = SearchPattern.createPattern(RunWith.name, IJavaSearchConstants.ANNOTATION_TYPE, IJavaSearchConstants.ANNOTATION_TYPE_REFERENCE, matchRule)
+    val testPattern = SearchPattern.createPattern(Test.name, IJavaSearchConstants.ANNOTATION_TYPE, IJavaSearchConstants.ANNOTATION_TYPE_REFERENCE, matchRule)
 
     val annotationsPattern = SearchPattern.createOrPattern(runWithPattern, testPattern)
     val searchParticipants = Array(SearchEngine.getDefaultSearchParticipant())
@@ -88,8 +88,8 @@ class JavaJUnit4TestFinder extends HasLogger {
 }
 
 object JavaJUnit4TestFinder {
-  private final val RUN_WITH = new Annotation("org.junit.runner.RunWith")
-  private final val TEST = new Annotation("org.junit.Test")
+  private final val RunWith = new Annotation("org.junit.runner.RunWith")
+  private final val Test = new Annotation("org.junit.Test")
 
   private class Annotation(val name: String) {
     private def annotates(annotations: Array[IAnnotationBinding]): Boolean = {

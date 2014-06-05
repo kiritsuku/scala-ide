@@ -143,13 +143,13 @@ class SpyView extends ViewPart with HasLogger {
       }
     }
 
-    browseAction.setImageDescriptor(Images.TREE_ICON_DESCRIPTOR)
+    browseAction.setImageDescriptor(Images.TreeIconDescriptor)
   }
 }
 
 object Images {
   val PluginId = "org.scala-ide.sdt.spy"
-  final val TREE_ICON = "tree.icon"
+  final val TreeIcon = "tree.icon"
 
-  val TREE_ICON_DESCRIPTOR: ImageDescriptor = AbstractUIPlugin.imageDescriptorFromPlugin(PluginId, "icons/tree.png")
+  val TreeIconDescriptor: ImageDescriptor = AbstractUIPlugin.imageDescriptorFromPlugin(PluginId, "icons/tree.png")
 }

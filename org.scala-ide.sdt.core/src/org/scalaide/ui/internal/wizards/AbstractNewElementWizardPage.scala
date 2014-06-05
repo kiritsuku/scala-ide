@@ -66,11 +66,11 @@ abstract class AbstractNewElementWizardPage extends NewTypeWizardPage(1, "") wit
   setTitle("Scala " + declarationType)
   setDescription("Create a new Scala " + declarationType)
 
-  val PAGE_NAME = "New" + declarationType + "WizardPage"
-  val DEFAULT_SUPER_TYPE = "scala.AnyRef"
-  val SETTINGS_CREATEMAIN = "create_main"
-  val SETTINGS_CREATECONSTR = "create_constructor"
-  val SETTINGS_CREATEUNIMPLEMENTED = "create_unimplemented"
+  val PageName = "New" + declarationType + "WizardPage"
+  val DefaultSuperType = "scala.AnyRef"
+  val SettingsCreateMain = "CreateMain"
+  val SettingsCreateConstr = "CreateConstructor"
+  val SettingsCreateUnimplemented = "CreateUnimplemented"
 
   protected object dialogFieldListener extends IDialogFieldListener {
     def dialogFieldChanged(field: DialogField) {
@@ -216,13 +216,13 @@ abstract class AbstractNewElementWizardPage extends NewTypeWizardPage(1, "") wit
     } else {
       val dialogSettings = getDialogSettings()
       if (dialogSettings != null) {
-        var section = dialogSettings.getSection(PAGE_NAME)
+        var section = dialogSettings.getSection(PageName)
         if (section == null) {
-          section = dialogSettings.addNewSection(PAGE_NAME)
+          section = dialogSettings.addNewSection(PageName)
         }
-        section.put(SETTINGS_CREATEMAIN, createMainSelected)
-        section.put(SETTINGS_CREATECONSTR, createConstructorsSelected)
-        section.put(SETTINGS_CREATEUNIMPLEMENTED, createInheritedSelected)
+        section.put(SettingsCreateMain, createMainSelected)
+        section.put(SettingsCreateConstr, createConstructorsSelected)
+        section.put(SettingsCreateUnimplemented, createInheritedSelected)
       }
     }
   }
@@ -296,7 +296,7 @@ abstract class AbstractNewElementWizardPage extends NewTypeWizardPage(1, "") wit
     createTypeNameControls(composite, columns)
     createModifierControls(composite, columns)
     createSuperClassControls(composite, columns)
-    setSuperClass(DEFAULT_SUPER_TYPE, true)
+    setSuperClass(DefaultSuperType, true)
 
     createSuperInterfacesControls(composite, columns)
     // disabled until we can generate code properly
@@ -564,7 +564,7 @@ abstract class AbstractNewElementWizardPage extends NewTypeWizardPage(1, "") wit
 
   protected def initializeIfNotNull(dialogSettings: IDialogSettings)(f: IDialogSettings => Unit) {
     if (dialogSettings != null) {
-      val section = dialogSettings.getSection(PAGE_NAME)
+      val section = dialogSettings.getSection(PageName)
       if (section != null)
         f(section)
     }

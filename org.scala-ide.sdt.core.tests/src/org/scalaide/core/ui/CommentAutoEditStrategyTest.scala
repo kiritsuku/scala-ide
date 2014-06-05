@@ -8,7 +8,7 @@ import org.scalaide.ui.internal.preferences.EditorPreferencePage._
 
 class CommentAutoEditStrategyTest extends AutoEditStrategyTests {
 
-  val strategy = new CommentAutoIndentStrategy(ScalaPartitions.SCALA_PARTITIONING, prefStore)
+  val strategy = new CommentAutoIndentStrategy(ScalaPartitions.ScalaPartitioning, prefStore)
 
   val newline = Add("\n")
 
@@ -16,14 +16,14 @@ class CommentAutoEditStrategyTest extends AutoEditStrategyTests {
   def startUp() {
     import org.eclipse.ui.texteditor.AbstractDecoratedTextEditorPreferenceConstants._
 
-    enable(P_ENABLE_AUTO_CLOSING_COMMENTS, true)
-    enable(P_ENABLE_AUTO_BREAKING_COMMENTS, true)
+    enable(EnableAutoClosingComments, true)
+    enable(EnableAutoBreakingComments, true)
     setIntPref(EDITOR_PRINT_MARGIN_COLUMN, 20)
   }
 
   @Test
   def no_close_on_deactivated_feature() {
-    enable(P_ENABLE_AUTO_CLOSING_COMMENTS, false)
+    enable(EnableAutoClosingComments, false)
     """
     /**^
     """ becomes
@@ -512,7 +512,7 @@ class CommentAutoEditStrategyTest extends AutoEditStrategyTests {
   """ after Add("t")
 
   @Test
-  def no_auto_break_on_print_margin_when_feature_disabled() = disabled(P_ENABLE_AUTO_BREAKING_COMMENTS) { """
+  def no_auto_break_on_print_margin_when_feature_disabled() = disabled(EnableAutoBreakingComments) { """
       /*
        *      test tes^
        */

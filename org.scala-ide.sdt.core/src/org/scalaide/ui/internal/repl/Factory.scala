@@ -32,7 +32,7 @@ class Factory extends IConsoleFactory {
 }
 
 object Factory {
-  val SCALA_INTERPRETER_LAUNCH_ID = "scala.interpreter"
+  val ScalaInterpreterLaunchId = "scala.interpreter"
 
   def openConsoleInProject(project: IProject) = {
   openConsoleInProjectFromTarget(project, None)
@@ -42,7 +42,7 @@ object Factory {
     import org.eclipse.jdt.launching.IJavaLaunchConfigurationConstants._
     import org.eclipse.debug.core.DebugPlugin
     val manager = DebugPlugin.getDefault().getLaunchManager();
-    val launchType = manager.getLaunchConfigurationType(SCALA_INTERPRETER_LAUNCH_ID);
+    val launchType = manager.getLaunchConfigurationType(ScalaInterpreterLaunchId);
     val projectName = project.getName
     //Pull out the first interpreter configuration we can find for the project.
     val configuration = manager.getLaunchConfigurations(launchType).filter({ config =>
@@ -61,7 +61,7 @@ object Factory {
 
     target match {
       case Some(x : IPackageFragment) =>
-        workingCopy.setAttribute(InterpreterLaunchConstants.PACKAGE_IMPORT, x.getElementName)
+        workingCopy.setAttribute(InterpreterLaunchConstants.PackageImport, x.getElementName)
       case Some(x : ITypeRoot) =>
 
       case _ => //Ignore

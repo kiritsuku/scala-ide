@@ -81,14 +81,14 @@ abstract class BaseSemanticAction(
     case _ => SWT.NORMAL
   }
 
-  protected lazy val P_COLOR = {
+  protected lazy val PrefColor = {
     val lookup = new org.eclipse.ui.texteditor.AnnotationPreferenceLookup()
     val pref = lookup.getAnnotationPreference(annotationId)
     pref.getColorPreferenceKey()
   }
 
   protected def colorValue = {
-    val rgb = PreferenceConverter.getColor(EditorsUI.getPreferenceStore, P_COLOR)
+    val rgb = PreferenceConverter.getColor(EditorsUI.getPreferenceStore, PrefColor)
     ColorManager.colorManager.getColor(rgb)
   }
 
@@ -138,7 +138,7 @@ abstract class BaseSemanticAction(
     def propertyChange(event: PropertyChangeEvent) {
       propertiesOpt.foreach { properties =>
         val changed = event.getProperty() match {
-          case properties.bold | properties.italic | P_COLOR => true
+          case properties.bold | properties.italic | PrefColor => true
           case properties.active => {
             refresh()
             false

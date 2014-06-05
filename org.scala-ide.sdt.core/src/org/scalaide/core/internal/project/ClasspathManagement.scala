@@ -347,7 +347,7 @@ trait ClasspathManagement extends HasLogger { self: ScalaProject =>
             // compatible version (major, minor are the same). Still, add warning message
             (IMarker.SEVERITY_WARNING, s"The version of scala library found in the build path ($v) is different from the one provided by scala IDE ($scalaVersion). Make sure you know what you are doing.") :: Nil
           case Some(v) if (isBinaryPrevious(plugin.scalaVer, ScalaVersion(v))) => {
-            val status = new Status(IStatus.ERROR, ScalaPlugin.plugin.pluginId, ClasspathErrorPromptStatusHandler.STATUS_CODE_PREV_CLASSPATH, "", null)
+            val status = new Status(IStatus.ERROR, ScalaPlugin.plugin.pluginId, ClasspathErrorPromptStatusHandler.StatusCodePrevClasspath, "", null)
             if (!messageWasShown.getAndSet(true)) try {
               val handler = DebugPlugin.getDefault().getStatusHandler(status)
               if (!classpathContinuation.isCompleted) handler.handleStatus(status, (this, classpathContinuation))

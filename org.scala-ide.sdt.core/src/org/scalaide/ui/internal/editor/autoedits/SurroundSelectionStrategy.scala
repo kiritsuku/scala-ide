@@ -18,10 +18,10 @@ class SurroundSelectionStrategy(sourceViewer: ISourceViewer) extends VerifyKeyLi
   ScalaPlugin.prefStore.addPropertyChangeListener(this)
 
   private lazy val optionToMapping = Map(
-    P_ENABLE_SMART_PARENS -> (('(', ')')),
-    P_ENABLE_SMART_BRACES -> (('{', '}')),
-    P_ENABLE_SMART_QUOTES -> (('"', '"')),
-    P_ENABLE_SMART_BRACKETS -> (('[', ']')))
+    EnableSmartParens -> (('(', ')')),
+    EnableSmartBraces -> (('{', '}')),
+    EnableSmartQuotes -> (('"', '"')),
+    EnableSmartBrackets -> (('[', ']')))
 
   /** Automatically surround the current selection with the corresponding
    *  character, if it is defined in the `activeChars` map.

@@ -88,10 +88,10 @@ class SyntaxColoringPreferencePage extends PreferencePage with IWorkbenchPrefere
 
   def makeOverlayPreferenceStore = {
     val keys =
-      new OverlayKey(BOOLEAN, ENABLE_SEMANTIC_HIGHLIGHTING) ::
-        new OverlayKey(BOOLEAN, USE_SYNTACTIC_HINTS) ::
-        new OverlayKey(BOOLEAN, STRIKETHROUGH_DEPRECATED) ::
-        ALL_SYNTAX_CLASSES.flatMap(makeOverlayKeys)
+      new OverlayKey(BOOLEAN, EnableSemanticHighlighting) ::
+        new OverlayKey(BOOLEAN, UseSyntacticHints) ::
+        new OverlayKey(BOOLEAN, StrikethroughDeprecated) ::
+        AllSyntaxClasses.flatMap(makeOverlayKeys)
     new OverlayPreferenceStore(getPreferenceStore, keys.toArray)
   }
 
@@ -111,11 +111,11 @@ class SyntaxColoringPreferencePage extends PreferencePage with IWorkbenchPrefere
     super.performDefaults()
     overlayStore.loadDefaults()
     handleSyntaxColorListSelection()
-    enableSemanticHighlightingCheckBox.setSelection(overlayStore getBoolean ENABLE_SEMANTIC_HIGHLIGHTING)
+    enableSemanticHighlightingCheckBox.setSelection(overlayStore getBoolean EnableSemanticHighlighting)
     extraAccuracyCheckBox.setEnabled(enableSemanticHighlightingCheckBox.getSelection)
     strikethroughDeprecatedCheckBox.setEnabled(enableSemanticHighlightingCheckBox.getSelection)
-    extraAccuracyCheckBox.setSelection(overlayStore getBoolean USE_SYNTACTIC_HINTS)
-    strikethroughDeprecatedCheckBox.setSelection(overlayStore getBoolean STRIKETHROUGH_DEPRECATED)
+    extraAccuracyCheckBox.setSelection(overlayStore getBoolean UseSyntacticHints)
+    strikethroughDeprecatedCheckBox.setSelection(overlayStore getBoolean StrikethroughDeprecated)
   }
 
   def createTreeViewer(editorComposite: Composite) {
@@ -125,7 +125,7 @@ class SyntaxColoringPreferencePage extends PreferencePage with IWorkbenchPrefere
     treeViewer.setLabelProvider(SyntaxColouringTreeContentAndLabelProvider)
 
     // scrollbars and tree indentation guess
-    val widthHint = ALL_SYNTAX_CLASSES.map { syntaxClass => convertWidthInCharsToPixels(syntaxClass.displayName.length) }.max +
+    val widthHint = AllSyntaxClasses.map { syntaxClass => convertWidthInCharsToPixels(syntaxClass.displayName.length) }.max +
       Option(treeViewer.getControl.asInstanceOf[Scrollable].getVerticalBar).map { _.getSize.x * 3 }.getOrElse(0)
 
     treeViewer.getControl.setLayoutData(gridData(
@@ -186,18 +186,18 @@ class SyntaxColoringPreferencePage extends PreferencePage with IWorkbenchPrefere
     enableSemanticHighlightingCheckBox = new Button(outerComposite, SWT.CHECK)
     enableSemanticHighlightingCheckBox.setText("Enable semantic highlighting")
     enableSemanticHighlightingCheckBox.setLayoutData(new GridData(GridData.FILL_HORIZONTAL))
-    enableSemanticHighlightingCheckBox.setSelection(overlayStore.getBoolean(ENABLE_SEMANTIC_HIGHLIGHTING))
+    enableSemanticHighlightingCheckBox.setSelection(overlayStore.getBoolean(EnableSemanticHighlighting))
 
     extraAccuracyCheckBox = new Button(outerComposite, SWT.CHECK)
     extraAccuracyCheckBox.setText("Use slower but more accurate semantic highlighting")
     extraAccuracyCheckBox.setLayoutData(new GridData(GridData.FILL_HORIZONTAL))
-    extraAccuracyCheckBox.setSelection(overlayStore.getBoolean(USE_SYNTACTIC_HINTS))
+    extraAccuracyCheckBox.setSelection(overlayStore.getBoolean(UseSyntacticHints))
     extraAccuracyCheckBox.setEnabled(enableSemanticHighlightingCheckBox.getSelection)
 
     strikethroughDeprecatedCheckBox = new Button(outerComposite, SWT.CHECK)
     strikethroughDeprecatedCheckBox.setText("Strikethrough deprecated symbols")
     strikethroughDeprecatedCheckBox.setLayoutData(new GridData(GridData.FILL_HORIZONTAL))
-    strikethroughDeprecatedCheckBox.setSelection(overlayStore.getBoolean(STRIKETHROUGH_DEPRECATED))
+    strikethroughDeprecatedCheckBox.setSelection(overlayStore.getBoolean(StrikethroughDeprecated))
     strikethroughDeprecatedCheckBox.setEnabled(enableSemanticHighlightingCheckBox.getSelection)
 
     val elementLabel = new Label(outerComposite, SWT.LEFT)
@@ -289,16 +289,16 @@ class SyntaxColoringPreferencePage extends PreferencePage with IWorkbenchPrefere
       updatePreviewerColours()
     }
     enableSemanticHighlightingCheckBox.addSelectionListener { () =>
-      overlayStore.setValue(ENABLE_SEMANTIC_HIGHLIGHTING, enableSemanticHighlightingCheckBox.getSelection)
+      overlayStore.setValue(EnableSemanticHighlighting, enableSemanticHighlightingCheckBox.getSelection)
       extraAccuracyCheckBox.setEnabled(enableSemanticHighlightingCheckBox.getSelection)
       strikethroughDeprecatedCheckBox.setEnabled(enableSemanticHighlightingCheckBox.getSelection)
       handleSyntaxColorListSelection()
     }
     extraAccuracyCheckBox.addSelectionListener { () =>
-      overlayStore.setValue(USE_SYNTACTIC_HINTS, extraAccuracyCheckBox.getSelection)
+      overlayStore.setValue(UseSyntacticHints, extraAccuracyCheckBox.getSelection)
     }
     strikethroughDeprecatedCheckBox.addSelectionListener { () =>
-      overlayStore.setValue(STRIKETHROUGH_DEPRECATED, strikethroughDeprecatedCheckBox.getSelection)
+      overlayStore.setValue(StrikethroughDeprecated, strikethroughDeprecatedCheckBox.getSelection)
     }
     enabledCheckBox.addSelectionListener { () =>
       for (syntaxClass <- selectedSyntaxClass)
@@ -351,7 +351,7 @@ class SyntaxColoringPreferencePage extends PreferencePage with IWorkbenchPrefere
       massSetEnablement(false)
     case Some(syntaxClass) =>
       val isSemanticClass = ScalaSyntaxClasses.scalaSemanticCategory.children contains syntaxClass
-      if (isSemanticClass && !(overlayStore getBoolean ENABLE_SEMANTIC_HIGHLIGHTING))
+      if (isSemanticClass && !(overlayStore getBoolean EnableSemanticHighlighting))
         massSetEnablement(false)
       else {
         import syntaxClass._
@@ -374,7 +374,7 @@ class SyntaxColoringPreferencePage extends PreferencePage with IWorkbenchPrefere
   private def updatePreviewerColours() {
     val textWidget = previewer.getTextWidget
     for (position <- SyntaxColouringPreviewText.semanticLocations)
-      if (overlayStore.getBoolean(ENABLE_SEMANTIC_HIGHLIGHTING) && (overlayStore.getBoolean(HighlightingStyle.symbolTypeToSyntaxClass(position.kind).enabledKey) || position.shouldStyle)) {
+      if (overlayStore.getBoolean(EnableSemanticHighlighting) && (overlayStore.getBoolean(HighlightingStyle.symbolTypeToSyntaxClass(position.kind).enabledKey) || position.shouldStyle)) {
       val styleRange = HighlightingStyle(Preferences(overlayStore), position.kind).style(position)
       textWidget.setStyleRange(styleRange)
     }

@@ -11,11 +11,11 @@ class BracketAutoEditStrategyTest extends AutoEditStrategyTests {
 
   @Before
   def startUp() {
-    enable(P_ENABLE_AUTO_CLOSING_PARENS, true)
-    enable(P_ENABLE_AUTO_CLOSING_SQUARE_BRACKETS, true)
-    enable(P_ENABLE_AUTO_CLOSING_ANGLE_BRACKETS, true)
-    enable(P_ENABLE_AUTO_CLOSING_BRACES, true)
-    enable(P_ENABLE_SMART_INSERTION_BRACES, true)
+    enable(EnableAutoClosingParens, true)
+    enable(EnableAutoClosingSquareBrackets, true)
+    enable(EnableAutoClosingAngleBrackets, true)
+    enable(EnableAutoClosingBraces, true)
+    enable(EnableSmartInsertionBraces, true)
   }
 
   @Test
@@ -28,10 +28,10 @@ class BracketAutoEditStrategyTest extends AutoEditStrategyTests {
 
   @Test
   def no_auto_closing_on_disabled_feature() {
-    enable(P_ENABLE_AUTO_CLOSING_PARENS, false)
-    enable(P_ENABLE_AUTO_CLOSING_SQUARE_BRACKETS, false)
-    enable(P_ENABLE_AUTO_CLOSING_ANGLE_BRACKETS, false)
-    enable(P_ENABLE_AUTO_CLOSING_BRACES, false)
+    enable(EnableAutoClosingParens, false)
+    enable(EnableAutoClosingSquareBrackets, false)
+    enable(EnableAutoClosingAngleBrackets, false)
+    enable(EnableAutoClosingBraces, false)
     test(input = "^", expectedOutput = "(^", operation = Add("("))
     test(input = "^", expectedOutput = "[^", operation = Add("["))
     test(input = "^", expectedOutput = "<^", operation = Add("<"))
@@ -40,7 +40,7 @@ class BracketAutoEditStrategyTest extends AutoEditStrategyTests {
 
   @Test
   def auto_closing_opening_brace_on_disabled_smart_behavior() {
-    enable(P_ENABLE_SMART_INSERTION_BRACES, false)
+    enable(EnableSmartInsertionBraces, false)
     test(input = "^}", expectedOutput = "{^}}", operation = Add("{"))
   }
 
@@ -89,7 +89,7 @@ class BracketAutoEditStrategyTest extends AutoEditStrategyTests {
 
   @Test
   def not_prevent_auto_closing_brace_when_caret_before_non_white_space_and_smart_behavior_disabled() {
-    enable(P_ENABLE_SMART_INSERTION_BRACES, false)
+    enable(EnableSmartInsertionBraces, false)
     test(
         input = "List(1) map ^(_+1)",
         expectedOutput = "List(1) map {^}(_+1)",

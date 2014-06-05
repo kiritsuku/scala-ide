@@ -14,9 +14,9 @@ import org.scalaide.core.ScalaPlugin
 class RunDiagnosticAction extends IObjectActionDelegate with IWorkbenchWindowActionDelegate {
   private var parentWindow: IWorkbenchWindow = null
 
-  val RUN_DIAGNOSTICS = "org.scala-ide.sdt.ui.runDiag.action"
-  val REPORT_BUG      = "org.scala-ide.sdt.ui.reportBug.action"
-  val OPEN_LOG_FILE   = "org.scala-ide.sdt.ui.openLogFile.action"
+  val RunDiagnostics = "org.scala-ide.sdt.ui.runDiag.action"
+  val ReportBug      = "org.scala-ide.sdt.ui.reportBug.action"
+  val OpenLogFile    = "org.scala-ide.sdt.ui.openLogFile.action"
 
   override def init(window: IWorkbenchWindow) {
     parentWindow = window
@@ -29,13 +29,13 @@ class RunDiagnosticAction extends IObjectActionDelegate with IWorkbenchWindowAct
   override def run(action: IAction) {
     Utils tryExecute {
       action.getId match {
-        case RUN_DIAGNOSTICS =>
+        case RunDiagnostics =>
           val shell = if (parentWindow == null) ScalaPlugin.getShell else parentWindow.getShell
           new diagnostic.DiagnosticDialog(shell).open
-        case REPORT_BUG =>
+        case ReportBug =>
           val shell = if (parentWindow == null) ScalaPlugin.getShell else parentWindow.getShell
           new diagnostic.ReportBugDialog(shell).open
-        case OPEN_LOG_FILE =>
+        case OpenLogFile =>
           OpenExternalFile(LogManager.logFile).open()
         case _ =>
       }

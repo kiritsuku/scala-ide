@@ -49,14 +49,14 @@ class CompilerSettingsTest {
 
   @After
   def clean_deprecation_and_additional() {
-    ScalaPlugin.prefStore.setToDefault(SettingConverterUtil.USE_PROJECT_SETTINGS_PREFERENCE)
+    ScalaPlugin.prefStore.setToDefault(SettingConverterUtil.UseProjectSettingsPreference)
     ScalaPlugin.prefStore.setToDefault("deprecation")
-    ScalaPlugin.prefStore.setToDefault(CompilerSettings.ADDITIONAL_PARAMS)
+    ScalaPlugin.prefStore.setToDefault(CompilerSettings.AdditionalParams)
 
     val projectStore = new ScopedPreferenceStore(projectScope, ScalaPlugin.plugin.pluginId)
-    projectStore.setToDefault(SettingConverterUtil.USE_PROJECT_SETTINGS_PREFERENCE)
+    projectStore.setToDefault(SettingConverterUtil.UseProjectSettingsPreference)
     projectStore.setToDefault("deprecation")
-    projectStore.setToDefault(CompilerSettings.ADDITIONAL_PARAMS)
+    projectStore.setToDefault(CompilerSettings.AdditionalParams)
   }
 
   // independent from PropertyStore, checks project-scoped reads find the instance scope
@@ -171,10 +171,10 @@ class CompilerSettingsTest {
   def project_additional_settings_are_updated() {
     enableProjectSettings()
     checkProjectSettingsEnabled()
-    setProjectSettings(CompilerSettings.ADDITIONAL_PARAMS, "-language:implicits")
+    setProjectSettings(CompilerSettings.AdditionalParams, "-language:implicits")
     assertTrue("Settings should contain additional parameters: " + project.scalacArguments, project.scalacArguments.contains("-language:implicits"))
 
-    setProjectSettings(CompilerSettings.ADDITIONAL_PARAMS, "-Ylog:typer")
+    setProjectSettings(CompilerSettings.AdditionalParams, "-Ylog:typer")
     assertFalse("Settings should not contain additional parameters: " + project.scalacArguments, project.scalacArguments.contains("-language:implicits"))
     assertTrue("Settings should contain additional parameters: " + project.scalacArguments, project.scalacArguments.contains("-Ylog:typer"))
   }
@@ -195,7 +195,7 @@ class CompilerSettingsTest {
 
   private def enableProjectSettings(value: Boolean = true) {
     val projectStore = new PropertyStore(projectScope, ScalaPlugin.plugin.pluginId)
-    projectStore.setValue(SettingConverterUtil.USE_PROJECT_SETTINGS_PREFERENCE, value)
+    projectStore.setValue(SettingConverterUtil.UseProjectSettingsPreference, value)
     projectStore.save()
   }
 
@@ -203,7 +203,7 @@ class CompilerSettingsTest {
     val projectStore = new ScopedPreferenceStore(projectScope, ScalaPlugin.plugin.pluginId)
     // TODO: This line is done by default in Kepler, remove it when we drop Juno
     projectStore.setSearchContexts(Array(projectScope, InstanceScope.INSTANCE, ConfigurationScope.INSTANCE))
-    assertTrue("project-specific settings should be enabled at this stage", projectStore.getBoolean(SettingConverterUtil.USE_PROJECT_SETTINGS_PREFERENCE))
+    assertTrue("project-specific settings should be enabled at this stage", projectStore.getBoolean(SettingConverterUtil.UseProjectSettingsPreference))
   }
 
   /** Set a workspace-wide setting value. For compiler settings, you need to strip the '-', for instance

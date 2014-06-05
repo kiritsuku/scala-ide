@@ -66,7 +66,7 @@ object LogManager extends Log4JFacade with HasLogger {
     else Level.withName(levelName)
   }
 
-  private[logging] def defaultLogLevel: Level.Value = Level.WARN
+  private[logging] def defaultLogLevel: Level.Value = Level.Warn
 
   override def isConsoleAppenderEnabled: Boolean =
     ScalaPlugin.plugin.getPreferenceStore.getBoolean(IsConsoleAppenderEnabled)

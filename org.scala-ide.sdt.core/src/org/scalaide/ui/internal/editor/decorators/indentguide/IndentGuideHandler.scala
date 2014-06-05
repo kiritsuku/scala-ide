@@ -5,4 +5,4 @@ import org.scalaide.ui.internal.preferences.EditorPreferencePage
 
 class IndentGuideHandler extends AbstractToggleHandler(
     "org.scalaide.core.handler.indentGuide",
-    EditorPreferencePage.INDENT_GUIDE_ENABLE)
+    EditorPreferencePage.IndentGuideEnable)

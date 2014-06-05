@@ -20,12 +20,12 @@ class ScalaLaunchableTester extends PropertyTester {
   /**
    * name for the "has main" property
    */
-  private val PROPERTY_HAS_MAIN = "hasMain" //$NON-NLS-1$
+  private val PropertyHasMain = "hasMain" //$NON-NLS-1$
 
     /**
    * name for the "can launch as junit" property
    */
-  private val PROPERTY_CAN_LAUNCH_AS_JUNIT = "canLaunchAsJUnit"; //$NON-NLS-1$
+  private val PropertyCanLaunchAsJunit = "canLaunchAsJUnit"; //$NON-NLS-1$
 
   /**
    * Determines if the Scala element contains main method(s).
@@ -89,8 +89,8 @@ class ScalaLaunchableTester extends PropertyTester {
     }
 
     property match {
-      case PROPERTY_HAS_MAIN => hasMain(element)
-      case PROPERTY_CAN_LAUNCH_AS_JUNIT => canLaunchAsJUnit(element)
+      case PropertyHasMain => hasMain(element)
+      case PropertyCanLaunchAsJunit => canLaunchAsJUnit(element)
       case _ => false
     }
   }

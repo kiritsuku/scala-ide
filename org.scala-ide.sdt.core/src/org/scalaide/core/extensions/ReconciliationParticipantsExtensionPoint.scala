@@ -18,10 +18,10 @@ import org.scalaide.util.internal.Utils
  */
 object ReconciliationParticipantsExtensionPoint extends HasLogger {
 
-  final val PARTICIPANTS_ID = "org.scala-ide.sdt.core.reconciliationParticipants"
+  final val ParticipantsId = "org.scala-ide.sdt.core.reconciliationParticipants"
 
   lazy val extensions: List[ReconciliationParticipant] = {
-    val configs = Platform.getExtensionRegistry.getConfigurationElementsFor(PARTICIPANTS_ID).toList
+    val configs = Platform.getExtensionRegistry.getConfigurationElementsFor(ParticipantsId).toList
 
     configs map { e =>
       Utils.tryExecute {

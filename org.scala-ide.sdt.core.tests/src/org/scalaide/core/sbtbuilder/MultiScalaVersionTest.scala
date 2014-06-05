@@ -26,13 +26,13 @@ class MultiScalaVersionTest {
   @Test // Build using the previous version of the Scala library
   def previousVersionBuildSucceeds() {
     val Seq(p) = createProjects("prev-version-build")
-    p.projectSpecificStorage.setValue(SettingConverterUtil.USE_PROJECT_SETTINGS_PREFERENCE, true)
+    p.projectSpecificStorage.setValue(SettingConverterUtil.UseProjectSettingsPreference, true)
     val sourceFile = addFileToProject(p.underlying, "/src/InvalidCaseClass.scala", sourceCode)
 
     for (installation <- findPreviousScalaInstallation()) {
       setScalaLibrary(p, installation.libraryJar)
       val ShortScalaVersion(major, minor) = installation.version
-      p.projectSpecificStorage.setValue(CompilerSettings.ADDITIONAL_PARAMS, s"-Xsource:$major.$minor")
+      p.projectSpecificStorage.setValue(CompilerSettings.AdditionalParams, s"-Xsource:$major.$minor")
 
       p.underlying.build(IncrementalProjectBuilder.INCREMENTAL_BUILD, null)
       val (_, errors) = getErrorMessages(p.underlying).filter(_._1 == IMarker.SEVERITY_ERROR).unzip

@@ -281,7 +281,7 @@ object CodeBuilder {
 
 object templates extends QualifiedNameSupport {
 
-  val DEFAULT_SUPER_TYPE = "scala.AnyRef"
+  val DefaultSuperType = "scala.AnyRef"
 
   def newLine(implicit lineDelimiter: String): (String => String) =
     (s: String) => s + lineDelimiter
@@ -308,7 +308,7 @@ object templates extends QualifiedNameSupport {
   }
 
   private val explicitSuperTypes: List[String] => List[String] = {
-    case DEFAULT_SUPER_TYPE :: rest => rest.map(removePackage)
+    case DefaultSuperType :: rest => rest.map(removePackage)
     case xs => xs.map(removePackage)
   }
 

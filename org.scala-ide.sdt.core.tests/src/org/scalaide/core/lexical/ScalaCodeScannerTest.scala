@@ -57,7 +57,7 @@ class ScalaCodeScannerTest {
   @Test
   def brackets() {
     "(){}[]" map (x => tokenize(x.toString)) foreach {
-      _ === Seq((BRACKET, 0, 1))
+      _ === Seq((Bracket, 0, 1))
     }
   }
 
@@ -75,7 +75,7 @@ class ScalaCodeScannerTest {
       val testableKeywords = keywords filterNot Set("macro", "return", "then")
 
       testableKeywords map (x => tokenize(x) -> x) foreach {
-        case (token, x) => token === Seq((KEYWORD, 0, x.length()))
+        case (token, x) => token === Seq((Keyword, 0, x.length()))
       }
     }
   }
@@ -91,24 +91,24 @@ class ScalaCodeScannerTest {
         (syntaxClass, start, length)
     }
 
-    token.toList == Seq((RETURN, 3, 6))
+    token.toList == Seq((Return, 3, 6))
   }
 
   @Test
   def return_keyword() {
-    tokenize("return") === Seq((RETURN, 0, 6))
+    tokenize("return") === Seq((Return, 0, 6))
   }
 
   @Test
   def single_macro_keyword_in_source_should_not_produce_exception() {
-    tokenize("macro") === Seq((DEFAULT, 0, 5))
+    tokenize("macro") === Seq((Default, 0, 5))
   }
 
   @Test
   def operator_keywords() {
     val xs = "_ : = => <- <: <% >: ⇒ ← . , ; # @"
     xs split " " map (x => tokenize(x) -> x) foreach {
-      case (token, x) => token === Seq((OPERATOR, 0, x.length()))
+      case (token, x) => token === Seq((Operator, 0, x.length()))
     }
   }
 
@@ -116,7 +116,7 @@ class ScalaCodeScannerTest {
   def ascii_operators() {
     val os = """!%&*+-<=>?\^|~/""" map (_.toString)
     os map tokenize foreach {
-      _ === Seq((OPERATOR, 0, 1))
+      _ === Seq((Operator, 0, 1))
     }
   }
 
@@ -124,18 +124,18 @@ class ScalaCodeScannerTest {
   def number_literals() {
     val xs = "1 1.0 1E1 1E-1 1e1 1D 1d 1F 1f 1L 1l 0x1 0X1 01" split " "
     xs map (x => tokenize(x) -> x) foreach {
-      case (token, x) => token === Seq((NUMBER_LITERAL, 0, x.length()))
+      case (token, x) => token === Seq((NumberLiteral, 0, x.length()))
     }
   }
 
   @Test
   def symbol_literal() {
-    tokenize("'symbol") === Seq((SYMBOL, 0, 7))
+    tokenize("'symbol") === Seq((Symbol, 0, 7))
   }
 
   @Test
   def requires_is_no_keyword() {
-    tokenize("requires") === Seq((DEFAULT, 0, 8))
+    tokenize("requires") === Seq((Default, 0, 8))
   }
 
 }

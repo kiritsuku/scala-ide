@@ -18,14 +18,14 @@ object MessageDialog {
     JFMessageDialog.openConfirm(ScalaPlugin.getShell, heading, message)
   def question(heading: String, message: String) =
     JFMessageDialog.openQuestion(ScalaPlugin.getShell, heading, message)
-  val CLOSE_ACTION = -1
+  val CloseAction = -1
 }
 
 object StartupDiagnostics extends HasLogger {
   import ScalaPlugin.plugin
 
-  private val INSTALLED_VERSION_KEY = plugin.pluginId + ".diagnostic.currentPluginVersion"
-  val ASK_DIAGNOSTICS = plugin.pluginId + ".diagnostic.askOnUpgrade"
+  private val InstalledVersionKey = plugin.pluginId + ".diagnostic.currentPluginVersion"
+  val AskDiagnostics = plugin.pluginId + ".diagnostic.askOnUpgrade"
 
   private val weavingState = new WeavingStateConfigurer
 
@@ -33,16 +33,16 @@ object StartupDiagnostics extends HasLogger {
     ask && firstInstall && insufficientHeap
 
   def suggestDiagnostics(prefStore: IPreferenceStore): Boolean = {
-    val firstInstall = (prefStore getString INSTALLED_VERSION_KEY) == ""
-    val ask = prefStore getBoolean ASK_DIAGNOSTICS
+    val firstInstall = (prefStore getString InstalledVersionKey) == ""
+    val ask = prefStore getBoolean AskDiagnostics
     suggestDiagnostics(Diagnostics.insufficientHeap, firstInstall, ask)
   }
 
   def run() {
-    val YES_ACTION = 0
-    val NO_ACTION = 1
-    val NEVER_ACTION = 2
-    import MessageDialog.CLOSE_ACTION
+    val YesAction = 0
+    val NoAction = 1
+    val NeverAction = 2
+    import MessageDialog.CloseAction
 
     val prefStore = plugin.getPreferenceStore
     DisplayThread.asyncExec {
@@ -53,15 +53,15 @@ object StartupDiagnostics extends HasLogger {
           """|We detected that some of your settings are not adequate for the Scala IDE plugin.
              |
              |Run setup diagnostics to ensure correct plugin settings?""".stripMargin,
-          YES_ACTION -> YES_LABEL, NO_ACTION -> NO_LABEL, NEVER_ACTION -> "Never") match {
-            case YES_ACTION =>
+          YesAction -> YES_LABEL, NoAction -> NO_LABEL, NeverAction -> "Never") match {
+            case YesAction =>
               new DiagnosticDialog(weavingState, ScalaPlugin.getShell).open
-            case NEVER_ACTION =>
-              prefStore.setValue(ASK_DIAGNOSTICS, false)
-            case NO_ACTION | CLOSE_ACTION =>
+            case NeverAction =>
+              prefStore.setValue(AskDiagnostics, false)
+            case NoAction | CloseAction =>
           }
         val currentVersion = plugin.getBundle.getVersion.toString
-        prefStore.setValue(INSTALLED_VERSION_KEY, currentVersion)
+        prefStore.setValue(InstalledVersionKey, currentVersion)
         InstanceScope.INSTANCE.getNode(ScalaPlugin.plugin.pluginId).flush()
       }
       ensureWeavingIsEnabled()

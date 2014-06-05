@@ -405,7 +405,7 @@ class ScalaProject private (val underlying: IProject) extends ClasspathManagemen
 
       (classpathSettings ++ userSettings) map (_.unparse)
     }
-    val extraArgs = defaultScalaSettings().splitParams(storage.getString(CompilerSettings.ADDITIONAL_PARAMS))
+    val extraArgs = defaultScalaSettings().splitParams(storage.getString(CompilerSettings.AdditionalParams))
     shownArgs.flatten ++ encArgs ++ extraArgs
   }
 
@@ -438,7 +438,7 @@ class ScalaProject private (val underlying: IProject) extends ClasspathManagemen
     }
 
     // handle additional parameters
-    val additional = storage.getString(CompilerSettings.ADDITIONAL_PARAMS)
+    val additional = storage.getString(CompilerSettings.AdditionalParams)
     logger.info("setting additional parameters: " + additional)
     settings.processArgumentString(additional)
   }
@@ -468,8 +468,8 @@ class ScalaProject private (val underlying: IProject) extends ClasspathManagemen
   def getDesiredSourceLevel() = {
     if (!usesProjectSettings) ScalaPlugin.plugin.shortScalaVer
     else {
-      if (!projectSpecificStorage.contains(SettingConverterUtil.SCALA_DESIRED_SOURCELEVEL)) projectSpecificStorage.setDefault(SettingConverterUtil.SCALA_DESIRED_SOURCELEVEL, ScalaPlugin.plugin.shortScalaVer)
-      projectSpecificStorage.getString(SettingConverterUtil.SCALA_DESIRED_SOURCELEVEL)
+      if (!projectSpecificStorage.contains(SettingConverterUtil.ScalaDesiredSourceLevel)) projectSpecificStorage.setDefault(SettingConverterUtil.ScalaDesiredSourceLevel, ScalaPlugin.plugin.shortScalaVer)
+      projectSpecificStorage.getString(SettingConverterUtil.ScalaDesiredSourceLevel)
     }
   }
 
@@ -477,7 +477,7 @@ class ScalaProject private (val underlying: IProject) extends ClasspathManagemen
     if (!usesProjectSettings) {
       val pName = this.toString
       eclipseLog.warn(s"Turning on project-specific settings for $pName because of $reason")
-      projectSpecificStorage.setValue(SettingConverterUtil.USE_PROJECT_SETTINGS_PREFERENCE, true)
+      projectSpecificStorage.setValue(SettingConverterUtil.UseProjectSettingsPreference, true)
       projectSpecificStorage.save()
     }
   }
@@ -486,12 +486,12 @@ class ScalaProject private (val underlying: IProject) extends ClasspathManagemen
     if (usesProjectSettings){
       val pName = this.toString
       eclipseLog.warn(s"Turning off project-specific settings for $pName because of $reason")
-      projectSpecificStorage.setValue(SettingConverterUtil.USE_PROJECT_SETTINGS_PREFERENCE, false)
+      projectSpecificStorage.setValue(SettingConverterUtil.UseProjectSettingsPreference, false)
       projectSpecificStorage.save()
     }
   }
 
-  def setDesiredSourceLevel(scalaVersion: ScalaVersion = ScalaVersion(projectSpecificStorage.getString(SettingConverterUtil.SCALA_DESIRED_SOURCELEVEL)), slReason: String = "requested Source Level change"): Unit = {
+  def setDesiredSourceLevel(scalaVersion: ScalaVersion = ScalaVersion(projectSpecificStorage.getString(SettingConverterUtil.ScalaDesiredSourceLevel)), slReason: String = "requested Source Level change"): Unit = {
     projectSpecificStorage.removePropertyChangeListener(compilerSettingsListener)
     turnOnProjectSpecificSettings(slReason)
     // is the required sourceLevel the bundled scala version ?
@@ -504,7 +504,7 @@ class ScalaProject private (val underlying: IProject) extends ClasspathManagemen
         toggleProjectSpecificSettingsAndSetXsource(scalaVersion, slReason)
       }
     }
-    projectSpecificStorage.setValue(SettingConverterUtil.SCALA_DESIRED_SOURCELEVEL, CompilerUtils.shortString(scalaVersion))
+    projectSpecificStorage.setValue(SettingConverterUtil.ScalaDesiredSourceLevel, CompilerUtils.shortString(scalaVersion))
     projectSpecificStorage.save()
     classpathHasChanged()
     projectSpecificStorage.addPropertyChangeListener(compilerSettingsListener)
@@ -516,19 +516,19 @@ class ScalaProject private (val underlying: IProject) extends ClasspathManagemen
     // initial space here is important
     val optionString = s" -Xsource:$scalaVersionString -Ymacro-expand:none"
     eclipseLog.debug(s"Adding $optionString to compiler arguments because of: $reason")
-    val extraArgs = ScalaPlugin.defaultScalaSettings().splitParams(storage.getString(CompilerSettings.ADDITIONAL_PARAMS))
+    val extraArgs = ScalaPlugin.defaultScalaSettings().splitParams(storage.getString(CompilerSettings.AdditionalParams))
     val curatedArgs = extraArgs.filter { s => !s.startsWith("-Xsource") && !s.startsWith("-Ymacro-expand") }
-    storage.setValue(CompilerSettings.ADDITIONAL_PARAMS, curatedArgs.mkString(" ") + optionString)
+    storage.setValue(CompilerSettings.AdditionalParams, curatedArgs.mkString(" ") + optionString)
   }
 
   def unSetXSourceAndMaybeUntoggleProjectSettings(reason: String) = {
     if (usesProjectSettings) { // if no project-specific settings, Xsource is ineffective anyway
-      val extraArgs = ScalaPlugin.defaultScalaSettings().splitParams(storage.getString(CompilerSettings.ADDITIONAL_PARAMS))
+      val extraArgs = ScalaPlugin.defaultScalaSettings().splitParams(storage.getString(CompilerSettings.AdditionalParams))
 
       val (superfluousArgs, curatedArgs) = extraArgs.partition { s => s.startsWith("-Xsource") || s.equals("-Ymacro-expand:none") }
       val superfluousString = superfluousArgs.mkString(" ")
       eclipseLog.debug(s"Removing $superfluousString from compiler arguments because of: $reason")
-      storage.setValue(CompilerSettings.ADDITIONAL_PARAMS, curatedArgs.mkString(" "))
+      storage.setValue(CompilerSettings.AdditionalParams, curatedArgs.mkString(" "))
 
       // values in shownSettings are fetched from currentStorage, which here means projectSpecificSettings
       val projectSettingsSameAsWorkSpace = shownSettings(ScalaPlugin.defaultScalaSettings(), _ => true) forall {
@@ -542,15 +542,15 @@ class ScalaProject private (val underlying: IProject) extends ClasspathManagemen
 
   /** Does this project use project-specific compiler settings? */
   def usesProjectSettings: Boolean =
-    projectSpecificStorage.getBoolean(SettingConverterUtil.USE_PROJECT_SETTINGS_PREFERENCE)
+    projectSpecificStorage.getBoolean(SettingConverterUtil.UseProjectSettingsPreference)
 
 
   val compilerSettingsListener = new IPropertyChangeListener {
       def propertyChange(event: PropertyChangeEvent) = {
-        if (event.getProperty() == SettingConverterUtil.SCALA_DESIRED_SOURCELEVEL) {
+        if (event.getProperty() == SettingConverterUtil.ScalaDesiredSourceLevel) {
           setDesiredSourceLevel()
         }
-        if (event.getProperty() == CompilerSettings.ADDITIONAL_PARAMS || event.getProperty() == SettingConverterUtil.USE_PROJECT_SETTINGS_PREFERENCE){
+        if (event.getProperty() == CompilerSettings.AdditionalParams || event.getProperty() == SettingConverterUtil.UseProjectSettingsPreference){
           if (isUnderlyingValid) classpathHasChanged()
         }
       }

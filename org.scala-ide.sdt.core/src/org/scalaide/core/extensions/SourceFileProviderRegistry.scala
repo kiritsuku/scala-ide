@@ -11,7 +11,7 @@ import org.scalaide.logging.HasLogger
 import org.eclipse.core.runtime.IPath
 
 object SourceFileProviderRegistry extends HasLogger {
-  private val EXTENSION_POINT = "org.scala-ide.sdt.core.sourcefileprovider"
+  private val ExtensionPoint = "org.scala-ide.sdt.core.sourcefileprovider"
 
   private object FileExtension {
     def apply(path: IPath): FileExtension = new FileExtension(path.getFileExtension())
@@ -29,7 +29,7 @@ object SourceFileProviderRegistry extends HasLogger {
   private def getProvider(extension: FileExtension): SourceFileProvider = registry get extension
 
   private def registerProviders() {
-    val extensionPoint = Platform.getExtensionRegistry().getExtensionPoint(EXTENSION_POINT)
+    val extensionPoint = Platform.getExtensionRegistry().getExtensionPoint(ExtensionPoint)
     if (extensionPoint != null) {
       val extensions = extensionPoint.getExtensions()
       for {

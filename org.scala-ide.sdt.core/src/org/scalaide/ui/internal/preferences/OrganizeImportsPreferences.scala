@@ -96,10 +96,10 @@ class OrganizeImportsPreferencesPage extends PropertyPage with IWorkbenchPrefere
 
       val projectSpecificButton = new Button(control, SWT.CHECK | SWT.WRAP)
       projectSpecificButton.setText("Enable project specific settings")
-      projectSpecificButton.setSelection(getPreferenceStore.getBoolean(USE_PROJECT_SPECIFIC_SETTINGS_KEY))
+      projectSpecificButton.setSelection(getPreferenceStore.getBoolean(UseProjectSpecificSettingsKey))
       projectSpecificButton.addSelectionListener { () =>
         val enabled = projectSpecificButton.getSelection
-        getPreferenceStore.setValue(USE_PROJECT_SPECIFIC_SETTINGS_KEY, enabled)
+        getPreferenceStore.setValue(UseProjectSpecificSettingsKey, enabled)
         allEnableDisableControls foreach { _.setEnabled(enabled) }
       }
       projectSpecificButton.setLayoutData(new CC)
@@ -107,7 +107,7 @@ class OrganizeImportsPreferencesPage extends PropertyPage with IWorkbenchPrefere
       val link = new Link(control, SWT.NONE)
       link.setText("<a>" + PreferencesMessages.PropertyAndPreferencePage_useworkspacesettings_change + "</a>")
       link.addSelectionListener { () =>
-        PreferencesUtil.createPreferenceDialogOn(getShell, PAGE_ID, Array(PAGE_ID), null).open()
+        PreferencesUtil.createPreferenceDialogOn(getShell, PageId, Array(PageId), null).open()
       }
       link.setLayoutData(new CC().alignX("right").wrap)
 
@@ -181,7 +181,7 @@ class OrganizeImportsPreferencesPage extends PropertyPage with IWorkbenchPrefere
     }
 
     if (!isWorkbenchPage) {
-      val enabled = getPreferenceStore.getBoolean(USE_PROJECT_SPECIFIC_SETTINGS_KEY)
+      val enabled = getPreferenceStore.getBoolean(UseProjectSpecificSettingsKey)
       allEnableDisableControls foreach { _.setEnabled(enabled) }
     }
     control
@@ -201,24 +201,24 @@ class OrganizeImportsPreferencesPage extends PropertyPage with IWorkbenchPrefere
 }
 
 object OrganizeImportsPreferences extends Enumeration {
-  val PREFIX = "organizeimports"
-  val USE_PROJECT_SPECIFIC_SETTINGS_KEY = PREFIX + ".useProjectSpecificSettings"
-  val PAGE_ID = "scala.tools.eclipse.properties.OrganizeImportsPreferencesPage"
+  val Prefix = "organizeimports"
+  val UseProjectSpecificSettingsKey = Prefix + ".useProjectSpecificSettings"
+  val PageId = "scala.tools.eclipse.properties.OrganizeImportsPreferencesPage"
 
   val ExpandImports = Value("expand")
   val CollapseImports = Value("collapse")
   val PreserveExistingGroups = Value("preserve")
 
-  val groupsKey         = PREFIX +".groups"
-  val wildcardsKey      = PREFIX +".wildcards"
-  val expandCollapseKey = PREFIX +".expandcollapse"
+  val groupsKey         = Prefix +".groups"
+  val wildcardsKey      = Prefix +".wildcards"
+  val expandCollapseKey = Prefix +".expandcollapse"
 
-  val omitScalaPackage = PREFIX +".scalapackage"
+  val omitScalaPackage = Prefix +".scalapackage"
 
   private def getPreferenceStore(project: IProject): IPreferenceStore = {
     val workspaceStore = ScalaPlugin.prefStore
     val projectStore = new PropertyStore(new ProjectScope(project), ScalaPlugin.plugin.pluginId)
-    val useProjectSettings = projectStore.getBoolean(USE_PROJECT_SPECIFIC_SETTINGS_KEY)
+    val useProjectSettings = projectStore.getBoolean(UseProjectSpecificSettingsKey)
     val prefStore = if (useProjectSettings) projectStore else ScalaPlugin.prefStore
     prefStore
   }

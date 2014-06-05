@@ -46,37 +46,37 @@ class EditorPreferencePage extends PreferencePage with IWorkbenchPreferencePage 
 
   private def createSettingsGroup(base: Composite): Unit = {
     val surround = group("Automatically surround selection", base)
-    checkBox(P_ENABLE_SMART_BRACKETS, "With [brackets]", surround)
-    checkBox(P_ENABLE_SMART_BRACES, "With {braces}", surround)
-    checkBox(P_ENABLE_SMART_PARENS, "With (parenthesis)", surround)
-    checkBox(P_ENABLE_SMART_QUOTES, "With \"quotes\"", surround)
+    checkBox(EnableSmartBrackets, "With [brackets]", surround)
+    checkBox(EnableSmartBraces, "With {braces}", surround)
+    checkBox(EnableSmartParens, "With (parenthesis)", surround)
+    checkBox(EnableSmartQuotes, "With \"quotes\"", surround)
 
     val insertion = group("Enable smart insertion mode", base)
-    checkBox(P_ENABLE_SMART_INSERTION_SEMICOLONS, "For Semicolons", insertion)
-    checkBox(P_ENABLE_SMART_INSERTION_BRACES, "Close braces but close only when necessary", insertion)
+    checkBox(EnableSmartInsertionSemicolons, "For Semicolons", insertion)
+    checkBox(EnableSmartInsertionBraces, "Close braces but close only when necessary", insertion)
 
     val autoClose = group("Automatically close", base)
-    checkBox(P_ENABLE_AUTO_CLOSING_STRINGS, "\"Strings\", \"\"\"Multi line strings\"\"\" and 'Chars'", autoClose)
-    checkBox(P_ENABLE_AUTO_CLOSING_PARENS, "(Parentheses)", autoClose)
-    checkBox(P_ENABLE_AUTO_CLOSING_SQUARE_BRACKETS, "[Square] brackets", autoClose)
-    checkBox(P_ENABLE_AUTO_CLOSING_ANGLE_BRACKETS, "<Angle> brackets", autoClose)
-    checkBox(P_ENABLE_AUTO_CLOSING_BRACES, "{Braces}", autoClose)
-    checkBox(P_ENABLE_AUTO_CLOSING_COMMENTS, "/*Multi line comments*/ and /**Scaladoc*/", autoClose)
+    checkBox(EnableAutoClosingStrings, "\"Strings\", \"\"\"Multi line strings\"\"\" and 'Chars'", autoClose)
+    checkBox(EnableAutoClosingParens, "(Parentheses)", autoClose)
+    checkBox(EnableAutoClosingSquareBrackets, "[Square] brackets", autoClose)
+    checkBox(EnableAutoClosingAngleBrackets, "<Angle> brackets", autoClose)
+    checkBox(EnableAutoClosingBraces, "{Braces}", autoClose)
+    checkBox(EnableAutoClosingComments, "/*Multi line comments*/ and /**Scaladoc*/", autoClose)
 
     val typing = group("Typing", base)
-    checkBox(P_ENABLE_AUTO_ESCAPE_LITERALS, "Automatically escape \" signs in string literals", typing)
-    checkBox(P_ENABLE_AUTO_ESCAPE_SIGN, "Automatically escape \\ signs in string and character literals", typing)
-    checkBox(P_ENABLE_AUTO_REMOVE_ESCAPED_SIGN, "Automatically remove complete escaped sign in string and character literals", typing)
-    checkBox(P_ENABLE_AUTO_BREAKING_COMMENTS, "Automatically break multi-line comments and Scaladoc after the Print Margin", typing)
+    checkBox(EnableAutoEscapeLiterals, "Automatically escape \" signs in string literals", typing)
+    checkBox(EnableAutoEscapeSign, "Automatically escape \\ signs in string and character literals", typing)
+    checkBox(EnableAutoRemoveEscapedSign, "Automatically remove complete escaped sign in string and character literals", typing)
+    checkBox(EnableAutoBreakingComments, "Automatically break multi-line comments and Scaladoc after the Print Margin", typing)
 
     val indent = group("Indentation", base)
-    checkBox(P_ENABLE_AUTO_INDENT_ON_TAB, "Enable auto indent when tab is pressed", indent)
-    checkBox(P_ENABLE_AUTO_INDENT_MULTI_LINE_STRING, "Enable auto indent for multi line string literals", indent)
-    checkBox(P_ENABLE_AUTO_STRIP_MARGIN_IN_MULTI_LINE_STRING, "Automatically add strip margins when multi line string starts with a |", indent)
+    checkBox(EnableAutoIndentOnTab, "Enable auto indent when tab is pressed", indent)
+    checkBox(EnableAutoIndentMultiLineString, "Enable auto indent for multi line string literals", indent)
+    checkBox(EnableAutoStripMarginInMultiLineString, "Automatically add strip margins when multi line string starts with a |", indent)
 
     val highlighting = group("Highlighting", base)
-    checkBox(P_ENABLE_MARK_OCCURRENCES, "Mark Occurences of the selected element in the current file", highlighting)
-    checkBox(P_SHOW_INFERRED_SEMICOLONS, "Show inferred semicolons", highlighting)
+    checkBox(EnableMarkOccurrences, "Mark Occurences of the selected element in the current file", highlighting)
+    checkBox(ShowInferredSemicolons, "Show inferred semicolons", highlighting)
   }
 
   private def group(text: String, parent: Composite): Group = {
@@ -95,9 +95,9 @@ class EditorPreferencePage extends PreferencePage with IWorkbenchPreferencePage 
 
   private def createIndentGuideGroup(base: Composite): Unit = {
     val indentGuide = group("Indent Guide", base)
-    val enable = checkBox(INDENT_GUIDE_ENABLE, "Enable the indent guide", indentGuide)
+    val enable = checkBox(IndentGuideEnable, "Enable the indent guide", indentGuide)
     val color = new Composite(indentGuide, SWT.NONE)
-    val c = new ColorFieldEditor(INDENT_GUIDE_COLOR, "Color:", color)
+    val c = new ColorFieldEditor(IndentGuideColor, "Color:", color)
 
     c.setPreferenceStore(store)
     c.load()
@@ -112,69 +112,69 @@ class EditorPreferencePage extends PreferencePage with IWorkbenchPreferencePage 
 }
 
 object EditorPreferencePage {
-  private final val BASE = "scala.tools.eclipse.editor."
+  private final val Base = "scala.tools.eclipse.editor."
 
-  final val P_ENABLE_SMART_BRACKETS = BASE + "smartBrackets"
-  final val P_ENABLE_SMART_BRACES = BASE + "smartBraces"
-  final val P_ENABLE_SMART_PARENS = BASE + "smartParens"
-  final val P_ENABLE_SMART_QUOTES = BASE + "smartQuotes"
+  final val EnableSmartBrackets = Base + "smartBrackets"
+  final val EnableSmartBraces = Base + "smartBraces"
+  final val EnableSmartParens = Base + "smartParens"
+  final val EnableSmartQuotes = Base + "smartQuotes"
 
-  final val P_ENABLE_SMART_INSERTION_SEMICOLONS = BASE + "smartInsertionSemicolons"
-  final val P_ENABLE_SMART_INSERTION_BRACES = BASE + "smartAutoClosingBraces"
+  final val EnableSmartInsertionSemicolons = Base + "smartInsertionSemicolons"
+  final val EnableSmartInsertionBraces = Base + "smartAutoClosingBraces"
 
-  final val P_ENABLE_AUTO_CLOSING_STRINGS = BASE + "autoClosingStrings"
-  final val P_ENABLE_AUTO_CLOSING_PARENS = BASE + "autoClosingParens"
-  final val P_ENABLE_AUTO_CLOSING_SQUARE_BRACKETS = BASE + "autoClosingSquareBrackets"
-  final val P_ENABLE_AUTO_CLOSING_ANGLE_BRACKETS = BASE + "autoClosingAngleBrackets"
-  final val P_ENABLE_AUTO_CLOSING_BRACES = BASE + "autoClosingBraces"
-  final val P_ENABLE_AUTO_CLOSING_COMMENTS = BASE + "autoClosingComments"
+  final val EnableAutoClosingStrings = Base + "autoClosingStrings"
+  final val EnableAutoClosingParens = Base + "autoClosingParens"
+  final val EnableAutoClosingSquareBrackets = Base + "autoClosingSquareBrackets"
+  final val EnableAutoClosingAngleBrackets = Base + "autoClosingAngleBrackets"
+  final val EnableAutoClosingBraces = Base + "autoClosingBraces"
+  final val EnableAutoClosingComments = Base + "autoClosingComments"
 
-  final val P_ENABLE_AUTO_ESCAPE_LITERALS = BASE + "autoEscapeLiterals"
-  final val P_ENABLE_AUTO_ESCAPE_SIGN = BASE + "autoEscapeSign"
-  final val P_ENABLE_AUTO_REMOVE_ESCAPED_SIGN = BASE + "autoRemoveEscapedSign"
-  final val P_ENABLE_AUTO_INDENT_ON_TAB = BASE + "autoIndent"
-  final val P_ENABLE_AUTO_INDENT_MULTI_LINE_STRING = BASE + "autoIndentMultiLineString"
-  final val P_ENABLE_AUTO_STRIP_MARGIN_IN_MULTI_LINE_STRING = BASE + "autoStringMarginInMultiLineString"
-  final val P_ENABLE_AUTO_BREAKING_COMMENTS = BASE + "autoBreakingComments"
+  final val EnableAutoEscapeLiterals = Base + "autoEscapeLiterals"
+  final val EnableAutoEscapeSign = Base + "autoEscapeSign"
+  final val EnableAutoRemoveEscapedSign = Base + "autoRemoveEscapedSign"
+  final val EnableAutoIndentOnTab = Base + "autoIndent"
+  final val EnableAutoIndentMultiLineString = Base + "autoIndentMultiLineString"
+  final val EnableAutoStripMarginInMultiLineString = Base + "autoStringMarginInMultiLineString"
+  final val EnableAutoBreakingComments = Base + "autoBreakingComments"
 
-  final val P_ENABLE_MARK_OCCURRENCES = BASE + "markOccurences"
-  final val P_SHOW_INFERRED_SEMICOLONS = BASE + "showInferredSemicolons"
+  final val EnableMarkOccurrences = Base + "markOccurences"
+  final val ShowInferredSemicolons = Base + "showInferredSemicolons"
 
-  final val INDENT_GUIDE_ENABLE = BASE + "indentGuideEnable"
-  final val INDENT_GUIDE_COLOR = BASE + "indentGuideColor"
+  final val IndentGuideEnable = Base + "indentGuideEnable"
+  final val IndentGuideColor = Base + "indentGuideColor"
 }
 
 class EditorPreferenceInitializer extends AbstractPreferenceInitializer {
 
   override def initializeDefaultPreferences() {
     val store = ScalaPlugin.plugin.getPreferenceStore
-    store.setDefault(P_ENABLE_SMART_BRACKETS, false)
-    store.setDefault(P_ENABLE_SMART_BRACES, false)
-    store.setDefault(P_ENABLE_SMART_PARENS, false)
-    store.setDefault(P_ENABLE_SMART_QUOTES, false)
+    store.setDefault(EnableSmartBrackets, false)
+    store.setDefault(EnableSmartBraces, false)
+    store.setDefault(EnableSmartParens, false)
+    store.setDefault(EnableSmartQuotes, false)
 
-    store.setDefault(P_ENABLE_SMART_INSERTION_SEMICOLONS, false)
+    store.setDefault(EnableSmartInsertionSemicolons, false)
 
-    store.setDefault(P_ENABLE_AUTO_CLOSING_STRINGS, true)
-    store.setDefault(P_ENABLE_AUTO_CLOSING_PARENS, true)
-    store.setDefault(P_ENABLE_AUTO_CLOSING_SQUARE_BRACKETS, true)
-    store.setDefault(P_ENABLE_AUTO_CLOSING_ANGLE_BRACKETS, false)
-    store.setDefault(P_ENABLE_AUTO_CLOSING_BRACES, true)
-    store.setDefault(P_ENABLE_AUTO_CLOSING_COMMENTS, true)
+    store.setDefault(EnableAutoClosingStrings, true)
+    store.setDefault(EnableAutoClosingParens, true)
+    store.setDefault(EnableAutoClosingSquareBrackets, true)
+    store.setDefault(EnableAutoClosingAngleBrackets, false)
+    store.setDefault(EnableAutoClosingBraces, true)
+    store.setDefault(EnableAutoClosingComments, true)
 
-    store.setDefault(P_ENABLE_AUTO_ESCAPE_LITERALS, false)
-    store.setDefault(P_ENABLE_AUTO_ESCAPE_SIGN, false)
-    store.setDefault(P_ENABLE_AUTO_REMOVE_ESCAPED_SIGN, false)
-    store.setDefault(P_ENABLE_AUTO_INDENT_ON_TAB, true)
-    store.setDefault(P_ENABLE_AUTO_INDENT_MULTI_LINE_STRING, false)
-    store.setDefault(P_ENABLE_AUTO_STRIP_MARGIN_IN_MULTI_LINE_STRING, false)
-    store.setDefault(P_ENABLE_AUTO_BREAKING_COMMENTS, false)
+    store.setDefault(EnableAutoEscapeLiterals, false)
+    store.setDefault(EnableAutoEscapeSign, false)
+    store.setDefault(EnableAutoRemoveEscapedSign, false)
+    store.setDefault(EnableAutoIndentOnTab, true)
+    store.setDefault(EnableAutoIndentMultiLineString, false)
+    store.setDefault(EnableAutoStripMarginInMultiLineString, false)
+    store.setDefault(EnableAutoBreakingComments, false)
 
-    store.setDefault(P_ENABLE_MARK_OCCURRENCES, false)
+    store.setDefault(EnableMarkOccurrences, false)
     // TODO This preference is added in 4.0. Delete the former preference once support for the former release is dropped.
-    store.setDefault(P_SHOW_INFERRED_SEMICOLONS, store.getBoolean("actions.showInferredSemicolons"))
+    store.setDefault(ShowInferredSemicolons, store.getBoolean("actions.showInferredSemicolons"))
 
-    store.setDefault(INDENT_GUIDE_ENABLE, false)
-    store.setDefault(INDENT_GUIDE_COLOR, "72,72,72")
+    store.setDefault(IndentGuideEnable, false)
+    store.setDefault(IndentGuideColor, "72,72,72")
   }
 }
