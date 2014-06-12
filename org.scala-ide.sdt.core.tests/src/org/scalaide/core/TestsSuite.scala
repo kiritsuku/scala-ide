@@ -40,6 +40,7 @@ import org.scalaide.core.sbtbuilder.MultiScalaVersionTest
 import org.scalaide.core.ui.completion.CompletionTestSuite
 import org.scalaide.core.project.DirectoryScalaInstallationTest
 import org.scalaide.core.classpath.DesiredScalaInstallationTests
+import org.scalaide.core.text.TextTestSuite
 
 /**
  * To run this class DO NOT FORGET to set the config.ini in the  "configuration" tab.
@@ -86,7 +87,8 @@ import org.scalaide.core.classpath.DesiredScalaInstallationTests
     classOf[ScalaWordFinderTest],
     classOf[ScalaInstallationTest],
     classOf[MultiScalaVersionTest],
+    classOf[CompletionTestSuite],
     classOf[DirectoryScalaInstallationTest],
-    classOf[CompletionTestSuite]
+    classOf[TextTestSuite]
 ))
 class TestsSuite
