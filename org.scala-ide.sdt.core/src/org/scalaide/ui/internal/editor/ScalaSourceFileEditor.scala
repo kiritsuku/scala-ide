@@ -87,6 +87,7 @@ class ScalaSourceFileEditor extends CompilationUnitEditor with ScalaCompilationU
   }
 
   setPartName("Scala Editor")
+  setDocumentProvider(new ScalaDocumentProvider)
 
   override protected def createActions() {
     super.createActions()
