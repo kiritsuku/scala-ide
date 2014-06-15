@@ -1,8 +1,10 @@
-package org.scalaide.core.text
+package org.scalaide.core.internal.text
 
 import org.eclipse.jface.text.{Document => EDocument}
+import org.scalaide.core.text.Document
+import org.scalaide.core.text.InternalDocument
 
-class TextDocument(content: String) extends Document {
+class TextDocument(content: String) extends Document with InternalDocument {
 
   private val doc = new EDocument(content)
 
@@ -34,4 +36,7 @@ class TextDocument(content: String) extends Document {
     val l = doc.getLineInformation(lineNumber)
     Range(l.getOffset(), l.getOffset()+l.getLength())
   }
+
+  override def replace(start: Int, end: Int, text: String): Unit =
+    doc.replace(start, end-start, text)
 }

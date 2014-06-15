@@ -39,6 +39,7 @@ import scala.tools.nsc.settings.ScalaVersion
 import org.eclipse.jface.util.StatusHandler
 import org.eclipse.debug.core.DebugPlugin
 import scala.collection.immutable.HashMap
+import org.scalaide.core.internal.extensions.XRuntime
 
 /** The Scala classpath broken down in the JDK, Scala library and user library.
  *
@@ -113,9 +114,17 @@ trait ClasspathManagement extends HasLogger { self: ScalaProject =>
     val jdkEntries = jdkPaths
     val cp = javaClasspath.filterNot(jdkEntries.toSet)
 
+    def enriched: Seq[IPath] =
+      if (self.underlying.getName() == "extide") {
+        val cls = XRuntime.classpathValuesToEnrich()
+        cls map (new Path(_))
+      }
+      else
+        Nil
+
     scalaLibraries match {
       case Seq(ScalaLibrary(pf, version, _), _*) =>
-        new ScalaClasspath(jdkEntries, Some(pf), cp.filterNot(_ == pf), version)
+        new ScalaClasspath(jdkEntries, Some(pf), (cp++enriched).filterNot(_ == pf), version)
       case _ =>
         new ScalaClasspath(jdkEntries, None, cp, None)
     }

@@ -2,6 +2,7 @@ package org.scalaide.core.text
 
 import org.junit.ComparisonFailure
 import org.junit.Test
+import org.scalaide.core.internal.text.TextDocument
 
 class DocumentTest {
 
