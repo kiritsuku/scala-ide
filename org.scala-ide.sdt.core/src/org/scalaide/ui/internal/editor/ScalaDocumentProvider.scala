@@ -1,7 +1,6 @@
 package org.scalaide.ui.internal.editor
 
 import java.lang.reflect.Field
-
 import org.eclipse.core.resources.IFile
 import org.eclipse.core.resources.IMarker
 import org.eclipse.core.resources.IResource
@@ -24,12 +23,23 @@ import org.eclipse.jdt.ui.JavaUI
 import org.eclipse.jface.text.IRegion
 import org.eclipse.ui.texteditor.AbstractMarkerAnnotationModel
 import org.scalaide.logging.HasLogger
+import org.eclipse.jface.text.IDocument
+import org.eclipse.ui.editors.text.TextFileDocumentProvider.DocumentProviderOperation
+import org.scalaide.extensions.saveactions.SaveAction
+import org.scalaide.core.internal.extensions.XRuntime
 
 class ScalaDocumentProvider extends CompilationUnitDocumentProvider with HasLogger {
+
+  private var sa: Seq[SaveAction] = Nil
 
   // TODO make save actions static, otherwise they are created every time a new editor is created
   def saveActions: Seq[IPostSaveListener] =
     Nil
+
+  override def createSaveOperation(element: AnyRef, document: IDocument, overwrite: Boolean): DocumentProviderOperation = {
+    sa = XRuntime.loadSaveActions()
+    super.createSaveOperation(element, document, overwrite)
+  }
 
   /**
    * The implementation of this method is copied/adapted from the class

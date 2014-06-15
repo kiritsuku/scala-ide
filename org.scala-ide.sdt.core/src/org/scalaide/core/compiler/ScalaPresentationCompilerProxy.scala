@@ -15,6 +15,7 @@ import org.eclipse.core.runtime.IStatus
 import org.eclipse.core.runtime.MultiStatus
 import org.eclipse.debug.core.DebugPlugin
 import org.eclipse.core.runtime.Status
+import org.scalaide.core.internal.extensions.XRuntime
 
 /** Holds a reference to the currently 'live' presentation compiler.
   *
@@ -147,7 +148,17 @@ final class ScalaPresentationCompilerProxy(val project: ScalaProject) extends Ha
 
       try {
         val settings = ScalaPlugin.defaultScalaSettings()
+
         project.initializeCompilerSettings(settings, isPCSetting(settings))
+
+        if (project.underlying.getName() == "extide") {
+          XRuntime.enrichClasspath(settings)
+          project.outputFolderLocations.headOption foreach { bin =>
+            settings.d.value = bin.toOSString()
+          }
+          println("!!! enriching classpath: " + settings)
+        }
+
         val pc = new ScalaPresentationCompiler(project, settings)
         logger.debug("Presentation compiler classpath: " + pc.classPath)
         pc

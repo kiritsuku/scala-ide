@@ -48,3 +48,7 @@ trait Document {
     }
   }
 }
+
+private[core] trait InternalDocument extends Document {
+  def replace(start: Int, end: Int, text: String): Unit
+}
