@@ -115,7 +115,7 @@ trait ClasspathManagement extends HasLogger { self: ScalaProject =>
     val cp = javaClasspath.filterNot(jdkEntries.toSet)
 
     def enriched: Seq[IPath] =
-      if (self.underlying.getName() == "extide") {
+      if (self.underlying.getName() == XRuntime.ProjectName) {
         val cls = XRuntime.classpathValuesToEnrich()
         cls map (new Path(_))
       }

@@ -2,6 +2,7 @@ package org.scalaide.core.text
 
 import org.junit.ComparisonFailure
 import org.junit.Test
+import org.eclipse.jface.text.{Document => EDocument}
 import org.scalaide.core.internal.text.TextDocument
 
 class DocumentTest {
@@ -9,7 +10,7 @@ class DocumentTest {
   type Op = Document => String
 
   final def document(text: String): Document =
-    new TextDocument(text)
+    new TextDocument(new EDocument(text))
 
   final implicit class Assert_===[A](actual: A) {
     def ===(expected: A): Unit =

@@ -1,12 +1,10 @@
 package org.scalaide.core.internal.text
 
-import org.eclipse.jface.text.{Document => EDocument}
+import org.eclipse.jface.text.IDocument
 import org.scalaide.core.text.Document
 import org.scalaide.core.text.InternalDocument
 
-class TextDocument(content: String) extends Document with InternalDocument {
-
-  private val doc = new EDocument(content)
+class TextDocument(private val doc: IDocument) extends Document with InternalDocument {
 
   override def length: Int =
     doc.getLength()

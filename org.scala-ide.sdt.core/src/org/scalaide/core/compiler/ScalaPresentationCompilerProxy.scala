@@ -151,12 +151,12 @@ final class ScalaPresentationCompilerProxy(val project: ScalaProject) extends Ha
 
         project.initializeCompilerSettings(settings, isPCSetting(settings))
 
-        if (project.underlying.getName() == "extide") {
+        if (project.underlying.getName() == XRuntime.ProjectName) {
           XRuntime.enrichClasspath(settings)
           project.outputFolderLocations.headOption foreach { bin =>
             settings.d.value = bin.toOSString()
           }
-          println("!!! enriching classpath: " + settings)
+          logger.debug(s"Enriching classpath of project '${XRuntime.ProjectName}'")
         }
 
         val pc = new ScalaPresentationCompiler(project, settings)

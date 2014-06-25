@@ -62,6 +62,7 @@ import org.scalaide.util.internal.eclipse.EclipseUtils
 import org.scalaide.util.internal.FixedSizeCache
 import org.scalaide.core.internal.project.ScalaInstallation
 import org.scalaide.ui.internal.migration.RegistryExtender
+import org.scalaide.core.internal.extensions.ExtensionBuilder
 
 object ScalaPlugin {
   final val IssueTracker = "https://www.assembla.com/spaces/scala-ide/support/tickets"
@@ -163,6 +164,9 @@ class ScalaPlugin extends AbstractUIPlugin with PluginLogConfigurator with IReso
       diagnostic.StartupDiagnostics.run
 
       new RegistryExtender().perform()
+
+      // startup extension mechanism when the platform is started
+      ExtensionBuilder.startup()
     }
     ResourcesPlugin.getWorkspace.addResourceChangeListener(this, IResourceChangeEvent.PRE_CLOSE)
     JavaCore.addElementChangedListener(this)
