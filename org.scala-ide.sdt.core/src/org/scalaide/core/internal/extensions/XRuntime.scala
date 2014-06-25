@@ -28,28 +28,51 @@ import org.scalaide.extensions.saveactions.SaveAction
 import org.scalaide.core.ScalaPlugin
 import java.net.URI
 import org.eclipse.core.resources.IFile
+import java.net.URLClassLoader
+
+object TB {
+  import scala.reflect.runtime.universe.runtimeMirror
+  import scala.tools.reflect.ToolBox
+
+  val path = XRuntime.classpathValuesToEnrich()
+
+  val cl = new URLClassLoader(
+      path.map(p => new File(p).toURI().toURL()).toArray,
+      TB.getClass().getClassLoader())
+
+  private val tb = runtimeMirror(cl).mkToolBox()
+  import tb._, u._
+
+  def createExtensions(exts: Seq[String]): Seq[SaveAction] = {
+    println("!!!!!!"+exts)
+    val extension = parse(exts.head)
+    val saveAction = extension.find { case _: ClassDef => true }.get.asInstanceOf[ClassDef]
+    val name = TypeName(s"${saveAction.name}$$Internal")
+    val instance = q"""
+      $extension
+
+      class $name extends ${saveAction.name} {
+        val global = null
+      }
+
+      new $name()
+    """
+
+    Seq(eval(instance).asInstanceOf[SaveAction])
+  }
+}
 
 object XRuntime extends AnyRef with HasLogger {
-
-//  val compiler = projectByName("extide") map projectAsScalaProject map (new Compiler(_))
-
-  import scala.reflect.runtime.universe._
-  import scala.tools.reflect.ToolBox
-  val tb = runtimeMirror(getClass.getClassLoader()).mkToolBox()
-
   def loadSaveActions(): Seq[SaveAction] = {
-//    projectByName("extide") map projectAsScalaProject foreach { p =>
-//      val srcs = p.allSourceFiles() map fromFile
-//
-//      srcs map (src => tb.compile(tb.parse(src)))
-//    }
-
-//    compiler foreach (_.execute())
+    projectByName("extide") map projectAsScalaProject foreach { sp =>
+      val sources = sp.allSourceFiles().toSeq map fromFile
+      val saveActions = TB.createExtensions(sources)
+      println(saveActions)
+    }
     Nil
   }
 
   def fromFile(path: IFile): String = {
-    // hello he
     val s = io.Source.fromFile(path.getLocationURI())
     val ret = s.mkString
     s.close()
@@ -64,7 +87,7 @@ object XRuntime extends AnyRef with HasLogger {
 //        "scala/build/quick/classes/asm",
         "scala/build/quick/classes/interactive",
 //        "scala-ide/org.scala-ide.sdt.core/target/classes",
-        "org.scala-ide.sdt.extensions/bin",
+        "scala-ide/org.scala-ide.sdt.extensions/bin",
         "scala-refactoring/org.scala-refactoring.library/bin"
         ).map("/home/antoras/dev/scala/" + _)
 //        :+ "/home/antoras/Software/scala-eclipse/plugins/org.scala-ide.sbt.compiler.interface_0.13.2.local-20140530-1553.jar"

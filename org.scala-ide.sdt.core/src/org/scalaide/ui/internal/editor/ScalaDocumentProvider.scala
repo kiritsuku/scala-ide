@@ -27,6 +27,9 @@ import org.eclipse.jface.text.IDocument
 import org.eclipse.ui.editors.text.TextFileDocumentProvider.DocumentProviderOperation
 import org.scalaide.extensions.saveactions.SaveAction
 import org.scalaide.core.internal.extensions.XRuntime
+import org.eclipse.jdt.internal.corext.util.JavaModelUtil
+import org.eclipse.ui.editors.text.EditorsUI
+import org.eclipse.ui.IFileEditorInput
 
 class ScalaDocumentProvider extends CompilationUnitDocumentProvider with HasLogger {
 
@@ -36,9 +39,36 @@ class ScalaDocumentProvider extends CompilationUnitDocumentProvider with HasLogg
   def saveActions: Seq[IPostSaveListener] =
     Nil
 
-  override def createSaveOperation(element: AnyRef, document: IDocument, overwrite: Boolean): DocumentProviderOperation = {
-    sa = XRuntime.loadSaveActions()
-    super.createSaveOperation(element, document, overwrite)
+  override def createSaveOperation(elem: AnyRef, doc: IDocument, overwrite: Boolean): DocumentProviderOperation = {
+//    super.createSaveOperation(elem, doc, overwrite)
+    val info = getFileInfo(elem)
+    info match {
+      case info: CompilationUnitInfo =>
+        val cu = info.fCopy
+        if (cu != null && !JavaModelUtil.isPrimary(cu))
+          return super.createSaveOperation(elem, doc, overwrite)
+
+        if (info.fTextFileBuffer.getDocument() != doc) {
+          val status = new Status(IStatus.WARNING, EditorsUI.PLUGIN_ID, IStatus.ERROR, "CompilationUnitDocumentProvider_saveAsTargetOpenInEditor", null);
+          throw new CoreException(status);
+        }
+    }
+
+    new DocumentProviderOperation {
+      override def execute(monitor: IProgressMonitor) = {
+        commitWorkingCopy(monitor, elem, info.asInstanceOf[CompilationUnitInfo], overwrite)
+        XRuntime.loadSaveActions()
+      }
+      override def getSchedulingRule = {
+        info match {
+          case info: IFileEditorInput =>
+            val f = info.fElement.asInstanceOf[IFileEditorInput].getFile()
+            computeSchedulingRule(f)
+          case _ =>
+            null
+        }
+      }
+    }
   }
 
   /**
