@@ -1,6 +1,7 @@
 package org.scalaide.extensions.saveactions
 
 import org.scalaide.core.text.Remove
+import org.scalaide.extensions.SaveAction
 
 trait RemoveTrailingWhitespace extends SaveAction {
 
@@ -9,7 +10,7 @@ trait RemoveTrailingWhitespace extends SaveAction {
       val trimmed = line.trimRight
 
       if (trimmed.length != line.length)
-        Seq(Remove(trimmed.end, line.end-trimmed.end))
+        Seq(Remove(trimmed.end, line.end))
       else
         Seq()
     }

@@ -25,21 +25,85 @@ import org.eclipse.ui.texteditor.AbstractMarkerAnnotationModel
 import org.scalaide.logging.HasLogger
 import org.eclipse.jface.text.IDocument
 import org.eclipse.ui.editors.text.TextFileDocumentProvider.DocumentProviderOperation
-import org.scalaide.extensions.saveactions.SaveAction
+import org.scalaide.extensions._
 import org.scalaide.core.internal.extensions.XRuntime
 import org.eclipse.jdt.internal.corext.util.JavaModelUtil
 import org.eclipse.ui.editors.text.EditorsUI
 import org.eclipse.ui.IFileEditorInput
+import org.eclipse.jdt.core.ICompilationUnit
+import org.scalaide.core.internal.text.TextDocument
+import org.scalaide.core.text._
+import org.eclipse.jface.text.Document
+import org.scalaide.util.internal.eclipse.EditorUtils
+import org.scalaide.util.internal.eclipse.FileUtils
+import scala.tools.refactoring.common.TextChange
+import org.eclipse.jdt.internal.ui.JavaPlugin
+import org.eclipse.jdt.core.JavaCore
+import org.eclipse.e4.ui.workbench.modeling.EModelService
+import org.eclipse.ui.PlatformUI
 
 class ScalaDocumentProvider extends CompilationUnitDocumentProvider with HasLogger {
 
-  private var sa: Seq[SaveAction] = Nil
-
   // TODO make save actions static, otherwise they are created every time a new editor is created
-  def saveActions: Seq[IPostSaveListener] =
-    Nil
+  def saveActions(udoc: IDocument): IPostSaveListener = {
+    new IPostSaveListener {
+      override def getName = "scala save action name"
+      override def getId = "scala save action id"
+      override def needsChangedRegions(cu: ICompilationUnit) = false
+      override def saved(cu: ICompilationUnit, changedRegions: Array[IRegion], monitor: IProgressMonitor): Unit = {
+
+        // do not apply save actions in extension project
+        if (cu.getPath().segment(0) == XRuntime.ProjectName)
+          return
+
+//        val service = PlatformUI.getWorkbench().getAdapter(classOf[EModelService]).asInstanceOf[EModelService]
+//        val x: EModelService = null
+//        val persp = x.getPerspectiveFor(null)
+
+
+        def applyChange(udoc: IDocument)(c: Change): Unit = c match {
+          case Add(start, text) =>
+            udoc.replace(start, 0, text)
+          case Replace(start, end, text) =>
+            udoc.replace(start, end-start, text)
+          case Remove(start, end) =>
+            udoc.replace(start, end-start, "")
+        }
+
+        val sa = XRuntime.loadSaveActions()
+        //val src = ""
+        //val udoc = new Document(src)
+        val doc = new TextDocument(udoc.get())
+
+//        val f = FileUtils.toIFile(cu.getPath()).get
+        EditorUtils.withScalaSourceFileAndSelection { (ssf, sel) =>
+          val sv = ssf.sourceFile()
+          val edits = sa.flatMap(_.perform(doc)) map {
+            case Add(start, text) =>
+              new TextChange(sv, start, start, text)
+            case Replace(start, end, text) =>
+              new TextChange(sv, start, end, text)
+            case Remove(start, end) =>
+              new TextChange(sv, start, end, "")
+          }
+          EditorUtils.applyChangesToFileWhileKeepingSelection(udoc, sel, ssf.file, edits.toList)
+          None
+        }
+
+//        val edits = sa.flatMap(_.perform(doc)).sortBy {
+//          case Add(start, text) => -start
+//          case Replace(start, end, text) => -start
+//          case Remove(start, end) => -start
+//        }
+//        edits foreach applyChange(udoc)
+      }
+    }
+  }
+
+  private var udoc: IDocument = _
 
   override def createSaveOperation(elem: AnyRef, doc: IDocument, overwrite: Boolean): DocumentProviderOperation = {
+    udoc = doc
 //    super.createSaveOperation(elem, doc, overwrite)
     val info = getFileInfo(elem)
     info match {
@@ -57,7 +121,6 @@ class ScalaDocumentProvider extends CompilationUnitDocumentProvider with HasLogg
     new DocumentProviderOperation {
       override def execute(monitor: IProgressMonitor) = {
         commitWorkingCopy(monitor, elem, info.asInstanceOf[CompilationUnitInfo], overwrite)
-        XRuntime.loadSaveActions()
       }
       override def getSchedulingRule = {
         info match {
@@ -112,7 +175,8 @@ class ScalaDocumentProvider extends CompilationUnitDocumentProvider with HasLogg
         fIsAboutToSave= true;
 
         // the Java editor call [[CleanUpPostSaveListener]] here
-        val listeners = saveActions.toArray
+        val listeners = try Array(saveActions(udoc)) catch { case e: Exception =>
+          e.printStackTrace(); Array[IPostSaveListener]()}
 
         var changedRegionException: CoreException= null;
         var needsChangedRegions= false;

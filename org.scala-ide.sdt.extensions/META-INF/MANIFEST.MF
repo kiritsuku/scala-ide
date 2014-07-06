@@ -22,3 +22,5 @@ Import-Package: scala.reflect.internal;resolution:=optional,
  scala.tools.nsc.symtab,
  scala.tools.nsc.typechecker,
  scala.tools.nsc.util
+Export-Package: org.scalaide.core.text,
+ org.scalaide.extensions.saveactions

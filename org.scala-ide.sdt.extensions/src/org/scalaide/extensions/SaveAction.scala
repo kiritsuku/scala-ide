@@ -1,10 +1,10 @@
-package org.scalaide.extensions.saveactions
+package org.scalaide.extensions
 
 import scala.tools.refactoring.common.InteractiveScalaCompiler
 import scala.tools.refactoring.common.Selections
-
 import org.scalaide.core.text.Change
 import org.scalaide.core.text.Document
+import scala.reflect.internal.util.SourceFile
 
 /**
  * Parameterization on:
@@ -18,7 +18,15 @@ import org.scalaide.core.text.Document
  */
 
 trait ScalaIdeExtension {
+  type Parameter
   type Result
+
+  def perform(param: Parameter): Result
+}
+
+trait SimpleSaveAction extends ScalaIdeExtension {
+  override type Parameter = Document
+  override type Result = Seq[Change]
 }
 
 trait SaveAction
@@ -28,6 +36,7 @@ trait SaveAction
     with InteractiveScalaCompiler {
 
   override type Result = Seq[Change]
+  override type Parameter = Selection
 
   private var doc: Document = _
 
@@ -41,6 +50,4 @@ trait SaveAction
     // how to get pref store here?
     true
   }
-
-  def perform(selection: Selection): Result
 }

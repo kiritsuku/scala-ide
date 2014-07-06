@@ -2,12 +2,11 @@ package org.scalaide.extensions.saveactions
 
 import org.scalaide.extensions.SaveAction
 
-//import org.scalaide.refactoring.internal
-
-trait OrganizeImports extends SaveAction {
+trait AddMissingOverride extends SaveAction {
 
   def perform(selection: Selection): Result = {
-    ???
-//    new internal.OrganizeImports
+    import global._
+
+    Nil
   }
 }

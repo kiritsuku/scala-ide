@@ -24,52 +24,35 @@ import org.scalaide.logging.HasLogger
 import scala.tools.nsc.Global
 import scala.tools.nsc.CompilerCommand
 import scala.tools.nsc.reporters.StoreReporter
-import org.scalaide.extensions.saveactions.SaveAction
 import org.scalaide.core.ScalaPlugin
 import java.net.URI
 import org.eclipse.core.resources.IFile
 import java.net.URLClassLoader
-
-object TB {
-  import scala.reflect.runtime.universe.runtimeMirror
-  import scala.tools.reflect.ToolBox
-
-  val path = XRuntime.classpathValuesToEnrich()
-
-  val cl = new URLClassLoader(
-      path.map(p => new File(p).toURI().toURL()).toArray,
-      TB.getClass().getClassLoader())
-
-  private val tb = runtimeMirror(cl).mkToolBox()
-  import tb._, u._
-
-  def createExtensions(exts: Seq[String]): Seq[SaveAction] = {
-    println("!!!!!!"+exts)
-    val extension = parse(exts.head)
-    val saveAction = extension.find { case _: ClassDef => true }.get.asInstanceOf[ClassDef]
-    val name = TypeName(s"${saveAction.name}$$Internal")
-    val instance = q"""
-      $extension
-
-      class $name extends ${saveAction.name} {
-        val global = null
-      }
-
-      new $name()
-    """
-
-    Seq(eval(instance).asInstanceOf[SaveAction])
-  }
-}
+import org.scalaide.util.internal.eclipse.EditorUtils
+import org.scalaide.extensions._
 
 object XRuntime extends AnyRef with HasLogger {
-  def loadSaveActions(): Seq[SaveAction] = {
-    projectByName("extide") map projectAsScalaProject foreach { sp =>
-      val sources = sp.allSourceFiles().toSeq map fromFile
-      val saveActions = TB.createExtensions(sources)
-      println(saveActions)
+
+  val ProjectName = "extide"
+
+  def loadSaveActions(): Seq[SimpleSaveAction] = {
+    try {
+      val saveActions = projectByName(ProjectName) map projectAsScalaProject flatMap { sp =>
+        EditorUtils.withScalaSourceFileAndSelection { (ssf, sel) =>
+          ssf.withSourceFile { (file, compiler) =>
+            val sources = sp.allSourceFiles().toSeq map fromFile
+            val saveActions = ExtensionBuilder.createExtensions(compiler, sources)
+            println("all save actions: " + saveActions)
+            saveActions.asInstanceOf[Seq[SimpleSaveAction]]
+          }
+        }
+      }
+      saveActions.getOrElse(Seq())
+    } catch {
+      case e: Exception =>
+        logger.error("error in save actions", e)
+        Nil
     }
-    Nil
   }
 
   def fromFile(path: IFile): String = {
