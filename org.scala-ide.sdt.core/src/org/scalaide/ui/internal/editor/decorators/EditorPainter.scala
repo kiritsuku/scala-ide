@@ -24,15 +24,18 @@ abstract class EditorPainter(viewer: ISourceViewer, enablePreference: String) ex
   private var isEnabled = store.getBoolean(enablePreference)
 
   loadPreferences()
+  if (isEnabled) onActivation()
 
   final override def paint(reason: Int): Unit = {
-    if (!isActive) {
-      isActive = true
-      store.addPropertyChangeListener(this)
-      widget.addPaintListener(this)
-      widget.redraw()
+    if (isEnabled) {
+      if (!isActive) {
+        isActive = true
+        store.addPropertyChangeListener(this)
+        widget.addPaintListener(this)
+        widget.redraw()
+      }
+      paintByReason(reason)
     }
-    paintByReason(reason)
   }
 
   final override def paintControl(e: PaintEvent): Unit = {
@@ -54,10 +57,24 @@ abstract class EditorPainter(viewer: ISourceViewer, enablePreference: String) ex
   final override def propertyChange(e: PropertyChangeEvent): Unit = {
     isEnabled = store.getBoolean(enablePreference)
     loadPreferences()
+    if (isEnabled) onActivation() else onDeactivation()
     widget.redraw()
   }
 
   override def setPositionManager(manager: IPaintPositionManager): Unit = {}
+
+  final def activate(): Unit = {
+    isActive = true
+    store.addPropertyChangeListener(this)
+    widget.addPaintListener(this)
+    widget.redraw()
+  }
+
+  /** Gets called whenever this painter is activated. */
+  def onActivation(): Unit = {}
+
+  /** Gets called whenever this painter is deactivated. */
+  def onDeactivation(): Unit = {}
 
   /**
    * This method has to be implemented by subclasses to ensure that all preference

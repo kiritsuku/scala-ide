@@ -1,8 +1,9 @@
-package org.scalaide.extensions.saveactions
+package org.scalaide.extensions
+package saveactions
 
 import org.scalaide.extensions.SaveAction
 
-trait AddMissingOverride extends SaveAction {
+trait AddMissingOverride extends SaveAction with CompilerSupport {
 
   def perform(selection: Selection): Result = {
     import global._

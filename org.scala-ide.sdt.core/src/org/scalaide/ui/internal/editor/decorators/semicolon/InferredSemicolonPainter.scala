@@ -37,9 +37,18 @@ class InferredSemicolonPainter(textViewer: ISourceViewer with ITextViewerExtensi
     typingDelayHelper.stop()
   }
 
+  override def onActivation(): Unit = {
+    textViewer.getDocument().addDocumentListener(this)
+  }
+
+  override def onDeactivation(): Unit = {
+    textViewer.getDocument().removeDocumentListener(this)
+  }
+
   override def loadPreferences(): Unit = {}
 
   override def paintByReason(reason: Int): Unit = {
+    println(">> paintByReason: " + reason + "("+ IPainter.TEXT_CHANGE + ")")
     val doc = textViewer.getDocument
 
     if (reason == IPainter.TEXT_CHANGE) {
@@ -52,9 +61,10 @@ class InferredSemicolonPainter(textViewer: ISourceViewer with ITextViewerExtensi
     }
   }
 
-  def documentAboutToBeChanged(event: DocumentEvent) {}
+  override def documentAboutToBeChanged(event: DocumentEvent): Unit = {}
 
-  def documentChanged(event: DocumentEvent) {
+  override def documentChanged(event: DocumentEvent): Unit = {
+    println(">> documentChanged: " + event)
     inferredSemis = updateInferredSemis(event)
     typingDelayHelper.scheduleCallback {
       inferredSemis = findInferredSemis
@@ -63,8 +73,9 @@ class InferredSemicolonPainter(textViewer: ISourceViewer with ITextViewerExtensi
   }
 
   /**
-   * Shift semi tokens the appropriate amount if they occur after the site of a document change. (This is a heuristic -- the real
-   * positions are recalculated the no-typing delay.)
+   * Shift semi tokens the appropriate amount if they occur after the site of
+   * a document change. This is a heuristic - the real positions are recalculated
+   * after the no-typing delay.
    */
   private def updateInferredSemis(event: DocumentEvent): List[Token] = {
     val offset = event.getOffset
@@ -79,6 +90,7 @@ class InferredSemicolonPainter(textViewer: ISourceViewer with ITextViewerExtensi
 
   private def findInferredSemis: List[Token] =
     try {
+      println(">> findInferredSemis")
       val tokens = ScalaLexer.tokenise(textViewer.getDocument.get)
       InferredSemicolonScalaParser.findSemicolons(tokens.toArray).toList
     } catch {

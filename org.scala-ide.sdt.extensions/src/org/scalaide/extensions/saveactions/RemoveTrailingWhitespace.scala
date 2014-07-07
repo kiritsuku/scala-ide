@@ -1,11 +1,12 @@
-package org.scalaide.extensions.saveactions
+package org.scalaide.extensions
+package saveactions
 
 import org.scalaide.core.text.Remove
-import org.scalaide.extensions.SaveAction
+import org.scalaide.core.text.Document
 
-trait RemoveTrailingWhitespace extends SaveAction {
+trait RemoveTrailingWhitespace extends SaveAction with DocumentSupport {
 
-  def perform(selection: Selection): Result = {
+  def perform(document: Document): Result = {
     document.lines flatMap { line =>
       val trimmed = line.trimRight
 

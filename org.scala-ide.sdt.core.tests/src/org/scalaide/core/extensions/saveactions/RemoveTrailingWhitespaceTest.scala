@@ -15,7 +15,7 @@ import org.scalaide.core.text.Replace
 import org.scalaide.core.text.Remove
 import org.scalaide.core.text.InternalDocument
 import org.scalaide.extensions.saveactions.RemoveTrailingWhitespace
-import org.scalaide.extensions.saveactions.SaveAction
+import org.scalaide.extensions._
 import org.scalaide.core.internal.text.TextDocument
 
 trait CompilerSupport {
