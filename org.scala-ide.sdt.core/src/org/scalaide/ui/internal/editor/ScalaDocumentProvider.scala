@@ -33,70 +33,120 @@ import org.eclipse.ui.IFileEditorInput
 import org.eclipse.jdt.core.ICompilationUnit
 import org.scalaide.core.internal.text.TextDocument
 import org.scalaide.core.text._
-import org.eclipse.jface.text.Document
 import org.scalaide.util.internal.eclipse.EditorUtils
 import org.scalaide.util.internal.eclipse.FileUtils
 import scala.tools.refactoring.common.TextChange
 import org.eclipse.jdt.internal.ui.JavaPlugin
 import org.eclipse.jdt.core.JavaCore
-import org.eclipse.e4.ui.workbench.modeling.EModelService
 import org.eclipse.ui.PlatformUI
+import scala.tools.refactoring.common.Selections
+import scala.reflect.internal.util.SourceFile
+import org.eclipse.jface.text.ITextSelection
+import scala.tools.nsc.interactive.Global
 
 class ScalaDocumentProvider extends CompilationUnitDocumentProvider with HasLogger {
 
-  // TODO make save actions static, otherwise they are created every time a new editor is created
   def saveActions(udoc: IDocument): IPostSaveListener = {
     new IPostSaveListener {
-      override def getName = "scala save action name"
-      override def getId = "scala save action id"
+      override def getName = "Scala SaveActions"
+      override def getId = "Scala SaveActions"
       override def needsChangedRegions(cu: ICompilationUnit) = false
       override def saved(cu: ICompilationUnit, changedRegions: Array[IRegion], monitor: IProgressMonitor): Unit = {
-
-        // do not apply save actions in extension project
-        if (cu.getPath().segment(0) == XRuntime.ProjectName)
-          return
-
-//        val service = PlatformUI.getWorkbench().getAdapter(classOf[EModelService]).asInstanceOf[EModelService]
-//        val x: EModelService = null
-//        val persp = x.getPerspectiveFor(null)
-
-
-        def applyChange(udoc: IDocument)(c: Change): Unit = c match {
-          case Add(start, text) =>
-            udoc.replace(start, 0, text)
-          case Replace(start, end, text) =>
-            udoc.replace(start, end-start, text)
-          case Remove(start, end) =>
-            udoc.replace(start, end-start, "")
-        }
-
-        val sa = XRuntime.loadSaveActions()
-        //val src = ""
-        //val udoc = new Document(src)
-        val doc = new TextDocument(udoc.get())
-
-//        val f = FileUtils.toIFile(cu.getPath()).get
-        EditorUtils.withScalaSourceFileAndSelection { (ssf, sel) =>
-          val sv = ssf.sourceFile()
-          val edits = sa.flatMap(_.perform(doc)) map {
-            case Add(start, text) =>
-              new TextChange(sv, start, start, text)
-            case Replace(start, end, text) =>
-              new TextChange(sv, start, end, text)
-            case Remove(start, end) =>
-              new TextChange(sv, start, end, "")
+        // do not apply save actions to extension project
+        if (cu.getPath().segment(0) != XRuntime.ProjectName) {
+          try compilationUnitSaved(cu, udoc)
+          catch {
+            case e: Exception =>
+              logger.error("error while executing Scala save actions", e)
           }
-          EditorUtils.applyChangesToFileWhileKeepingSelection(udoc, sel, ssf.file, edits.toList)
-          None
         }
-
-//        val edits = sa.flatMap(_.perform(doc)).sortBy {
-//          case Add(start, text) => -start
-//          case Replace(start, end, text) => -start
-//          case Remove(start, end) => -start
-//        }
-//        edits foreach applyChange(udoc)
       }
+    }
+  }
+
+  trait ExtensionType {
+    val extension: ScalaIdeExtension
+
+    trait Context
+
+    type Ctx <: Context
+
+    def perform(ctx: Ctx): extension.Result
+  }
+
+  case class DocumentType(extension: DocumentSupport) extends ExtensionType {
+    case class DocumentContext(doc: Document) extends Context
+    override type Ctx = DocumentContext
+
+    override def perform(ctx: Ctx) =
+      extension.perform(ctx.doc)
+  }
+
+  case class CompilerType(extension: CompilerSupport) extends ExtensionType {
+    case class CompilerContext(sv: SourceFile, selectionStart: Int, selectionEnd: Int) extends Context
+    override type Ctx = CompilerContext
+
+    override def perform(ctx: Ctx) = {
+      import extension.global._
+      import ctx._
+      val r = new Response[Tree]
+      askLoadedTyped(sv, r)
+      r.get match {
+        case Left(t) =>
+          val fs = new extension.FileSelection(sv.file, t, selectionStart, selectionEnd)
+          extension.perform(fs)
+        case Right(e) =>
+          logger.error(
+              s"An error occurred while trying to get tree of file '${sv.file.name}'."+
+              s" Aborting save action '${extension.getClass().getSimpleName()}'", e)
+          Seq()
+      }
+    }
+  }
+
+  private def compilationUnitSaved(cu: ICompilationUnit, udoc: IDocument): Unit = {
+    val sa = XRuntime.loadSaveActions()
+    val doc = new TextDocument(udoc.get())
+
+    val xs: Map[ScalaIdeExtension, ExtensionType] = null
+
+    EditorUtils.withScalaSourceFileAndSelection { (ssf, sel) =>
+      val sv = ssf.sourceFile()
+      val changes = sa flatMap {
+        case sa: DocumentSupport =>
+//          val dt = DocumentType(sa)
+//          dt.perform(dt.DocumentContext(doc))
+          sa.perform(doc)
+
+        case sa: CompilerSupport =>
+          // XXX accessing sa directly results in a sbt crash
+          val sa2: sa.type = sa
+          import sa.global._
+
+          val r = new Response[Tree]
+          askLoadedTyped(sv, r)
+          r.get match {
+            case Left(t) =>
+              val fs = new sa2.FileSelection(sv.file, t, sel.getOffset(), sel.getOffset()+sel.getLength())
+              sa2.perform(fs)
+            case Right(e) =>
+              logger.error(
+                  s"An error occurred while trying to get tree of file '${sv.file.name}'."+
+                  s" Aborting save action '${sa2.getClass().getSimpleName()}'", e)
+              Seq()
+          }
+          Seq()
+      }
+      val edits = changes map {
+        case Add(start, text) =>
+          new TextChange(sv, start, start, text)
+        case Replace(start, end, text) =>
+          new TextChange(sv, start, end, text)
+        case Remove(start, end) =>
+          new TextChange(sv, start, end, "")
+      }
+      EditorUtils.applyChangesToFileWhileKeepingSelection(udoc, sel, ssf.file, edits.toList)
+      None
     }
   }
 
@@ -104,33 +154,51 @@ class ScalaDocumentProvider extends CompilationUnitDocumentProvider with HasLogg
 
   override def createSaveOperation(elem: AnyRef, doc: IDocument, overwrite: Boolean): DocumentProviderOperation = {
     udoc = doc
-//    super.createSaveOperation(elem, doc, overwrite)
-    val info = getFileInfo(elem)
-    info match {
-      case info: CompilationUnitInfo =>
-        val cu = info.fCopy
-        if (cu != null && !JavaModelUtil.isPrimary(cu))
-          return super.createSaveOperation(elem, doc, overwrite)
+    super.createSaveOperation(elem, doc, overwrite)
+//    val info = getFileInfo(elem)
+//    info match {
+//      case info: CompilationUnitInfo =>
+//        val cu = info.fCopy
+//        if (cu != null && !JavaModelUtil.isPrimary(cu))
+//          return super.createSaveOperation(elem, doc, overwrite)
+//
+//        if (info.fTextFileBuffer.getDocument() != doc) {
+//          val status = new Status(IStatus.WARNING, EditorsUI.PLUGIN_ID, IStatus.ERROR, "CompilationUnitDocumentProvider_saveAsTargetOpenInEditor", null);
+//          throw new CoreException(status);
+//        }
+//    }
+//
+//    new DocumentProviderOperation {
+//      override def execute(monitor: IProgressMonitor) = {
+//        try commitWorkingCopy(monitor, elem, info.asInstanceOf[CompilationUnitInfo], overwrite)
+//        catch {
+//          case e: Exception =>
+//            logger.error("exception thrown while trying to save document", e)
+//        }
+//      }
+//      override def getSchedulingRule = {
+//        info match {
+//          case info: IFileEditorInput =>
+//            val f = info.fElement.asInstanceOf[IFileEditorInput].getFile()
+//            computeSchedulingRule(f)
+//          case _ =>
+//            null
+//        }
+//      }
+//    }
+  }
 
-        if (info.fTextFileBuffer.getDocument() != doc) {
-          val status = new Status(IStatus.WARNING, EditorsUI.PLUGIN_ID, IStatus.ERROR, "CompilationUnitDocumentProvider_saveAsTargetOpenInEditor", null);
-          throw new CoreException(status);
-        }
+  override def commitWorkingCopy(m: IProgressMonitor, element: AnyRef, info: CompilationUnitInfo, overwrite: Boolean): Unit = {
+    val monitor = if (m == null) new NullProgressMonitor() else m
+    monitor.beginTask("", 100)
+
+    try commitWorkingCopy0(monitor, element, info, overwrite)
+    catch {
+      case e: Exception =>
+        logger.error("exception thrown while trying to save document", e)
     }
-
-    new DocumentProviderOperation {
-      override def execute(monitor: IProgressMonitor) = {
-        commitWorkingCopy(monitor, elem, info.asInstanceOf[CompilationUnitInfo], overwrite)
-      }
-      override def getSchedulingRule = {
-        info match {
-          case info: IFileEditorInput =>
-            val f = info.fElement.asInstanceOf[IFileEditorInput].getFile()
-            computeSchedulingRule(f)
-          case _ =>
-            null
-        }
-      }
+    finally {
+      monitor.done()
     }
   }
 
@@ -142,112 +210,113 @@ class ScalaDocumentProvider extends CompilationUnitDocumentProvider with HasLogg
    * this method does too many useful things. I'm afraid when reimplementing
    * it I break too many things.
    */
-  override def commitWorkingCopy(m: IProgressMonitor, element: AnyRef, info: CompilationUnitInfo, overwrite: Boolean): Unit = {
-
+  def commitWorkingCopy0(m: IProgressMonitor, element: AnyRef, info: CompilationUnitInfo, overwrite: Boolean): Unit = {
     val monitor = if (m == null) new NullProgressMonitor() else m
 
-    monitor.beginTask("", 100);
+    monitor.beginTask("", 100)
 
+    val document = info.fTextFileBuffer.getDocument()
+    val resource = info.fCopy.getResource()
+
+    Assert.isTrue(resource.isInstanceOf[IFile])
+
+    val isSynchronized = resource.isSynchronized(IResource.DEPTH_ZERO)
+
+    /* https://bugs.eclipse.org/bugs/show_bug.cgi?id=98327
+     * Make sure file gets save in commit() if the underlying file has been deleted */
+    if (!isSynchronized && isDeleted(element))
+      info.fTextFileBuffer.setDirty(true)
+
+    if (!resource.exists()) {
+      // underlying resource has been deleted, just recreate file, ignore the rest
+      createFileFromDocument(monitor, resource.asInstanceOf[IFile], document)
+      return
+    }
+
+    if (fSavePolicy != null)
+      fSavePolicy.preSave(info.fCopy)
+
+    var subMonitor: IProgressMonitor = null
     try {
-      val document= info.fTextFileBuffer.getDocument();
-      val resource= info.fCopy.getResource();
+      fIsAboutToSave = true
 
-      Assert.isTrue(resource.isInstanceOf[IFile]);
+      // the Java editor calls [[CleanUpPostSaveListener]] here
+      val listeners =
+        try Array(saveActions(udoc))
+        catch {
+          case e: Exception =>
+            logger.error("error occurred while executing save actions", e)
+            Array[IPostSaveListener]()
+        }
 
-      val isSynchronized= resource.isSynchronized(IResource.DEPTH_ZERO);
-
-      /* https://bugs.eclipse.org/bugs/show_bug.cgi?id=98327
-       * Make sure file gets save in commit() if the underlying file has been deleted */
-      if (!isSynchronized && isDeleted(element))
-        info.fTextFileBuffer.setDirty(true);
-
-      if (!resource.exists()) {
-        // underlying resource has been deleted, just recreate file, ignore the rest
-        createFileFromDocument(monitor, resource.asInstanceOf[IFile], document);
-        return;
+      var changedRegionException: CoreException = null
+      var needsChangedRegions = false
+      try {
+        if (listeners.length > 0)
+          needsChangedRegions = false // XXX original code: SaveParticipantRegistry.isChangedRegionsRequired(info.fCopy)
+      } catch {
+        case ex: CoreException => changedRegionException = ex
       }
 
-      if (fSavePolicy != null)
-        fSavePolicy.preSave(info.fCopy);
-
-      var subMonitor: IProgressMonitor = null;
-      try {
-        fIsAboutToSave= true;
-
-        // the Java editor call [[CleanUpPostSaveListener]] here
-        val listeners = try Array(saveActions(udoc)) catch { case e: Exception =>
-          e.printStackTrace(); Array[IPostSaveListener]()}
-
-        var changedRegionException: CoreException= null;
-        var needsChangedRegions= false;
+      var changedRegions: Array[IRegion] = null
+      if (needsChangedRegions) {
         try {
-          if (listeners.length > 0)
-            needsChangedRegions= false // XXX original code: SaveParticipantRegistry.isChangedRegionsRequired(info.fCopy);
+          changedRegions = EditorUtility.calculateChangedLineRegions(info.fTextFileBuffer, getSubProgressMonitor(monitor, 20))
         } catch {
-          case ex: CoreException => changedRegionException= ex;
+          case ex: CoreException => changedRegionException = ex
+        } finally {
+          subMonitor = getSubProgressMonitor(monitor, 50)
         }
+      } else
+        subMonitor = getSubProgressMonitor(monitor, if (listeners.length > 0) 70 else 100)
 
-        var changedRegions: Array[IRegion]= null;
-        if (needsChangedRegions) {
-          try {
-            changedRegions= EditorUtility.calculateChangedLineRegions(info.fTextFileBuffer, getSubProgressMonitor(monitor, 20));
-          } catch  {
-            case ex: CoreException => changedRegionException= ex;
-          } finally {
-            subMonitor= getSubProgressMonitor(monitor, 50);
-          }
-        } else
-          subMonitor= getSubProgressMonitor(monitor, if (listeners.length > 0) 70 else 100);
+      info.fCopy.commitWorkingCopy(overwrite || isSynchronized, subMonitor)
+      if (listeners.length > 0)
+        notifyPostSaveListeners(info, changedRegions, listeners, getSubProgressMonitor(monitor, 30))
 
-        info.fCopy.commitWorkingCopy(overwrite || isSynchronized, subMonitor);
-        if (listeners.length > 0)
-          notifyPostSaveListeners(info, changedRegions, listeners, getSubProgressMonitor(monitor, 30));
-
-        if (changedRegionException != null) {
-          throw changedRegionException;
-        }
-      } catch {
-        // inform about the failure
-        case x: JavaModelException => fireElementStateChangeFailed(element);
+      if (changedRegionException != null) {
+        throw changedRegionException
+      }
+    } catch {
+      // inform about the failure
+      case x: JavaModelException =>
+        fireElementStateChangeFailed(element)
         if (IJavaModelStatusConstants.UPDATE_CONFLICT == x.getStatus().getCode())
           // convert JavaModelException to CoreException
-          throw new CoreException(new Status(IStatus.WARNING, JavaUI.ID_PLUGIN, IResourceStatus.OUT_OF_SYNC_LOCAL, "CompilationUnitDocumentProvider_error_outOfSync", null));
-        throw x;
-        case x: CoreException =>
+          throw new CoreException(new Status(IStatus.WARNING, JavaUI.ID_PLUGIN, IResourceStatus.OUT_OF_SYNC_LOCAL, "CompilationUnitDocumentProvider_error_outOfSync", null))
+        throw x
+      case x: CoreException =>
         // inform about the failure
-        fireElementStateChangeFailed(element);
-        throw x;
-        case x: RuntimeException =>
+        fireElementStateChangeFailed(element)
+        throw x
+      case x: RuntimeException =>
         // inform about the failure
-        fireElementStateChangeFailed(element);
-        throw x;
-      } finally {
-        fIsAboutToSave= false;
-        if (subMonitor != null)
-          subMonitor.done();
-      }
+        fireElementStateChangeFailed(element)
+        throw x
+    } finally {
+      fIsAboutToSave = false
+      if (subMonitor != null)
+        subMonitor.done()
+    }
 
-      // If here, the dirty state of the editor will change to "not dirty".
-      // Thus, the state changing flag will be reset.
-      if (info.fModel.isInstanceOf[AbstractMarkerAnnotationModel]) {
-        val model= info.fModel.asInstanceOf[AbstractMarkerAnnotationModel];
-        model.updateMarkers(document);
-      }
+    // If here, the dirty state of the editor will change to "not dirty".
+    // Thus, the state changing flag will be reset.
+    if (info.fModel.isInstanceOf[AbstractMarkerAnnotationModel]) {
+      val model = info.fModel.asInstanceOf[AbstractMarkerAnnotationModel]
+      model.updateMarkers(document)
+    }
 
-      if (fSavePolicy != null) {
-        val unit= fSavePolicy.postSave(info.fCopy);
-        if (unit != null && info.fModel.isInstanceOf[AbstractMarkerAnnotationModel]) {
-          val r= unit.getResource();
-          val markers= r.findMarkers(IMarker.MARKER, true, IResource.DEPTH_ZERO);
-          if (markers != null && markers.length > 0) {
-            val model= info.fModel.asInstanceOf[AbstractMarkerAnnotationModel];
-            for (i <- 0 until markers.length)
-              model.updateMarker(document, markers(i), null);
-          }
+    if (fSavePolicy != null) {
+      val unit = fSavePolicy.postSave(info.fCopy)
+      if (unit != null && info.fModel.isInstanceOf[AbstractMarkerAnnotationModel]) {
+        val r = unit.getResource()
+        val markers = r.findMarkers(IMarker.MARKER, true, IResource.DEPTH_ZERO)
+        if (markers != null && markers.length > 0) {
+          val model = info.fModel.asInstanceOf[AbstractMarkerAnnotationModel]
+          for (i <- 0 until markers.length)
+            model.updateMarker(document, markers(i), null)
         }
       }
-    } finally {
-      monitor.done();
     }
   }
 

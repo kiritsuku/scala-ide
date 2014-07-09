@@ -18,7 +18,7 @@ import org.eclipse.jface.text.ITextSelection
 import org.eclipse.ui.PlatformUI
 import org.scalaide.core.ScalaPlugin
 import org.scalaide.core.internal.project.ScalaProject
-import org.scalaide.extensions.SimpleSaveAction
+import org.scalaide.extensions.SaveAction
 import org.scalaide.logging.HasLogger
 import org.scalaide.util.internal.eclipse.EditorUtils
 
@@ -26,19 +26,14 @@ object XRuntime extends AnyRef with HasLogger {
 
   val ProjectName = "extide"
 
-  def loadSaveActions(): Seq[SimpleSaveAction] = {
+  def loadSaveActions(): Seq[SaveAction] = {
     try {
-      val saveActions = projectByName(ProjectName) map projectAsScalaProject flatMap { sp =>
-        EditorUtils.withScalaSourceFileAndSelection { (ssf, sel) =>
-          ssf.withSourceFile { (file, compiler) =>
-            val sources = sp.allSourceFiles().toSeq map fromFile
-            val saveActions = ExtensionBuilder.createExtensions(compiler, sources)
-            println("all save actions: " + saveActions)
-            saveActions.asInstanceOf[Seq[SimpleSaveAction]]
-          }
-        }
+      val saveActions = projectByName(ProjectName) map projectAsScalaProject map { sp =>
+        val sources = sp.allSourceFiles().toSeq map fromFile
+        sources flatMap ExtensionBuilder.createExtension
       }
-      saveActions.getOrElse(Seq())
+      val x = saveActions.getOrElse(Seq())
+      x.asInstanceOf[Seq[SaveAction]]
     } catch {
       case e: Exception =>
         logger.error("error in save actions", e)

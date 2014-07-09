@@ -15,8 +15,10 @@ import org.scalaide.core.text.Replace
 import org.scalaide.core.text.Remove
 import org.scalaide.core.text.InternalDocument
 import org.scalaide.extensions.saveactions.RemoveTrailingWhitespace
+import org.scalaide.extensions
 import org.scalaide.extensions._
 import org.scalaide.core.internal.text.TextDocument
+import org.scalaide.core.text.Change
 
 trait CompilerSupport {
 
@@ -62,24 +64,25 @@ class RemoveTrailingWhitespaceTest {
 
   import RemoveTrailingWhitespaceTest._
 
-  def performSaveAction(cu: ScalaCompilationUnit, saveAction: SaveAction) = {
-    import saveAction._
-    import saveAction.global._
-
-    def selection = {
-      val r = new Response[Tree]
-      askLoadedTyped(cu.sourceFile(), r)
-      r.get.fold(new FileSelection(cu.file, _, 0, 0), throw _)
-    }
-
-    perform(selection)
+  def performSaveAction(cu: ScalaCompilationUnit, saveAction: SaveAction): Seq[Change] = {
+    Nil
+//    import saveAction._
+//    import saveAction.global._
+//
+//    def selection = {
+//      val r = new Response[Tree]
+//      askLoadedTyped(cu.sourceFile(), r)
+//      r.get.fold(new FileSelection(cu.file, _, 0, 0), throw _)
+//    }
+//
+//    perform(selection)
   }
 
   def test(source: String) {
     EclipseUtils.workspaceRunnableIn(SDTTestUtils.workspace) { _ =>
       withCompiler { compiler =>
         val cu = mkScalaCompilationUnit(source)
-        val saveAction = new RemoveTrailingWhitespace { val global = compiler }
+        val saveAction = new RemoveTrailingWhitespace{}// { val global = compiler }
         val edits = performSaveAction(cu, saveAction)
         val sorted = edits.sortBy {
           case Add(start, text) =>
