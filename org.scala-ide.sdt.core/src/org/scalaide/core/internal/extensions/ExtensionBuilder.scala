@@ -10,8 +10,9 @@ import org.scalaide.util.internal.eclipse.EditorUtils
 import scala.tools.refactoring.common.Selections
 import scala.reflect.internal.util.SourceFile
 import scala.tools.reflect.ToolBox
+import org.scalaide.logging.HasLogger
 
-object ExtensionBuilder {
+object ExtensionBuilder extends HasLogger {
   import scala.reflect.runtime.universe.runtimeMirror
 
   val path = XRuntime.classpathValuesToEnrich()
@@ -66,11 +67,12 @@ object ExtensionBuilder {
       object $name {
         $ext
       }""")
+    val cls = Seq(typeOf[SaveAction].typeSymbol.asClass.fullName)
     val exts =
-      try findExtensions(typecheck(extension), Seq(typeOf[SaveAction].typeSymbol.asClass.fullName))
+      try findExtensions(typecheck(extension), cls)
       catch {
         case e: Exception =>
-          e.printStackTrace()
+          logger.error("Error occurred while typechecking save action.", e)
           Seq()
       }
 
