@@ -26,18 +26,17 @@ object XRuntime extends AnyRef with HasLogger {
 
   val ProjectName = "extide"
 
-  def loadSaveActions(): Seq[SaveAction] = {
+  def loadSaveActions(): Seq[ExtensionBuilder#Creator] = {
     try {
       val saveActions = projectByName(ProjectName) map projectAsScalaProject map { sp =>
         val sources = sp.allSourceFiles().toSeq map fromFile
-        sources flatMap ExtensionBuilder.createExtension
+        sources flatMap ExtensionBuilder.createSaveAction
       }
-      val x = saveActions.getOrElse(Seq())
-      x.asInstanceOf[Seq[SaveAction]]
+      saveActions.getOrElse(Seq())
     } catch {
       case e: Exception =>
         logger.error("error in save actions", e)
-        Nil
+        Seq()
     }
   }
 

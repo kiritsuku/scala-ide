@@ -43,6 +43,9 @@ import scala.tools.refactoring.common.Selections
 import scala.reflect.internal.util.SourceFile
 import org.eclipse.jface.text.ITextSelection
 import scala.tools.nsc.interactive.Global
+import org.scalaide.core.internal.extensions.CompilerSupportBuilder
+import org.scalaide.core.internal.extensions.ExtensionBuilder
+import org.scalaide.core.internal.extensions.DocumentSupportBuilder
 
 class ScalaDocumentProvider extends CompilationUnitDocumentProvider with HasLogger {
 
@@ -65,78 +68,50 @@ class ScalaDocumentProvider extends CompilationUnitDocumentProvider with HasLogg
   }
 
   trait ExtensionType {
-    val extension: ScalaIdeExtension
 
-    trait Context
-
-    type Ctx <: Context
-
-    def perform(ctx: Ctx): extension.Result
   }
 
-  case class DocumentType(extension: DocumentSupport) extends ExtensionType {
-    case class DocumentContext(doc: Document) extends Context
-    override type Ctx = DocumentContext
+  type ?=>[A, B] = PartialFunction[A, B]
 
-    override def perform(ctx: Ctx) =
-      extension.perform(ctx.doc)
+  val DocumentType: ExtensionBuilder#Creator ?=> Seq[Change] = {
+    case creator: DocumentSupportBuilder.DocumentSupportCreator =>
+      val doc = new TextDocument(udoc)
+      val ext = creator.create(doc)
+      ext.perform()
   }
 
-  case class CompilerType(extension: CompilerSupport) extends ExtensionType {
-    case class CompilerContext(sv: SourceFile, selectionStart: Int, selectionEnd: Int) extends Context
-    override type Ctx = CompilerContext
+  val CompilerType: ExtensionBuilder#Creator ?=> Seq[Change] = {
+    case creator: CompilerSupportBuilder.CompilerSupportCreator =>
+      EditorUtils.withScalaSourceFileAndSelection { (ssf, sel) =>
+        ssf.withSourceFile { (sf, compiler) =>
+          import compiler._
 
-    override def perform(ctx: Ctx) = {
-      import extension.global._
-      import ctx._
-      val r = new Response[Tree]
-      askLoadedTyped(sv, r)
-      r.get match {
-        case Left(t) =>
-          val fs = new extension.FileSelection(sv.file, t, selectionStart, selectionEnd)
-          extension.perform(fs)
-        case Right(e) =>
-          logger.error(
-              s"An error occurred while trying to get tree of file '${sv.file.name}'."+
-              s" Aborting save action '${extension.getClass().getSimpleName()}'", e)
-          Seq()
-      }
-    }
+          val r = new Response[Tree]
+          askLoadedTyped(sf, r)
+          r.get match {
+            case Left(t) =>
+              val c = creator.create(compiler)(t, sf, sel.getOffset(), sel.getOffset()+sel.getLength())
+              c.perform()
+            case Right(e) =>
+              logger.error(
+                  s"An error occurred while trying to get tree of file '${sf.file.name}'."+
+                  s" Aborting save action '${creator.extensionName}'", e)
+              Seq()
+          }
+        }
+      }.toSeq.flatten
   }
 
   private def compilationUnitSaved(cu: ICompilationUnit, udoc: IDocument): Unit = {
-    val sa = XRuntime.loadSaveActions()
-    val doc = new TextDocument(udoc.get())
+    val sas = XRuntime.loadSaveActions()
 
-    val xs: Map[ScalaIdeExtension, ExtensionType] = null
+    val xs = Seq[PartialFunction[ExtensionBuilder#Creator, Seq[Change]]](
+        DocumentType, CompilerType)
+
+    val changes = sas.flatMap(sa => xs.find(_.isDefinedAt(sa)).fold(Seq[Change]())(_(sa)))
 
     EditorUtils.withScalaSourceFileAndSelection { (ssf, sel) =>
       val sv = ssf.sourceFile()
-      val changes = sa flatMap {
-        case sa: DocumentSupport =>
-//          val dt = DocumentType(sa)
-//          dt.perform(dt.DocumentContext(doc))
-          sa.perform(doc)
-
-        case sa: CompilerSupport =>
-          // XXX accessing sa directly results in a sbt crash
-          val sa2: sa.type = sa
-          import sa.global._
-
-          val r = new Response[Tree]
-          askLoadedTyped(sv, r)
-          r.get match {
-            case Left(t) =>
-              val fs = new sa2.FileSelection(sv.file, t, sel.getOffset(), sel.getOffset()+sel.getLength())
-              sa2.perform(fs)
-            case Right(e) =>
-              logger.error(
-                  s"An error occurred while trying to get tree of file '${sv.file.name}'."+
-                  s" Aborting save action '${sa2.getClass().getSimpleName()}'", e)
-              Seq()
-          }
-          Seq()
-      }
       val edits = changes map {
         case Add(start, text) =>
           new TextChange(sv, start, start, text)

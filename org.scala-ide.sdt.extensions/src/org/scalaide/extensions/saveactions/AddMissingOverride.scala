@@ -24,10 +24,7 @@ trait AddMissingOverride extends SaveAction with CompilerSupport {
     }
   }
 
-  def perform(selection: Selection): Result = {
-
-
-
+  def perform() = {
     Nil
   }
 }
