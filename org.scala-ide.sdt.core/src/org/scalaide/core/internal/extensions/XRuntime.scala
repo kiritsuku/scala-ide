@@ -47,19 +47,19 @@ object XRuntime extends AnyRef with HasLogger {
     ret
   }
 
-  def classpathValuesToEnrich(): Seq[String] = Seq(
-    //        "/home/antoras/Software/scala-eclipse/plugins/org.scala-lang.scala-library_2.11.0.v20140324-160523-4aa58d48d2.jar",
-//        "/home/antoras/Software/scala-eclipse/plugins/org.scala-lang.scala-reflect_2.11.2.v20140529-233818-da2896c4e5.jar"
-        "scala/build/quick/classes/reflect",
-        "scala/build/quick/classes/compiler",
-//        "scala/build/quick/classes/asm",
-        "scala/build/quick/classes/interactive",
-//        "scala-ide/org.scala-ide.sdt.core/target/classes",
+  def classpathValuesToEnrich(): Seq[String] = (Seq(
+//        "scala/build/quick/classes/reflect",
+//        "scala/build/quick/classes/compiler",
+//        "scala/build/quick/classes/interactive",
         "scala-ide/org.scala-ide.sdt.extensions/bin",
+        "scala/build/deps/scaladoc/scala-parser-combinators_2.11-1.0.1.jar",
         "scala-refactoring/org.scala-refactoring.library/bin"
         ).map("/home/antoras/dev/scala/" + _)
-//        :+ "/home/antoras/Software/scala-eclipse/plugins/org.scala-ide.sbt.compiler.interface_0.13.2.local-20140530-1553.jar"
-//        :+ "/home/antoras/Software/scala-eclipse/plugins/org.scala-ide.sbt.full.library_0.13.2.local-2_11-20140530-1553.jar"
+        :+ "/home/antoras/dev/scala/scala/build/pack/lib/scala-compiler.jar"
+        :+ "/home/antoras/dev/scala/scala/build/pack/lib/scala-reflect.jar"
+//        :+ "/home/antoras/Software/scala-eclipse/plugins/org.scala-lang.scala-compiler_2.11.2.v20140709-163354-aea6519685.jar"
+//        :+ "/home/antoras/Software/scala-eclipse/plugins/org.scala-lang.scala-reflect_2.11.2.v20140709-163354-aea6519685.jar"
+  )
 
   def enrichClasspath(settings: Settings): Unit = {
     addToClasspath(settings, classpathValuesToEnrich())
@@ -112,52 +112,52 @@ object XRuntime extends AnyRef with HasLogger {
     PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage()
 }
 
-class Compiler(p: ScalaProject) extends AnyRef with HasLogger {
-  import XRuntime._
-
-  private val reporter = new StoreReporter
-
-  private val settings = {
-    val settings = ScalaPlugin.defaultScalaSettings()
-    p.initializeCompilerSettings(settings, _ => true)
-    p.outputFolderLocations.headOption foreach { bin =>
-      settings.d.value = bin.toOSString()
-    }
-    enrichClasspath(settings)
-    settings
-  }
-
-  private val compiler = new Global(settings)
-
-  def execute(): Unit = synchronized {
-    val files = compileFiles()
-
-    if (!reporter.hasErrors)
-      run(files)
-    else {
-      println("Errors during compilation of save actions:")
-      reporter.infos foreach println
-      reporter.reset()
-    }
-  }
-
-  def run(files: Seq[String]): Unit = {
-//    val ps = p.allSourceFiles().map(_.getProjectRelativePath())
-    val cus = p.javaProject.getPackageFragments().flatMap(_.getCompilationUnits())
-    println(cus.toList)
-//    val folder = p.underlying.getFolder("src")
-//    val root = p.javaProject.getPackageFragmentRoot(folder)
-//    val pkg = root.getPackageFragment("")
-//    val cus = pkg.getCompilationUnits()
-  }
-
-  def compileFiles(): Seq[String] = {
-    val srcs = p.allSourceFiles() map (_.getLocation().toOSString())
-    val cmd = new CompilerCommand(srcs.toList, settings)
-    val run = new compiler.Run()
-
-    logger info s"compiling save actions: ${cmd.files}"
-    run compile cmd.files
-    cmd.files
-  }
-}
+//class Compiler(p: ScalaProject) extends AnyRef with HasLogger {
+//  import XRuntime._
+//
+//  private val reporter = new StoreReporter
+//
+//  private val settings = {
+//    val settings = ScalaPlugin.defaultScalaSettings()
+//    p.initializeCompilerSettings(settings, _ => true)
+//    p.outputFolderLocations.headOption foreach { bin =>
+//      settings.d.value = bin.toOSString()
+//    }
+//    enrichClasspath(settings)
+//    settings
+//  }
+//
+//  private val compiler = new Global(settings)
+//
+//  def execute(): Unit = synchronized {
+//    val files = compileFiles()
+//
+//    if (!reporter.hasErrors)
+//      run(files)
+//    else {
+//      println("Errors during compilation of save actions:")
+//      reporter.infos foreach println
+//      reporter.reset()
+//    }
+//  }
+//
+//  def run(files: Seq[String]): Unit = {
+////    val ps = p.allSourceFiles().map(_.getProjectRelativePath())
+//    val cus = p.javaProject.getPackageFragments().flatMap(_.getCompilationUnits())
+//    println(cus.toList)
+////    val folder = p.underlying.getFolder("src")
+////    val root = p.javaProject.getPackageFragmentRoot(folder)
+////    val pkg = root.getPackageFragment("")
+////    val cus = pkg.getCompilationUnits()
+//  }
+//
+//  def compileFiles(): Seq[String] = {
+//    val srcs = p.allSourceFiles() map (_.getLocation().toOSString())
+//    val cmd = new CompilerCommand(srcs.toList, settings)
+//    val run = new compiler.Run()
+//
+//    logger info s"compiling save actions: ${cmd.files}"
+//    run compile cmd.files
+//    cmd.files
+//  }
+//}

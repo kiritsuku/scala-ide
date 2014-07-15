@@ -71,7 +71,7 @@ object ExtensionBuilder extends HasLogger {
     val exts =
       try findExtensions(typecheck(extension), cls)
       catch {
-        case e: Exception =>
+        case e @ (_: Exception | _: AssertionError) =>
           logger.error("Error occurred while typechecking save action.", e)
           Seq()
       }
@@ -80,13 +80,19 @@ object ExtensionBuilder extends HasLogger {
     println("--- extensions")
     exts foreach println
 
-    exts map {
-      case Extension(DocumentSupportBuilder, cls) =>
-        import DocumentSupportBuilder._
-        new DocumentSupportCreator(name, build(extension, name, cls))
-      case Extension(CompilerSupportBuilder, cls) =>
-        import CompilerSupportBuilder._
-        new CompilerSupportCreator(name, build(extension, name, cls))
+    try
+      exts map {
+        case Extension(DocumentSupportBuilder, cls) =>
+          import DocumentSupportBuilder._
+          new DocumentSupportCreator(name, build(extension, name, cls))
+        case Extension(CompilerSupportBuilder, cls) =>
+          import CompilerSupportBuilder._
+          new CompilerSupportCreator(name, build(extension, name, cls))
+      }
+    catch {
+      case e @ (_: Exception | _: AssertionError) =>
+        logger.error("Error occurred while building save action.", e)
+        Seq()
     }
 
   }
