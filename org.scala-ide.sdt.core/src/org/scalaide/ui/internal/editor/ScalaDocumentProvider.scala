@@ -46,10 +46,11 @@ import scala.tools.nsc.interactive.Global
 import org.scalaide.core.internal.extensions.CompilerSupportBuilder
 import org.scalaide.core.internal.extensions.ExtensionBuilder
 import org.scalaide.core.internal.extensions.DocumentSupportBuilder
+import org.scalaide.util.internal.ReflectAccess
 
 class ScalaDocumentProvider extends CompilationUnitDocumentProvider with HasLogger {
 
-  def saveActions(udoc: IDocument): IPostSaveListener = {
+  private def createScalaSaveActionListener(udoc: IDocument): IPostSaveListener = {
     new IPostSaveListener {
       override def getName = "Scala SaveActions"
       override def getId = "Scala SaveActions"
@@ -60,16 +61,14 @@ class ScalaDocumentProvider extends CompilationUnitDocumentProvider with HasLogg
           try compilationUnitSaved(cu, udoc)
           catch {
             case e: Exception =>
-              logger.error("error while executing Scala save actions", e)
+              logger.error("Error while executing Scala save actions", e)
           }
         }
       }
     }
   }
 
-  trait ExtensionType {
-
-  }
+  trait ExtensionType
 
   type ?=>[A, B] = PartialFunction[A, B]
 
@@ -130,37 +129,6 @@ class ScalaDocumentProvider extends CompilationUnitDocumentProvider with HasLogg
   override def createSaveOperation(elem: AnyRef, doc: IDocument, overwrite: Boolean): DocumentProviderOperation = {
     udoc = doc
     super.createSaveOperation(elem, doc, overwrite)
-//    val info = getFileInfo(elem)
-//    info match {
-//      case info: CompilationUnitInfo =>
-//        val cu = info.fCopy
-//        if (cu != null && !JavaModelUtil.isPrimary(cu))
-//          return super.createSaveOperation(elem, doc, overwrite)
-//
-//        if (info.fTextFileBuffer.getDocument() != doc) {
-//          val status = new Status(IStatus.WARNING, EditorsUI.PLUGIN_ID, IStatus.ERROR, "CompilationUnitDocumentProvider_saveAsTargetOpenInEditor", null);
-//          throw new CoreException(status);
-//        }
-//    }
-//
-//    new DocumentProviderOperation {
-//      override def execute(monitor: IProgressMonitor) = {
-//        try commitWorkingCopy(monitor, elem, info.asInstanceOf[CompilationUnitInfo], overwrite)
-//        catch {
-//          case e: Exception =>
-//            logger.error("exception thrown while trying to save document", e)
-//        }
-//      }
-//      override def getSchedulingRule = {
-//        info match {
-//          case info: IFileEditorInput =>
-//            val f = info.fElement.asInstanceOf[IFileEditorInput].getFile()
-//            computeSchedulingRule(f)
-//          case _ =>
-//            null
-//        }
-//      }
-//    }
   }
 
   override def commitWorkingCopy(m: IProgressMonitor, element: AnyRef, info: CompilationUnitInfo, overwrite: Boolean): Unit = {
@@ -179,17 +147,13 @@ class ScalaDocumentProvider extends CompilationUnitDocumentProvider with HasLogg
 
   /**
    * The implementation of this method is copied/adapted from the class
-   * [[org.eclipse.jdt.internal.ui.javaeditor.CompilationUnitDocumentProvider]].
+   * [[org.eclipse.jdt.internal.ui.javaeditor.CompilationUnitDocumentProvider#commitWorkingCopy]].
    *
    * `super.createSaveOperation` is the method that should be overwritten, but
    * this method does too many useful things. I'm afraid when reimplementing
    * it I break too many things.
    */
-  def commitWorkingCopy0(m: IProgressMonitor, element: AnyRef, info: CompilationUnitInfo, overwrite: Boolean): Unit = {
-    val monitor = if (m == null) new NullProgressMonitor() else m
-
-    monitor.beginTask("", 100)
-
+  private def commitWorkingCopy0(monitor: IProgressMonitor, element: AnyRef, info: CompilationUnitInfo, overwrite: Boolean): Unit = {
     val document = info.fTextFileBuffer.getDocument()
     val resource = info.fCopy.getResource()
 
@@ -215,50 +179,25 @@ class ScalaDocumentProvider extends CompilationUnitDocumentProvider with HasLogg
     try {
       fIsAboutToSave = true
 
-      // the Java editor calls [[CleanUpPostSaveListener]] here
-      val listeners =
-        try Array(saveActions(udoc))
-        catch {
-          case e: Exception =>
-            logger.error("error occurred while executing save actions", e)
-            Array[IPostSaveListener]()
-        }
+      // the Java editor calls [[CleanUpPostSaveListener]] here and calculates
+      // changed regions which we don't need
+      val listeners = Array(createScalaSaveActionListener(udoc))
 
-      var changedRegionException: CoreException = null
-      var needsChangedRegions = false
-      try {
-        if (listeners.length > 0)
-          needsChangedRegions = false // XXX original code: SaveParticipantRegistry.isChangedRegionsRequired(info.fCopy)
-      } catch {
-        case ex: CoreException => changedRegionException = ex
-      }
-
-      var changedRegions: Array[IRegion] = null
-      if (needsChangedRegions) {
-        try {
-          changedRegions = EditorUtility.calculateChangedLineRegions(info.fTextFileBuffer, getSubProgressMonitor(monitor, 20))
-        } catch {
-          case ex: CoreException => changedRegionException = ex
-        } finally {
-          subMonitor = getSubProgressMonitor(monitor, 50)
-        }
-      } else
-        subMonitor = getSubProgressMonitor(monitor, if (listeners.length > 0) 70 else 100)
+      subMonitor = getSubProgressMonitor(monitor, if (listeners.length > 0) 70 else 100)
 
       info.fCopy.commitWorkingCopy(overwrite || isSynchronized, subMonitor)
       if (listeners.length > 0)
-        notifyPostSaveListeners(info, changedRegions, listeners, getSubProgressMonitor(monitor, 30))
+        notifyPostSaveListeners(info, Array(), listeners, getSubProgressMonitor(monitor, 30))
 
-      if (changedRegionException != null) {
-        throw changedRegionException
-      }
     } catch {
       // inform about the failure
       case x: JavaModelException =>
         fireElementStateChangeFailed(element)
         if (IJavaModelStatusConstants.UPDATE_CONFLICT == x.getStatus().getCode())
           // convert JavaModelException to CoreException
-          throw new CoreException(new Status(IStatus.WARNING, JavaUI.ID_PLUGIN, IResourceStatus.OUT_OF_SYNC_LOCAL, "CompilationUnitDocumentProvider_error_outOfSync", null))
+          throw new CoreException(new Status(
+              IStatus.WARNING, JavaUI.ID_PLUGIN, IResourceStatus.OUT_OF_SYNC_LOCAL,
+              "The file is not synchronized with the local file system.", null))
         throw x
       case x: CoreException =>
         // inform about the failure
@@ -288,20 +227,20 @@ class ScalaDocumentProvider extends CompilationUnitDocumentProvider with HasLogg
         val markers = r.findMarkers(IMarker.MARKER, true, IResource.DEPTH_ZERO)
         if (markers != null && markers.length > 0) {
           val model = info.fModel.asInstanceOf[AbstractMarkerAnnotationModel]
-          for (i <- 0 until markers.length)
-            model.updateMarker(document, markers(i), null)
+          for (marker <- markers)
+            model.updateMarker(document, marker, null)
         }
       }
     }
   }
 
-  def getSubProgressMonitor(monitor: IProgressMonitor, ticks: Int): IProgressMonitor =
+  private def getSubProgressMonitor(monitor: IProgressMonitor, ticks: Int): IProgressMonitor =
     if (monitor != null)
       new SubProgressMonitor(monitor, ticks, SubProgressMonitor.PREPEND_MAIN_LABEL_TO_SUBTASK)
     else
       new NullProgressMonitor()
 
-  def reflectionAccess[A](name: String)(f: Field => A) = {
+  private def reflectionAccess[A](name: String)(f: Field => A) = {
     try {
       val field = classOf[CompilationUnitDocumentProvider].getDeclaredField(name)
       field.setAccessible(true)
@@ -313,13 +252,13 @@ class ScalaDocumentProvider extends CompilationUnitDocumentProvider with HasLogg
     }
   }
 
-  def fSavePolicy: ISavePolicy =
+  private def fSavePolicy: ISavePolicy =
     reflectionAccess("fSavePolicy")(_.get(this).asInstanceOf[ISavePolicy]).orNull
 
-  def fIsAboutToSave: Boolean =
+  private def fIsAboutToSave: Boolean =
     reflectionAccess("fIsAboutToSave")(_.get(this).asInstanceOf[Boolean]).getOrElse(false)
 
-  def fIsAboutToSave_=(b: Boolean): Unit =
+  private def fIsAboutToSave_=(b: Boolean): Unit =
     reflectionAccess("fIsAboutToSave")(_.set(this, b))
 
 }
