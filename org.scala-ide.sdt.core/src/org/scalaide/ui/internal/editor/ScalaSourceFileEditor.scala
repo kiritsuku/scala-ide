@@ -1,8 +1,13 @@
 package org.scalaide.ui.internal.editor
 
 import java.util.ResourceBundle
-import scala.collection.mutable.ArrayBuffer
+import java.util.concurrent.ConcurrentLinkedQueue
+
+import scala.collection.JavaConverters
+
+import org.eclipse.core.runtime.IAdaptable
 import org.eclipse.core.runtime.IProgressMonitor
+import org.eclipse.jdt.core.dom.AST
 import org.eclipse.jdt.core.dom.CompilationUnit
 import org.eclipse.jdt.internal.ui.javaeditor.CompilationUnitEditor
 import org.eclipse.jdt.internal.ui.javaeditor.JavaSourceViewer
@@ -39,7 +44,9 @@ import org.eclipse.ui.texteditor.ITextEditorActionConstants
 import org.eclipse.ui.texteditor.TextOperationAction
 import org.scalaide.core.internal.ScalaPlugin
 import org.scalaide.core.internal.extensions.SemanticHighlightingParticipants
+import org.scalaide.core.internal.formatter.FormatterPreferences
 import org.scalaide.core.internal.jdt.model.ScalaCompilationUnit
+import org.scalaide.core.internal.jdt.model.ScalaSourceFile
 import org.scalaide.logging.HasLogger
 import org.scalaide.refactoring.internal.OrganizeImports
 import org.scalaide.refactoring.internal.RefactoringHandler
@@ -52,11 +59,9 @@ import org.scalaide.ui.internal.editor.decorators.semantichighlighting.TextPrese
 import org.scalaide.ui.internal.editor.decorators.semantichighlighting.TextPresentationHighlighter
 import org.scalaide.ui.internal.editor.hover.FocusedControlCreator
 import org.scalaide.ui.internal.preferences.EditorPreferencePage
+import org.scalaide.util.Utils
 import org.scalaide.util.eclipse.EclipseUtils
 import org.scalaide.util.ui.DisplayThread
-import org.scalaide.core.internal.jdt.model.ScalaSourceFile
-import org.eclipse.jdt.core.dom.AST
-import org.scalaide.util.Utils
 
 class ScalaSourceFileEditor
     extends CompilationUnitEditor
@@ -397,7 +402,7 @@ class ScalaSourceFileEditor
     }
 
     override def smartBackspaceManager: SmartBackspaceManager =
-      self.getAdapter(classOf[SmartBackspaceManager]).asInstanceOf[SmartBackspaceManager]
+      self.asInstanceOf[IAdaptable].getAdapter(classOf[SmartBackspaceManager]).asInstanceOf[SmartBackspaceManager]
 
     /** Calls auto edits and if they produce no changes the super implementation. */
     override def handleVerifyEvent(e: VerifyEvent): Unit = {
