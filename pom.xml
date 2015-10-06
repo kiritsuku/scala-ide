@@ -160,7 +160,7 @@
         <repo.eclipse>${repo.eclipse.mars}</repo.eclipse>
         <repo.ajdt>${repo.ajdt.mars}</repo.ajdt>
         <jdt.core.version.range>[3.10.0,4.0.0)</jdt.core.version.range>
-        <weaving.hook.plugin.version>2.2.4.e45x-20150610-1700</weaving.hook.plugin.version>
+        <weaving.hook.plugin.version>1.1.100.weaving-hook-20140821</weaving.hook.plugin.version>
       </properties>
     </profile>
 
