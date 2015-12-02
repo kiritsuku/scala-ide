@@ -14,11 +14,14 @@ import scala.concurrent.Future
 import scala.util.Success
 import scala.util.Try
 
+import org.scalaide.debug.internal.BaseDebuggerActor
+import org.scalaide.debug.internal.ScalaDebugPlugin
 import org.scalaide.debug.internal.JdiEventReceiver
 import org.scalaide.debug.internal.model.ClassPrepareListener
 import org.scalaide.debug.internal.model.JdiRequestFactory
 import org.scalaide.debug.internal.model.ScalaDebugTarget
 import org.scalaide.debug.internal.model.ScalaValue
+import org.scalaide.debug.internal.preferences.AsyncDebuggerPreferencePage
 import org.scalaide.logging.HasLogger
 
 import com.sun.jdi.ObjectReference
@@ -30,12 +33,12 @@ import com.sun.jdi.event.ClassPrepareEvent
 import com.sun.jdi.event.Event
 import com.sun.jdi.request.BreakpointRequest
 
-import RetainedStackManager.OrdinalNotSet
-
 /**
  * Installs breakpoints in key places and collect stack frames.
  */
 class RetainedStackManager(debugTarget: ScalaDebugTarget) extends HasLogger {
+  import org.scalaide.debug.internal.launching.ScalaDebuggerConfiguration._
+
   final val MaxEntries = 20000
   private val stackFrames: mutable.Map[ObjectReference, AsyncStackTraces] = {
     import scala.collection.JavaConverters._
@@ -114,19 +117,18 @@ class RetainedStackManager(debugTarget: ScalaDebugTarget) extends HasLogger {
     }
   }
 
-  private val programPoints = List(
-    AsyncProgramPoint("scala.concurrent.Future$", "apply", 0),
-    AsyncProgramPoint("scala.concurrent.package$", "future", 0),
-    AsyncProgramPoint("play.api.libs.iteratee.Cont$", "apply", 0),
-    AsyncProgramPoint("akka.actor.LocalActorRef", "$bang", 0),
-    AsyncProgramPoint("akka.actor.RepointableActorRef", "$bang", 0),
-    AsyncProgramPoint("scala.actors.InternalReplyReactor$class", "$bang", 1))
+  private val programPoints = {
+    val app = ScalaDebugPlugin.plugin.getPreferenceStore.getString(AsyncDebuggerPreferencePage.AsyncProgramPoints)
+    app.split(AsyncDebuggerPreferencePage.DataDelimiter).map(_.split(",")).map {
+      case Array(className, methodName, paramIdx) ⇒ AsyncProgramPoint(className, methodName, paramIdx.toInt)
+    }.toList
+  }
 
   /** Return the saved stackframes for the given future body (if any). */
   def getStackFrameForFuture(future: ObjectReference, messageOrdinal: Int): Option[AsyncStackTrace] =
     stackFrames.get(future).flatMap(_(messageOrdinal))
 
-  def start(): Unit = {
+  def start(): Unit = if (debugTarget.getLaunch.getLaunchConfiguration.getAttribute(LaunchWithAsyncDebugger, false)) {
     for {
       app @ AsyncProgramPoint(clazz, meth, _) <- programPoints
       refType = debugTarget.virtualMachine.classesByName(clazz).asScala

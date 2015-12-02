@@ -26,6 +26,7 @@ import org.scalaide.core.pc.PresentationCompilerRefreshTest
 import org.scalaide.core.pc.PresentationCompilerTest
 import org.scalaide.core.project.DirectoryScalaInstallationTest
 import org.scalaide.core.project.ScalaInstallationTest
+import org.scalaide.core.sbtbuilder.BuildScopeUnitsTest
 import org.scalaide.core.sbtbuilder.DeprecationWarningsTests
 import org.scalaide.core.sbtbuilder.JavaDependsOnScalaBothAreOkTest
 import org.scalaide.core.sbtbuilder.JavaDependsOnScalaTest
@@ -41,6 +42,7 @@ import org.scalaide.core.sbtbuilder.ScalaJavaDepTest
 import org.scalaide.core.sbtbuilder.ScalaJavaDepTicket_1000607Test
 import org.scalaide.core.sbtbuilder.ScalaJavaDepWhenJavaIsWrongTest
 import org.scalaide.core.sbtbuilder.ScalaProjectDependedOnJavaProjectTest
+import org.scalaide.core.sbtbuilder.ScopeCompileConfigurationTest
 import org.scalaide.core.sbtbuilder.ScopeCompileTest
 import org.scalaide.core.sbtbuilder.TodoBuilderTest
 import org.scalaide.core.semantic.HighlightingTestsSuite
@@ -49,6 +51,7 @@ import org.scalaide.core.semantichighlighting.classifier.SymbolClassifierTestSui
 import org.scalaide.core.structurebuilder.ScalaJavaMapperTest
 import org.scalaide.core.structurebuilder.StructureBuilderTest
 import org.scalaide.core.text.TextTestSuite
+import org.scalaide.core.ui.OutlineModelTest
 import org.scalaide.core.ui.ScalaTemplateContextTest
 import org.scalaide.core.ui.UITestSuite
 import org.scalaide.core.ui.completion.CompletionTestSuite
@@ -62,6 +65,7 @@ import org.scalaide.util.internal.eclipse.TextSelectionTest
 @RunWith(classOf[Suite])
 @Suite.SuiteClasses(
   Array(
+    classOf[BuildScopeUnitsTest],
     classOf[ProjectsCleanJobTest],
     classOf[ClasspathTests],
     classOf[ClasspathContainersTests],
@@ -118,6 +122,8 @@ import org.scalaide.util.internal.eclipse.TextSelectionTest
     classOf[ScalaProjectDependedOnJavaProjectTest],
     classOf[NameHashingVulnerabilityTest],
     classOf[JavaDependsOnScalaTest],
-    classOf[JavaDependsOnScalaBothAreOkTest]
+    classOf[JavaDependsOnScalaBothAreOkTest],
+    classOf[ScopeCompileConfigurationTest],
+    classOf[OutlineModelTest]
 ))
 class TestsSuite

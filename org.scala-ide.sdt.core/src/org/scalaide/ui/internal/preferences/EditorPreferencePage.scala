@@ -52,7 +52,7 @@ class EditorPreferencePage extends PreferencePage with IWorkbenchPreferencePage 
     checkBox(P_ENABLE_AUTO_BREAKING_COMMENTS, "Automatically break multi-line comments and Scaladoc after the Print Margin", typing)
 
     val indent = group("Indentation", base)
-    checkBox(P_ENABLE_AUTO_INDENT_ON_TAB, "Enable auto indent when tab is pressed", indent)
+    checkBox(P_ENABLE_AUTO_INDENT_ON_TAB, "Automatically indent when tab is pressed", indent)
     checkBox(P_ENABLE_AUTO_INDENT_MULTI_LINE_STRING, "Enable auto indent for multi line string literals", indent)
     checkBox(P_ENABLE_AUTO_STRIP_MARGIN_IN_MULTI_LINE_STRING, "Automatically add strip margins when multi line string starts with a |", indent)
 
@@ -62,6 +62,9 @@ class EditorPreferencePage extends PreferencePage with IWorkbenchPreferencePage 
 
     val completion = group("Completion", base)
     checkBox(P_ENABLE_HOF_COMPLETION, "Always insert lambdas when completing higher-order functions", completion)
+
+    val outline = group("Outline", base)
+    checkBox(P_INITIAL_IMPORT_FOLD, "Fold import nodes by default", outline)
 }
 
   private def group(text: String, parent: Composite): Group = {
@@ -115,6 +118,7 @@ object EditorPreferencePage {
   final val INDENT_GUIDE_ENABLE = BASE + "indentGuideEnable"
   final val INDENT_GUIDE_COLOR = BASE + "indentGuideColor"
   final val P_ENABLE_HOF_COMPLETION = BASE + "completionAlwaysLambdas"
+  final val P_INITIAL_IMPORT_FOLD = BASE + "initialImportFold"
 }
 
 class EditorPreferenceInitializer extends AbstractPreferenceInitializer {
@@ -139,5 +143,7 @@ class EditorPreferenceInitializer extends AbstractPreferenceInitializer {
 
     store.setDefault(INDENT_GUIDE_ENABLE, false)
     store.setDefault(INDENT_GUIDE_COLOR, "72,72,72")
+
+    store.setDefault(P_INITIAL_IMPORT_FOLD, true)
   }
 }

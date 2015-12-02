@@ -95,11 +95,13 @@ class DeclarationPrinterTest {
       """import java.io._
          private val target1: java.io.File
          protected[pack] val target2: (Int, String)
+         private[pack] val target3: java.io.File
          private[this] object targetObj
          protected def targetM[A, B <: Option[File]](x: B)(y: File*): File
         """,
       List("private val target1: File",
-        "protected[package pack] val target2: (Int, String)",
+        "protected[pack] val target2: (Int, String)",
+        "private[pack] val target3: File",
         "private[this] object targetObj",
         "protected def targetM[A, B <: Option[File]](x: B)(y: File*): File"))
   }
@@ -142,5 +144,83 @@ class DeclarationPrinterTest {
         exp = exp.tail
       }
     }
+    Assert.assertTrue(exp.isEmpty)
+  }
+
+  @Test
+  def testVar(): Unit = {
+    runTestWithMarker(
+      """var a:Int=4
+         def f():Unit = {
+            println(a/**/)
+         }
+         """.stripMargin,
+      "var a: Int")
+  }
+  @Test
+  def testVarAssign(): Unit = {
+    runTestWithMarker(
+      """var a:Int=4
+         def f():Unit = {
+           println(a)
+           a/**/=5
+         }
+         """.stripMargin,
+      "var a: Int")
+  }
+
+  @Test
+  def testVarDeclr(): Unit = {
+    runTestWithMarker(
+      """var a/**/:Int=4
+         def f():Unit = {
+           println(a)
+         }
+         """.stripMargin,
+      "var a: Int")
+  }
+
+  @Test
+  def testModifierVarDeclr(): Unit = {
+    runTestWithMarker(
+      """protected[this] var a/**/:Int=4
+         def f():Unit = {
+           println(a)
+         }
+         """.stripMargin,
+      "protected[this] var a: Int")
+  }
+  private def runTestWithMarker(in: String, expected: String): Unit = {
+    import org.scalaide.core.compiler.IScalaPresentationCompiler.Implicits._
+    import org.eclipse.core.resources.IFile
+    import org.scalaide.core.testsetup.SDTTestUtils._
+    import org.scalaide.util.eclipse.RegionUtils
+    import RegionUtils.RichRegion
+
+    val fullUnit = s"""|package pack
+                       |
+                       |trait Foo {
+                       |  $in
+                       |}
+                       |""".stripMargin
+
+    val offset = fullUnit.indexOf("/**/") - 1
+    changeContentOfFile(unit.getResource().asInstanceOf[IFile], fullUnit)
+    val scalaRegion = new org.eclipse.jface.text.Region(unit.sourceMap(fullUnit.toCharArray()).scalaPos(offset), 1)
+    unit.withSourceFile((file, comp) => {
+      comp.askReload(unit, unit.sourceMap(fullUnit.toCharArray()).sourceFile)
+      val r = scalaRegion.toRangePos(file)
+      val tree = comp.askTypeAt(r).getOption()
+      val tt = tree.get
+      val tpe = tt match {
+        case comp.ValDef(_, _, tpt, _) => tpt.tpe
+        case _ => tt.tpe
+      }
+
+      val result = comp.asyncExec({
+        comp.declPrinter.defString(tt.symbol)(tpe)
+      }).getOrElse("")()
+      Assert.assertEquals(expected, result)
+    })
   }
 }

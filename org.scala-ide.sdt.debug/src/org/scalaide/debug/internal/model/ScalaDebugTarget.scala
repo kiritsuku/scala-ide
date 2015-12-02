@@ -18,6 +18,7 @@ import org.osgi.framework.Version
 import org.scalaide.core.IScalaPlugin
 import org.scalaide.debug.internal.JdiEventReceiver
 import org.scalaide.debug.internal.ScalaSourceLookupParticipant
+import org.scalaide.debug.internal.async.BreakOnDeadLetters
 import org.scalaide.debug.internal.async.RetainedStackManager
 import org.scalaide.debug.internal.breakpoints.ScalaDebugBreakpointManager
 import org.scalaide.debug.internal.hcr.HotCodeReplaceExecutor
@@ -181,7 +182,8 @@ abstract class ScalaDebugTarget private(
   private[debug] val hcrManager: Option[ScalaHotCodeReplaceManager]
   private[debug] val subordinate: ScalaDebugTargetSubordinate
   private[debug] val cache: ScalaDebugCache
-  val retainedStack: RetainedStackManager
+  private[debug] val retainedStack: RetainedStackManager
+  private[debug] val breakOnDeadLetters: BreakOnDeadLetters = new BreakOnDeadLetters(this)
 
   /** Initialize the dependent components
    */
@@ -364,6 +366,7 @@ abstract class ScalaDebugTarget private(
     initializeThreads(virtualMachine.allThreads.asScala.toList)
     retainedStack.start()
     breakpointManager.init()
+    breakOnDeadLetters.start()
     hcrManager.foreach(_.init())
 
     fireChangeEvent(DebugEvent.CONTENT)
@@ -379,6 +382,7 @@ abstract class ScalaDebugTarget private(
       hcrManager.foreach(_.dispose())
       cache.dispose()
       retainedStack.dispose()
+      breakOnDeadLetters.dispose()
       clearAsyncDebugView()
       disposeThreads()
       fireTerminateEvent()

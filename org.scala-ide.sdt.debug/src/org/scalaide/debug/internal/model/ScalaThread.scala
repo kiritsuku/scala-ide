@@ -15,6 +15,7 @@ import org.eclipse.debug.core.model.IBreakpoint
 import org.eclipse.debug.core.model.IStackFrame
 import org.eclipse.debug.core.model.IThread
 import org.scalaide.debug.internal.JDIUtil._
+import org.scalaide.debug.internal.async.StepMessageOut
 import org.scalaide.debug.internal.JDIUtil.safeVmCalls
 import org.scalaide.debug.internal.command.ScalaStep
 import org.scalaide.debug.internal.command.ScalaStepInto
@@ -31,6 +32,8 @@ import com.sun.jdi.ObjectReference
 import com.sun.jdi.ThreadReference
 import com.sun.jdi.VMCannotBeModifiedException
 import com.sun.jdi.Value
+
+import scala.collection.JavaConverters.asScalaBufferConverter
 
 class ThreadNotSuspendedException extends Exception
 
@@ -75,6 +78,10 @@ abstract class ScalaThread private(target: ScalaDebugTarget, val threadRef: Thre
     for (head <- stackFrames.get.headOption) {
       wrapJDIException("Exception while performing `step return`") { ScalaStepReturn(head).step() }
     }
+  }
+
+  def stepMessageOut(): Unit = {
+    (new StepMessageOut(getDebugTarget, this)).step
   }
 
   // Members declared in org.eclipse.debug.core.model.ISuspendResume
